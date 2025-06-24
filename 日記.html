@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簡易日記</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            margin: 7px;
+            background-color: #ffffc4;
+        }
+		header {
+		  background: #55aaaa;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: center;
+		  position: relative;
+		}
+		h1 {
+		  font-size: 20px;
+		  margin: 0;  /* 上下・左右余白は0 */
+		}    	            
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            background-color: #cbe4e4;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: blue;
+        }
+        .input-row {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        .input-row label, .input-row input, .input-row textarea, .input-row button {
+            margin: 5px;
+        }
+        .input-row textarea {
+            font-size: 16px;
+            width: 95%;
+            min-height: 150px;
+            max-height: 300px;
+        }
+        .input-row input {
+            height: 30px;
+            font-size: 16px;
+        }
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        th.date-column, td.date-column {
+		    width: 20%;
+		    max-width: 6ch;  /* 日付部分の幅を調整 */
+		}
+        th.content-column, td.content-column {
+		    width: 50%;
+		    max-width: 10ch; /* 日記内容の部分の幅を調整 */
+		}
+        th.actions-column, td.actions-column {
+	    	width: 30%; /* 操作部分の幅を調整 */
+    	    text-align: center;
+		}
+		td.actions-column button {
+		    display: inline-block; /* インラインブロックで中央寄せ */
+		}
+
+
+        #diaryList {
+            width: 100%;
+        }
+        button {
+            font-size: 14px;
+            padding: 2px 2px;
+            padding: 5px 10px; /* ボタンの余白を調整 */
+            background-color: #f7eeff;
+            color: black;
+            border: 1px solid #0000ff;
+            border-radius: 5px;            
+            cursor: pointer;
+            min-width: 80px;   /* 最小幅を設定 */
+            display: inline-block; /* 横並びにする */
+        }
+        .save-button {
+            padding: 3px 10px;
+            background-color: #ffdbed;
+            border-radius: 5px;
+            cursor: pointer;            
+        }
+
+        .btn-show-text {  /* 3/15に */
+            font-size: 14px;
+            padding: 2px 2px;
+            padding: 3px 5px; /* ボタンの余白を調整 */
+            background-color: #ffe9d2;
+            color: black;
+            border: 1px solid #0000ff;
+            border-radius: 5px;            
+            cursor: pointer;
+            min-width: 60px;   /* 最小幅を設定 */
+            display: inline-block; /* 横並びにする */
+        }
+        
+        #closeList {
+            background-color: #acffd6;
+        }
+        
+		#monthSelection {
+		    display: flex;
+		    gap: 10px; /* `input` と `button` の間に余白をつける */
+		    align-items: center; /* 縦の中央揃え */
+		}
+
+        .custom-alert {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffcccb;
+            color: black;
+            padding: 10px 20px;
+            border: 1px solid red;
+            border-radius: 5px;
+            font-size: 16px;
+            z-index: 1000;
+        }
+        
+	    /* Topボタン：最初は非表示にしておき、スクロールで表示 5/5 */
+	    .top-button {
+	      position: fixed;
+	      bottom: 20px;
+	      left: 50%;
+	      transform: translateX(-50%);
+	      background: #007bff;
+	      color: white;
+	      border: none;
+	      border-radius: 20px;
+	      padding: 10px 20px;
+	      font-size: 16px;
+	      cursor: pointer;
+	      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	      z-index: 9999;
+	      display: none; /* 最初は非表示 */
+	    }
+	    .top-button:hover {
+	      background: #0056b3;
+	    }
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 10px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 5px 10px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	                
+    </style>
+</head>
+<body>
+
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>簡易日記</h1>
+  	</header>
+  	
+<div class="container">	    
+	    <div class="input-row">
+	        <label for="date">日付:</label>
+	        <input type="date" id="date">
+	        <label for="diaryContent">日記:</label>
+	        <textarea id="diaryContent" rows="5"></textarea>
+	        <button class="save-button" onclick="saveDiary()">保存</button>
+	    </div>
+	    <p>日記を表示</p>
+	    <div id="monthSelection">
+			<label for="monthInput">月を選択:</label>
+			<input type="month" id="monthInput">
+	        <button onclick="showSelectedMonth()">表示</button>
+	    </div>
+	    <button id="closeList" onclick="closeDiaryList()" style="display: none;">リストを閉じる</button>
+	    <h2 id="selectedMonth" style="display: none;"></h2>
+	    <div id="diaryList" class="table-container" style="display: none;"></div>
+	</div>
+	<script>
+	    let displayedYear = new Date().getFullYear();
+	    let displayedMonth = new Date().getMonth() + 1;
+
+	    // カスタム通知を表示する関数
+	    function showCustomAlert(message) {
+	        const alertContainer = document.createElement('div');
+	        alertContainer.className = 'custom-alert';
+	        alertContainer.textContent = message;
+
+	        document.body.appendChild(alertContainer);
+
+	        // 5秒後に通知を自動的に消去
+	        setTimeout(() => {
+	            document.body.removeChild(alertContainer);
+	        }, 5000);
+	    }
+
+	        // 日記本文にmm/ddを転送 6/9
+	        // キーはそのまま diary_YYYYMMDD を維持
+	    document.getElementById('date').addEventListener('change', function() {
+	        const selectedDate = this.value;
+	        if (selectedDate) {
+	            const mmdd = selectedDate.slice(5).replace('-', '/'); // mm/dd形式
+	            const diaryContent = document.getElementById('diaryContent');
+	            if (!diaryContent.value.startsWith(mmdd)) { // すでに日付が入っていなければ追加
+	                diaryContent.value = mmdd + ' ' + diaryContent.value; // 半角スペース付きで挿入
+	            }
+	        }
+	    });
+
+	    function saveDiary() {
+	        const date = document.getElementById('date').value;
+	        const diaryContent = document.getElementById('diaryContent').value.trim();
+
+	        if (!date) {
+	            showCustomAlert("日付を選択してください。");
+	            return;
+	        }
+
+	        if (diaryContent.length < 1) {
+	            showCustomAlert("日記内容を入力してください。");
+	            return;
+	        }
+
+	        const key = `diary_${date.replace(/-/g, '')}`;
+	        localStorage.setItem(key, diaryContent);
+	        showCustomAlert("日記が保存されました。");
+
+	        document.getElementById('date').value = '';
+	        document.getElementById('diaryContent').value = '';
+	    }
+
+	    function showSelectedMonth() {
+	        const monthInput = document.getElementById('monthInput').value;
+	        if (!monthInput) {
+	            showCustomAlert("年月を選択してください。");
+	            return;
+	        }
+
+	        const [year, month] = monthInput.split('-').map(Number);
+	        displayedYear = year;
+	        displayedMonth = month;
+			document.getElementById('selectedMonth').innerHTML = `<span>${year}年</span>${month}月`;
+	        document.getElementById('selectedMonth').style.display = 'block';
+	        document.getElementById('monthSelection').style.display = 'none';
+	        document.getElementById('closeList').style.display = 'block';
+
+	        displayDiaries(year, month);
+	    }
+
+	    function closeDiaryList() {
+	        document.getElementById('diaryList').style.display = 'none';
+	        document.getElementById('selectedMonth').style.display = 'none';
+	        document.getElementById('monthSelection').style.display = 'block';
+	        document.getElementById('closeList').style.display = 'none';
+	        clearDetailInputs();
+	    }
+
+		function displayDiaries(year, month) {
+		        const keys = Object.keys(localStorage).filter(key => key.startsWith('diary_'))
+		            .sort((a, b) => {
+		                const dateA = new Date(a.split('_')[1].substring(0, 4), a.split('_')[1].substring(4, 6) - 1, a.split('_')[1].substring(6, 8));
+		                const dateB = new Date(b.split('_')[1].substring(0, 4), b.split('_')[1].substring(4, 6) - 1, b.split('_')[1].substring(6, 8));
+		                return dateA - dateB;
+		            });
+
+	        const diaryList = document.getElementById('diaryList');
+	        diaryList.innerHTML = '';
+
+	        const table = document.createElement('table');
+	        const headerRow = document.createElement('tr');
+	        const dateHeader = document.createElement('th');
+	        dateHeader.textContent = '日付';
+	        const contentHeader = document.createElement('th');
+	        contentHeader.textContent = '日記内容';
+	        const actionsHeader = document.createElement('th');
+	        actionsHeader.textContent = '操作';
+	        headerRow.appendChild(dateHeader);
+	        headerRow.appendChild(contentHeader);
+	        headerRow.appendChild(actionsHeader);
+	        table.appendChild(headerRow);
+
+	        keys.forEach(key => {
+	            const date = key.split('_')[1];
+	            const diaryDate = new Date(
+	                parseInt(date.substring(0, 4)),
+	                parseInt(date.substring(4, 6)) - 1,
+	                parseInt(date.substring(6, 8))
+	            );
+
+	            if (diaryDate.getFullYear() === year && diaryDate.getMonth() + 1 === month) {
+	                const row = document.createElement('tr');
+	                const dateCell = document.createElement('td');
+	                const contentCell = document.createElement('td');
+	                const actionsCell = document.createElement('td');
+	                dateCell.textContent = `${diaryDate.getFullYear()}-${(diaryDate.getMonth() + 1).toString().padStart(2, '0')}-${diaryDate.getDate().toString().padStart(2, '0')}`;
+	                contentCell.textContent = localStorage.getItem(key).substring(0, 40) + '...';
+
+	                const viewButton = document.createElement('button');
+	                viewButton.textContent = '表示';
+	                viewButton.classList.add('btn-show-text'); // クラスを追加
+	                
+	                viewButton.onclick = () => {
+	                    document.getElementById('date').value = dateCell.textContent;
+	                    document.getElementById('diaryContent').value = localStorage.getItem(key);
+	                    window.scrollTo({ top: 0, behavior: 'smooth' }); // ページのトップにスクロール
+	                };
+
+	                actionsCell.appendChild(viewButton);
+	                row.appendChild(dateCell);
+	                row.appendChild(contentCell);
+	                row.appendChild(actionsCell);
+	                table.appendChild(row);
+	            }
+	        });
+
+	        diaryList.appendChild(table);
+	        diaryList.style.display = 'block';
+	    }
+
+	    function clearDetailInputs() {
+	        document.getElementById('date').value = '';
+	        document.getElementById('diaryContent').value = '';
+	    }
+	</script>
+	
+  <!-- スクロールで表示されるTopボタン 5/5 -->
+  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+
+  <!-- JavaScript -->
+  <script>
+    // Topに戻る
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // スクロールしてボタン表示制御
+    window.addEventListener("scroll", function () {
+      const topBtn = document.getElementById("topBtn");
+      if (window.scrollY > 300) {
+        topBtn.style.display = "block";
+      } else {
+        topBtn.style.display = "none";
+      }
+    });
+  </script>
+  	
+	<!-- HTML末尾にこれを追加 5/5 -->
+	<div style="height: 80px;"></div>
+  	
+</body>
+</html>
+

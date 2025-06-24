@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アルコールチェック</title>
+    <style>
+        /* 共通のスタイル */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 15px;
+            background-color: #ffe6ff; /* 背景色 */
+        }
+        .container {
+            max-width: 350px; /* 最大幅を設定 */
+            margin: 20px auto; /* 中央揃え */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+		header {
+		  background: #55aaaa;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: left;
+		  position: relative;
+		}
+		h1 {
+		  font-size: 19px;
+		  margin: 0; /* 上下・右は0 */
+          margin-left: 15px; /* ← 左に15pxの余白 */
+		}
+		
+        label, p {
+            font-size: 15px; /* フォントサイズを設定 */
+        }
+        .label-highlight {
+            color: blue; /* 特定のラベルを青色に設定 */
+            font-weight:bold;
+        }
+        input[type="number"], select, button {
+            font-size: 15px; /* フォントサイズを設定 */
+            padding: 2px;
+            margin: 2px 0;
+            width: 100%; /* 幅を100%に */
+            box-sizing: border-box; /* ボーダーやパディングを含めたサイズに */
+        }
+        .warning {
+            color: red;
+            font-size: 20px;            
+            font-weight:bold;            
+        }
+        .okay {
+            color: blue;
+            font-size: 18px;            
+            font-weight:bold;             
+        }
+
+        .clear-button {
+            font-size: 16px;
+            padding: 2px;
+            margin-top: 10px;
+            width: 40%;
+        }
+        .male-button {
+            color: blue; /* 男性計算ボタンの文字色を青色に設定 */
+        }
+        .female-button {
+            color: red; /* 女性計算ボタンの文字色を赤色に設定 */
+        }
+        /* メディアクエリ：画面幅が600px以下の場合に適用 */
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            input[type="number"], select, button {
+                font-size: 14px;
+                padding: 6px;
+            }
+        }
+        
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 9px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      border: none;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	            
+    </style>
+
+</head>
+<body>
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>アルコールチェック</h1>
+  	</header>
+
+    <div class="container">
+
+        <div>
+            <label for="volume1"><span class="label-highlight">1本目</span> 容量（ml）:</label>
+            <input type="number" id="volume1">
+            <label for="percentage1">アルコール度数（%）:</label>
+            <input type="number" id="percentage1">
+            <p id="weight1">アルコール重量: 0g</p>
+        </div>
+        <div>
+            <label for="volume2"><span class="label-highlight">2本目</span> 容量（ml）:</label>
+            <input type="number" id="volume2">
+            <label for="percentage2">アルコール度数（%）:</label>
+            <input type="number" id="percentage2">
+            <p id="weight2">アルコール重量: 0g</p>
+        </div>
+        <div>
+            <label for="volume3"><span class="label-highlight">3本目</span> 容量（ml）:</label>
+            <input type="number" id="volume3">
+            <label for="percentage3">アルコール度数（%）:</label>
+            <input type="number" id="percentage3">
+            <p id="weight3">アルコール重量: 0g</p>
+        </div>
+        <button class="male-button" onclick="calculate('male')">男性計算</button>
+        <button class="female-button" onclick="calculate('female')">女性計算</button>
+        <p id="totalWeight">アルコール重量の総計: 0g</p>
+        <p id="result"></p>
+        <button class="clear-button" onclick="clearFields()">消去</button>
+    </div>
+
+    <audio id="cautionAudio" src="注意.mp3" preload="auto"></audio>
+
+    <script>
+        function calculateWeight(volume, percentage) {
+            return volume * (percentage / 100) * 0.8; // アルコールの比重を0.8と仮定
+        }
+
+		// 既存の音声再生関数
+		function speakText(text) {
+		   if ('speechSynthesis' in window) {
+		       const utterance = new SpeechSynthesisUtterance(text);
+		       window.speechSynthesis.speak(utterance);
+		   } else {
+		       alert("音声合成がサポートされていません");
+		   }
+		}
+
+		// 新しい音声合成関数
+		function nativeSpeak(text) {
+		   if (typeof Android !== 'undefined' && Android.speak) {
+		       Android.speak(text);
+		   } else {
+		       speakText(text); // Android.speakが使用できない場合はブラウザの音声合成を使用
+		   }
+		}
+
+
+        function playCaution() {
+            document.getElementById('cautionAudio').play();
+        }
+
+        function calculate(gender) {
+            const volume1 = parseFloat(document.getElementById('volume1').value) || 0;
+            const percentage1 = parseFloat(document.getElementById('percentage1').value) || 0;
+            const weight1 = calculateWeight(volume1, percentage1);
+            document.getElementById('weight1').innerText = `アルコール重量: ${weight1.toFixed(2)}g`;
+
+            const volume2 = parseFloat(document.getElementById('volume2').value) || 0;
+            const percentage2 = parseFloat(document.getElementById('percentage2').value) || 0;
+            const weight2 = calculateWeight(volume2, percentage2);
+            document.getElementById('weight2').innerText = `アルコール重量: ${weight2.toFixed(2)}g`;
+
+            const volume3 = parseFloat(document.getElementById('volume3').value) || 0;
+            const percentage3 = parseFloat(document.getElementById('percentage3').value) || 0;
+            const weight3 = calculateWeight(volume3, percentage3);
+            document.getElementById('weight3').innerText = `アルコール重量: ${weight3.toFixed(2)}g`;
+
+            const totalWeight = weight1 + weight2 + weight3;
+            document.getElementById('totalWeight').innerText = `アルコール重量の総計: ${totalWeight.toFixed(2)}g`;
+
+            let limit = gender === 'male' ? 40 : 20;
+            const resultElement = document.getElementById('result');
+            if (totalWeight > limit) {
+                playCaution();
+                const warningText = "問題ありです。控えめに !!";
+                resultElement.innerHTML = `<span class='warning'>${warningText}</span>`;
+                nativeSpeak(warningText);
+            } else {
+                const okayText = "なんとか許容量です。";
+                resultElement.innerHTML =  `<span class='okay'>${okayText}</span>`;
+                nativeSpeak(okayText);
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('volume1').value = '';
+            document.getElementById('percentage1').value = '';
+            document.getElementById('volume2').value = '';
+            document.getElementById('percentage2').value = '';
+            document.getElementById('volume3').value = '';
+            document.getElementById('percentage3').value = '';
+            document.getElementById('weight1').innerText = 'アルコール重量: 0g';
+            document.getElementById('weight2').innerText = 'アルコール重量: 0g';
+            document.getElementById('weight3').innerText = 'アルコール重量: 0g';
+            document.getElementById('totalWeight').innerText = 'アルコール重量の総計: 0g';
+            document.getElementById('result').innerText = '';
+        }
+    </script>
+</body>
+</html>

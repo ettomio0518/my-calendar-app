@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- ドキュメントの文字エンコーディングを指定 -->
+    <meta charset="UTF-8">
+    
+    <!-- ページの表示方法に関する情報をブラウザに提供する -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ページのタイトルを設定 -->
+    <title>度量衡 </title>
+    
+    <!-- スタイルシートの設定 -->
+    <style>
+        /* body要素に適用されるスタイル */
+        body {
+            font-family: Arial, sans-serif; /* 使用するフォントを指定 */
+            margin: 20px; /* 周囲の余白を設定 */
+            background-color: #cbe4e4; /* 背景色 */             
+        }
+
+        /* コンテナクラスに適用されるスタイル */
+        .container {
+            max-width: 100%; /* 最大幅を100%に設定 */
+            margin: 5px auto; /* 上下左右の余白を設定 */
+        }
+
+		header {
+		  background: #55aaaa;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: center;
+		  position: relative;
+		}
+		
+        /* タイトルや見出しのスタイル */		
+		h1 {
+		  font-size: 20px;
+		  margin: 0;
+		}    	   
+		
+	    /* ボタン全体のスタイル-ChatGPT */
+	    button {
+	        font-size: 16px; /* 文字サイズ */
+	        padding: 5px 20px; /* ボタンの内側の余白 */
+	        margin: 5px; /* ボタン周りの余白 */
+	        border-radius: 5px; /* ボタンの角を丸める */
+	        background-color: #f7eeff; /* ボタンの背景色 */
+	        color: black; /* ボタンの文字色 */
+            border: 1px solid #0000ff;  /* 枠線を表示 */
+	        cursor: pointer; /* カーソルをポインタに */
+	    }
+	    
+	    /* ボタンにホバーしたときの効果 */
+	    button:hover {
+	        background-color: #e7e7cf; /* ホバー時の色 */
+	    }
+        
+        /* テーブルのスタイル */
+        table {
+            width: 100%; /* テーブルの幅を100%に設定 */
+            border-collapse: collapse; /* ボーダーを折りたたむ */
+            margin-top: 5px; /* 上部の余白を設定 */
+        }
+
+        /* テーブルヘッダーとデータセルのスタイル */
+        th, td {
+            font-size: 18px; /* フォントサイズを設定 */
+            padding: 10px; /* 内側の余白を設定 */
+            text-align: left; /* テキストを左揃えに設定 */
+            border: 1px solid black; /* セルの境界線を設定 */
+            vertical-align: middle; /* テキストを縦の中央に揃える */
+        }
+
+        /* テーブルヘッダーの背景色を設定 */
+        th {
+            background-color: #f2f2f2; /* 背景色を薄いグレーに設定 */
+        }
+
+        h2 {
+            font-size: 18px; /* 文字サイズを設定 */
+            margin: 2px 0;
+        }
+        
+        /* 数値入力欄のスタイル */
+        input[type="number"] {
+            font-size: 16px; /* フォントサイズを設定 */
+            padding: 8px;
+            margin: 10px 0;
+            width: 100px;
+        }
+        /* 選択リストのスタイル */
+        select {
+            font-size: 16px; /* フォントサイズを設定 */
+            padding: 8px;
+            margin: 10px 0;
+        }
+        
+        /* メディアクエリ：画面幅が600px以下の場合に適用されるスタイル */
+        @media (max-width: 600px) {
+            /* body要素に適用されるスタイル */
+            body {
+                font-size: 16px; /* フォントサイズを12pxに設定 */
+            }
+
+            /* ホームボタンのスタイル */
+            .home-button {
+                font-size: 16px; /* フォントサイズを12pxに設定 */
+                padding: 6px 10px; /* 内側の余白を小さく設定 */
+            }
+
+            /* テーブルヘッダーとデータセルのスタイル */
+            th, td {
+                font-size: 16px; /* フォントサイズを12pxに設定 */
+                padding: 6px; /* 内側の余白を小さく設定 */
+            }
+        }
+        
+	    /* Topボタン：最初は非表示にしておき、スクロールで表示 5/5 */
+	    .top-button {
+	      position: fixed;
+	      bottom: 20px;
+	      left: 50%;
+	      transform: translateX(-50%);
+	      background: #007bff;
+	      color: white;
+	      border: none;
+	      border-radius: 20px;
+	      padding: 10px 20px;
+	      font-size: 16px;
+	      cursor: pointer;
+	      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	      z-index: 9999;
+	      display: none; /* 最初は非表示 */
+	    }
+	    .top-button:hover {
+	      background: #0056b3;
+	    }
+
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute; /* 絶対位置を指定 */
+	      top: 5px; /* 上からの距離を指定 */
+	      right: 10px; /* 右からの距離を指定 */
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px; /* 内側の余白を設定 */
+	      font-size: 14px; /* フォントサイズを設定 */
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	            
+    </style>
+</head>
+
+<body>
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>度量衡</h1>
+  	</header>
+
+    <div class="container">
+    	<br>
+        <h1>長さの換算</h1>
+        <label for="lengthValue">数値:</label>
+        <input type="number" id="lengthValue" step="any">
+        <label for="lengthUnit">単位:</label>
+        <select id="lengthUnit">
+            <option value="m">m</option>
+            <option value="km">km</option>
+            <option value="in">in</option>
+            <option value="ft">ft</option>
+            <option value="yd">yd</option>
+            <option value="mile">mile</option>
+            <option value="寸">寸</option>
+            <option value="尺">尺</option>
+            <option value="海里">海里</option>
+        </select>
+        <button onclick="convertLength()">換算</button>
+        <button onclick="clearFields('length')">消去</button>
+        <div class="result">
+            <table>
+                <thead>
+                    <tr>
+                        <th>単位</th>
+                        <th>換算結果</th>
+                    </tr>
+                </thead>
+                <tbody id="lengthResults"></tbody>
+            </table>
+        </div>
+    </div>
+	<br>
+	
+    <div class="container">
+        <h1>面積換算</h1>
+        <label for="areaValue">数値:</label>
+        <input type="number" id="areaValue" step="any">
+        <label for="areaUnit">単位:</label>
+        <select id="areaUnit">
+            <option value="m2">m²</option>
+            <option value="a">a</option>
+            <option value="ha">ha</option>
+            <option value="km2">km²</option>
+            <option value="yd2">yd²</option>
+            <option value="ac">ac</option>
+            <option value="坪">坪</option>
+            <option value="反">反</option>
+            <option value="町">町</option>
+        </select>
+        <button onclick="convertArea()">換算</button>
+        <button onclick="clearFields('area')">消去</button>
+        <div class="result">
+            <table>
+                <thead>
+                    <tr>
+                        <th>単位</th>
+                        <th>換算結果</th>
+                    </tr>
+                </thead>
+                <tbody id="areaResults"></tbody>
+            </table>
+        </div>
+    </div>
+	<br>
+	
+    <div class="container">
+        <h1>容積換算</h1>
+        <label for="volumeValue">数値:</label>
+        <input type="number" id="volumeValue" step="any">
+        <label for="volumeUnit">単位:</label>
+        <select id="volumeUnit">
+            <option value="cm3">cm³</option>
+            <option value="m3">m³</option>
+            <option value="dl">dl</option>
+            <option value="l">l</option>
+            <option value="gal(US)">gal(US)</option>
+            <option value="勺">勺</option>
+            <option value="合">合</option>
+            <option value="升">升</option>
+            <option value="斗">斗</option>
+        </select>
+        <button onclick="convertVolume()">換算</button>
+        <button onclick="clearFields('volume')">消去</button>
+        <div class="result">
+            <table>
+                <thead>
+                    <tr>
+                        <th>単位</th>
+                        <th>換算結果</th>
+                    </tr>
+                </thead>
+                <tbody id="volumeResults"></tbody>
+            </table>
+        </div>
+    </div>
+	<br>
+	
+    <div class="container">
+        <h1>重量換算</h1>
+        <label for="weightValue">数値:</label>
+        <input type="number" id="weightValue" step="any">
+        <label for="weightUnit">単位:</label>
+        <select id="weightUnit">
+            <option value="mg">mg</option>
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="t">t</option>
+            <option value="ct(カラット)">ct(カラット)</option>
+            <option value="oz(オンス)">oz(オンス)</option>
+            <option value="lb(ポンド)">lb(ポンド)</option>
+            <option value="貫">貫</option>
+        </select>
+        <button onclick="convertWeight()">換算</button>
+        <button onclick="clearFields('weight')">消去</button>
+        <div class="result">
+            <table>
+                <thead>
+                    <tr>
+                        <th>単位</th>
+                        <th>換算結果</th>
+                    </tr>
+                </thead>
+                <tbody id="weightResults"></tbody>
+            </table>
+        </div>
+    </div>
+	<br>
+
+	<div class="container">
+	    <h1>温度換算</h1>
+	    <label for="temperatureValue">数値:</label>
+	    <input type="number" id="temperatureValue" step="any">
+	    <label for="temperatureUnit">単位:</label>
+	    <select id="temperatureUnit">
+	        <option value="K">K (ケルビン)</option>
+	        <option value="C">℃ (摂氏)</option>
+	        <option value="F">℉ (華氏)</option>
+	    </select>
+	    <button onclick="convertTemperature()">換算</button>
+	    <button onclick="clearFields('temperature')">消去</button>
+	    <div class="result">
+	        <table>
+	            <thead>
+	                <tr>
+	                    <th>単位</th>
+	                    <th>換算結果</th>
+	                </tr>
+	            </thead>
+	            <tbody id="temperatureResults"></tbody>
+	        </table>
+	    </div>
+    </div>    
+    <br>
+
+<div class="container">
+    <h1>圧力換算</h1>
+    <label for="pressureValue">数値:</label>
+    <input type="number" id="pressureValue" step="any">
+    <label for="pressureUnit">単位:</label>
+    <select id="pressureUnit">
+        <option value="Pa">Pa (パスカル)</option>
+        <option value="hPa">hPa (ヘクトパスカル,mbar)</option>
+        <option value="mmHg">mmHg (ミリ水銀柱)</option>
+        <option value="atm">atm (標準大気圧)</option>
+    </select>
+    <button onclick="convertPressure()">換算</button>
+    <button onclick="clearFields('pressure')">消去</button>
+    <div class="result">
+		    <table>
+		        <thead>
+		            <tr>
+		                <th>単位</th>
+		                <th>換算結果</th>
+		            </tr>
+		        </thead>
+		        <tbody id="pressureResults"></tbody>
+		    </table>
+		</div>
+	</div>
+    <br>
+
+<script>
+
+function clearFields(type) {
+    document.getElementById(`${type}Value`).value = '';
+    document.getElementById(`${type}Results`).innerHTML = '';
+}
+    function convertLength() {
+        let value = parseFloat(document.getElementById('lengthValue').value);
+        let unit = document.getElementById('lengthUnit').value;
+        let results = document.getElementById('lengthResults');
+        results.innerHTML = '';
+
+        const conversions = {
+            'm': 1,
+            'km': 1000,
+            'in': 0.0254,
+            'ft': 0.3048,
+            'yd': 0.9144,
+            'mile': 1609.344,
+            '寸': 0.0303,
+            '尺': 0.303,
+            '海里': 1852
+        };
+
+        for (let key in conversions) {
+            let converted = (value * conversions[unit]) / conversions[key];
+            results.innerHTML += `<tr><td>${key}</td><td>${converted.toFixed(6)}</td></tr>`;
+        }
+    }
+
+    function convertArea() {
+        let value = parseFloat(document.getElementById('areaValue').value);
+        let unit = document.getElementById('areaUnit').value;
+        let results = document.getElementById('areaResults');
+        results.innerHTML = '';
+
+        const conversions = {
+                'm2': 1,
+                'a': 100,
+                'ha': 10000,
+                'km2': 1000000,
+                'yd2': 0.836127,
+                'ac': 4046.8564224,
+                '坪': 3.305785,
+                '反': 300 * 3.305785,
+                '町': 10 * 300 * 3.305785
+        };
+
+        for (let key in conversions) {
+            let converted = (value * conversions[unit]) / conversions[key];
+            results.innerHTML += `<tr><td>${key}</td><td>${converted.toFixed(6)}</td></tr>`;
+        }
+    }
+
+    function convertVolume() {
+        let value = parseFloat(document.getElementById('volumeValue').value);
+        let unit = document.getElementById('volumeUnit').value;
+        let results = document.getElementById('volumeResults');
+        results.innerHTML = '';
+
+        const conversions = {
+                'cm3': 1,
+                'm3': 1000000,
+                'dl': 100,
+                'l': 1000,
+                'gal(US)': 3785.41,
+                '勺': 18.0390798626,
+                '合': 180.390798626,
+                '升': 1803.90798626,
+                '斗': 18039.0798626
+        };
+
+        for (let key in conversions) {
+            let converted = (value * conversions[unit]) / conversions[key];
+            results.innerHTML += `<tr><td>${key}</td><td>${converted.toFixed(6)}</td></tr>`;
+        }
+    }
+
+    function convertWeight() {
+        let value = parseFloat(document.getElementById('weightValue').value);
+        let unit = document.getElementById('weightUnit').value;
+        let results = document.getElementById('weightResults');
+        results.innerHTML = '';
+
+        const conversions = {
+                'mg': 1,
+                'g': 1000,
+                'kg': 1000000,
+                't': 1000000000,
+                'ct(カラット)': 200,
+                'oz(オンス)': 28349.5231,
+                'lb(ポンド)': 453592.37,
+                '貫': 3750000
+        };
+
+        for (let key in conversions) {
+            let converted = (value * conversions[unit]) / conversions[key];
+            results.innerHTML += `<tr><td>${key}</td><td>${converted.toFixed(6)}</td></tr>`;
+        }
+    }
+
+    function convertTemperature() {
+        let value = parseFloat(document.getElementById('temperatureValue').value);
+        let unit = document.getElementById('temperatureUnit').value;
+        let results = document.getElementById('temperatureResults');
+        results.innerHTML = '';
+
+        let kelvin, celsius, fahrenheit;
+
+        if (unit === 'K') {
+            kelvin = value;
+            celsius = value - 273.15;
+            fahrenheit = (value - 273.15) * 9/5 + 32;
+        } else if (unit === 'C') {
+            celsius = value;
+            kelvin = value + 273.15;
+            fahrenheit = (value * 9/5) + 32;
+        } else if (unit === 'F') {
+            fahrenheit = value;
+            celsius = (value - 32) * 5/9;
+            kelvin = (value - 32) * 5/9 + 273.15;
+        }
+
+        results.innerHTML += `<tr><td>K</td><td>${kelvin.toFixed(2)}</td></tr>`;
+        results.innerHTML += `<tr><td>℃</td><td>${celsius.toFixed(2)}</td></tr>`;
+        results.innerHTML += `<tr><td>℉</td><td>${fahrenheit.toFixed(2)}</td></tr>`;
+    }
+
+
+    function convertPressure() {
+        const value = parseFloat(document.getElementById("pressureValue").value);
+        const unit = document.getElementById("pressureUnit").value;
+        const results = {};
+
+        if (isNaN(value)) {
+            alert("数値を入力してください。");
+            return;
+        }
+
+        // 圧力換算公式
+        if (unit === "Pa") {
+            results["Pa (パスカル)"] = value;
+            results["hPa (ヘクトパスカル,mbar)"] = value / 100;
+            results["mmHg (ミリ水銀柱)"] = value / 133.322;
+            results["atm (標準大気圧)"] = value / 101325;
+        } else if (unit === "hPa") {
+            results["Pa (パスカル)"] = value * 100;
+            results["hPa (ヘクトパスカル,mbar)"] = value;
+            results["mmHg (ミリ水銀柱)"] = value / 1.33322;
+            results["atm (標準大気圧)"] = value / 1013.25;
+        } else if (unit === "mmHg") {
+            results["Pa (パスカル)"] = value * 133.322;
+            results["hPa (ヘクトパスカル,mbar)"] = value * 1.33322;
+            results["mmHg (ミリ水銀柱)"] = value;
+            results["atm (標準大気圧)"] = value / 760;
+        } else if (unit === "atm") {
+            results["Pa (パスカル)"] = value * 101325;
+            results["hPa (ヘクトパスカル,mbar)"] = value * 1013.25;
+            results["mmHg (ミリ水銀柱)"] = value * 760;
+            results["atm (標準大気圧)"] = value;
+        }
+
+        // 結果を表示
+        const tbody = document.getElementById("pressureResults");
+        tbody.innerHTML = ""; // 結果をクリア
+        for (const [key, val] of Object.entries(results)) {
+            const row = document.createElement("tr");
+            const unitCell = document.createElement("td");
+            const valueCell = document.createElement("td");
+
+            unitCell.textContent = key;
+            valueCell.textContent = val.toFixed(3); // 小数点以下3桁まで表示
+
+            row.appendChild(unitCell);
+            row.appendChild(valueCell);
+            tbody.appendChild(row);
+        }
+    }
+
+</script>
+
+	  <!-- スクロールで表示されるTopボタン 5/5 -->
+	  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+
+	  <!-- JavaScript -->
+	  <script>
+	    // Topに戻る
+	    function scrollToTop() {
+	      window.scrollTo({
+	        top: 0,
+	        behavior: 'smooth'
+	      });
+	    }
+
+	    // スクロールしてボタン表示制御
+	    window.addEventListener("scroll", function () {
+	      const topBtn = document.getElementById("topBtn");
+	      if (window.scrollY > 300) {
+	        topBtn.style.display = "block";
+	      } else {
+	        topBtn.style.display = "none";
+	      }
+	    });
+	  </script>
+	  	
+		<!-- HTML末尾にこれを追加 5/5 -->
+		<div style="height: 80px;"></div>
+	  	
+</body>
+</html>
+

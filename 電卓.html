@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高機能電卓</title>
+    <style>
+        /* スタイリング */
+        .calculator-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .calculator {
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #333;
+            border-radius: 8px;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+            background-color: #d0d0ff; /* 背景色 */
+        }
+        .display {
+            width: 100%;
+            height: 40px;
+            font-size: 1.7em;
+            text-align: right;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #e8ffe8; /* 背景色 */
+        }
+        
+		header {
+		  background: #55aaaa;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: center;
+		  position: relative;
+		}
+		h1 {
+		  font-size: 20px;
+		  margin: 0;
+		}    	
+		        
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+        .button {
+            width: 100%;
+            height: 55px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        .history {
+            margin-top: 10px;
+            max-height: 180px;
+            overflow-y: scroll;
+            font-size: 0.9em;
+            color: #666;
+        }
+        /* スクロールバーのスタイル */
+        .history::-webkit-scrollbar {
+            width: 16px; /* スクロールバーの幅 */
+        }
+        .history::-webkit-scrollbar-thumb {
+            background-color: #888; /* スクロールバーの色 */
+            border-radius: 8px; /* 丸みを追加 */
+            border: 4px solid transparent; /* 周りに余白を追加 */
+            background-clip: content-box; /* 背景の切り取り */
+        }
+        .history::-webkit-scrollbar-thumb:hover {
+            background-color: #555; /* ホバー時の色 */
+        }
+        .history::-webkit-scrollbar-track {
+            background-color: #ccc; /* 背景の色 */
+            border-radius: 8px; /* 丸みを追加 */
+        }
+        .history-item {
+            padding: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        body {
+            background-color: #cbe4e4; /* 背景色 */
+        }
+
+        button {
+            font-size: 18px; /* フォントサイズ */
+            padding: 3px 10px; /* 内側余白 */
+            margin: 1px; /* 周囲の余白 */
+            border-radius: 5px; /* 角を丸くする */
+            background-color: #ccffff; /* 背景色 */
+            color: black; /* 文字色 */
+    		border: 1px solid black; /* 枠線を表示 */
+            cursor: pointer; /* カーソルをポインタに変更 */
+        }
+
+		.history-text {
+		    color: blue;
+		    font-weight: bold;
+		}
+
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 10px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	    
+    </style>
+</head>
+<body>
+
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>簡易電卓</h1>
+  	</header>
+  	
+<div class="calculator-container">
+    <div class="calculator">
+        <input type="text" id="display" class="display" readonly>
+        <div class="buttons">
+            <button class="button" onclick="clearDisplay()">C</button>
+            <button class="button" onclick="backspace()">←</button>
+            <button class="button" onclick="setOperator('**')">x²</button>
+            <button class="button" onclick="setOperator('sqrt')">√</button>
+
+            <button class="button" onclick="appendNumber('7')">7</button>
+            <button class="button" onclick="appendNumber('8')">8</button>
+            <button class="button" onclick="appendNumber('9')">9</button>
+            <button class="button" onclick="setOperator('/')">÷</button>
+
+            <button class="button" onclick="appendNumber('4')">4</button>
+            <button class="button" onclick="appendNumber('5')">5</button>
+            <button class="button" onclick="appendNumber('6')">6</button>
+            <button class="button" onclick="setOperator('*')">×</button>
+
+            <button class="button" onclick="appendNumber('1')">1</button>
+            <button class="button" onclick="appendNumber('2')">2</button>
+            <button class="button" onclick="appendNumber('3')">3</button>
+            <button class="button" onclick="setOperator('-')">-</button>
+
+            <button class="button" onclick="appendNumber('0')">0</button>
+            <button class="button" onclick="appendDecimal()">.</button>
+            <button class="button" onclick="calculate()">=</button>
+            <button class="button" onclick="setOperator('+')">+</button>
+        </div>
+        <div class="history" id="history"></div>
+    </div>
+
+</div>
+
+<script>
+    let display = document.getElementById('display');
+    let history = document.getElementById('history');
+    let currentInput = '';
+    let operator = '';
+    let previousInput = '';
+    let decimalAdded = false;
+
+    function appendNumber(number) {
+        currentInput += number;
+        display.value = currentInput;
+    }
+
+    function appendDecimal() {
+        if (!decimalAdded) {
+            currentInput += '.';
+            display.value = currentInput;
+            decimalAdded = true;
+        }
+    }
+
+    function setOperator(op) {
+        if (currentInput === '') return;
+        if (op === 'sqrt') {
+            const originalValue = currentInput; // ルートを取る前の値
+            currentInput = roundResult(Math.sqrt(parseFloat(currentInput))).toString();
+            display.value = currentInput;
+            addHistory(`√${originalValue} = ${currentInput}`);
+        } else if (op === '**') {
+            const originalValue = currentInput; // 2乗する前の値
+            const squared = Math.pow(parseFloat(currentInput), 2);
+            currentInput = roundResult(squared).toString();
+            display.value = currentInput;
+            addHistory(`${originalValue}² = ${currentInput}`);
+        } else {
+            if (operator) calculate();
+            operator = op;
+            previousInput = currentInput;
+            currentInput = '';
+            decimalAdded = false;
+        }
+    }
+
+    function calculate() {
+        if (previousInput === '' || currentInput === '') return;
+        let result;
+        switch (operator) {
+            case '+':
+                result = parseFloat(previousInput) + parseFloat(currentInput);
+                break;
+            case '-':
+                result = parseFloat(previousInput) - parseFloat(currentInput);
+                break;
+            case '*':
+                result = parseFloat(previousInput) * parseFloat(currentInput);
+                break;
+            case '/':
+                result = parseFloat(previousInput) / parseFloat(currentInput);
+                break;
+            default:
+                result = parseFloat(currentInput);
+        }
+        result = roundResult(result);
+        display.value = result;
+        addHistory(`${previousInput} ${operator} ${currentInput} = ${display.value}`);
+        currentInput = result.toString();
+        previousInput = '';
+        operator = '';
+        decimalAdded = currentInput.includes('.');
+    }
+
+    function clearDisplay() {
+        currentInput = '';
+        previousInput = '';
+        operator = '';
+        display.value = '';
+        decimalAdded = false;
+    }
+
+    function backspace() {
+        currentInput = currentInput.slice(0, -1);
+        display.value = currentInput;
+        decimalAdded = currentInput.includes('.');
+    }
+
+	function addHistory(entry) {
+	    let historyItem = document.createElement('div');
+	    historyItem.classList.add('history-item');
+	    historyItem.innerHTML = `<span class="history-text">${entry}</span>`;
+	    history.appendChild(historyItem);
+	    history.scrollTop = history.scrollHeight;
+	}
+
+
+    // 計算結果を丸める関数（希望の小数点以下桁数に丸める）
+    function roundResult(value, precision = 10) {
+        const factor = Math.pow(10, precision); // 小数点以下を希望の桁数まで整数化
+        return Math.round(value * factor) / factor; // 整数化後に丸めて元の桁数に戻す
+    }
+</script>
+
+</body>
+</html>

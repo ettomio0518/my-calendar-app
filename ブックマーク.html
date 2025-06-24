@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブックマーク</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+		body {
+		    font-family: Arial, sans-serif;
+		    font-size: 18px;
+		    margin: 7px;
+		    background-color: #ffffc4;
+		}
+
+		.container {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: flex-start; /* 左寄せにする */
+		    padding: 20px;
+		    max-width: 600px;
+		    margin: auto;
+		    background-color: #cbe4e4;
+		}
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            margin: 7px;
+            background-color: #ffffc4;
+        }
+		header {
+		  background: #55aaaa;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: center;
+		  position: relative;
+		}
+		h1 {
+		  font-size: 20px;
+		  margin: 0;
+		}    	            
+
+		.input-row {
+		    display: flex;
+		    align-items: center;
+		    margin-bottom: 10px;
+		    width: 100%;
+		}
+
+		.input-row label {
+		    margin-right: 10px;
+		}
+
+		#siteName {
+		    width: 85%; /* ここでサイト名入力ボックスの幅を設定 */
+		    height: 30px;
+		    font-size: 16px;
+		    padding: 5px;
+		}
+
+		#siteUrl {
+		    width: 100%; /* ここでURL入力ボックスの幅を設定 */
+		    height: 30px;
+		    font-size: 16px;
+		    padding: 5px;
+		}
+
+		#category {
+		    font-size: 16px;
+		    padding: 5px;
+		    margin-bottom: 10px;
+		    width: auto;
+		    height: auto;
+		}
+
+		button {
+		    font-size: 16px;
+            padding: 3px 5px; /* 内側の余白を設定 */
+		    margin: 5px;
+		    border-radius: 5px;
+		    background-color: #ffdbed;
+		    color: black;
+		    border: 1px solid #0000ff;
+		    cursor: pointer;
+		}
+		
+		.save-button {
+            padding: 3px 12px; /* 内側の余白を設定 */		
+		    background-color: #ffcc99; /* 保存ボタンの独自の色 */
+		    align-self: flex-start; /* 左寄せにする */
+		}
+
+		.toggle-button {
+		    background-color: #ceffce; /* 「リストを開く」ボタンの色 */
+            padding: 3px 12px; /* 内側の余白を設定 */				    
+		}
+
+		.toggle-button.list-closed {
+		    background-color: #add8e6; /* 「リストを閉じる」ボタンの独自の色 */
+		}
+
+		.visit-button {
+		    background-color: #daffb5; /* 「移動」ボタンの独自の色 */
+		}
+
+		.output-row {
+		    display: flex;
+		    flex-direction: row;
+		    justify-content: space-between;
+		    padding: 10px;
+		    border-bottom: 1px solid #ddd;
+		    width: 100%;
+		}
+
+		.output-row .site-name {
+		    flex: 1;
+		    margin-right: 10px;
+		}
+
+		.output-row .actions {
+		    display: flex;
+		    gap: 5px;
+		}
+
+		.list-container {
+		    width: 100%;
+		}
+
+		.category-list {
+		    margin-top: 20px;
+		}
+
+	    /* Topボタン：最初は非表示にしておき、スクロールで表示 5/5 */
+	    .top-button {
+	      position: fixed;
+	      bottom: 20px;
+	      left: 50%;
+	      transform: translateX(-50%);
+	      background: #007bff;
+	      color: white;
+	      border: none;
+	      border-radius: 20px;
+	      padding: 10px 20px;
+	      font-size: 16px;
+	      cursor: pointer;
+	      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	      z-index: 9999;
+	      display: none; /* 最初は非表示 */
+	    }
+	    .top-button:hover {
+	      background: #0056b3;
+	    }
+
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 5px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	    	    
+    </style>
+</head>
+
+<body>
+
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>ブックマーク</h1>
+  	</header>
+
+    <div class="container">
+        <p>サイト名とアドレスを入力してください。</p>
+        <div class="input-row">
+            <label for="siteName">サイト名:</label>
+        </div>
+        <input type="text" id="siteName">
+        <br>
+        <label for="siteUrl">ウェブサイトのアドレスを入力してください:</label>
+        <input type="text" id="siteUrl" placeholder="アドレスを入力してください">
+
+        <br>
+        <label for="category">カテゴリー:</label>
+		<select id="category">
+		    <option value="1">ニュース</option>
+		    <option value="2">天気</option>
+		    <option value="3">仕事・学習</option>
+		    <option value="4">趣味</option>
+		    <option value="5">その他</option>
+		</select>
+        <br>
+        <button class="save-button" onclick="addBookmark()">保存</button>
+        <br>
+        <button id="toggleButton" class="toggle-button" onclick="toggleList()">リストを開く</button>
+        
+		<div id="listContainer" class="list-container" style="display: none;">
+		    <div id="newsList" class="category-list"></div>
+		    <div id="weatherList" class="category-list"></div>
+		    <div id="workList" class="category-list"></div>
+		    <div id="hobbyList" class="category-list"></div>
+		    <div id="otherList" class="category-list"></div>
+		</div>
+    </div>
+
+    <script>
+        function addBookmark() {
+            const siteName = document.getElementById('siteName').value.trim();
+            const siteUrl = document.getElementById('siteUrl').value.trim();
+            const category = document.getElementById('category').value;
+
+            if (siteName && siteUrl && category) {
+                const uniqueKey = `bookmark_${category}_${Math.floor(Math.random() * 900 + 100)}`;
+                localStorage.setItem(uniqueKey, JSON.stringify({ name: siteName, url: siteUrl }));
+                alert('ブックマークが登録されました');
+                document.getElementById('siteName').value = '';
+                document.getElementById('siteUrl').value = '';
+
+                if (document.getElementById('listContainer').style.display === 'block') {
+                    displayBookmarkList();
+                }
+            } else {
+                alert('サイト名、アドレス、カテゴリーを入力してください');
+            }
+        }
+
+        function toggleList() {
+            const listContainer = document.getElementById('listContainer');
+            const toggleButton = document.getElementById('toggleButton');
+
+            if (listContainer.style.display === 'none') {
+                listContainer.style.display = 'block';
+                toggleButton.textContent = 'リストを閉じる';
+                toggleButton.classList.add('list-closed');
+                displayBookmarkList();
+            } else {
+                listContainer.style.display = 'none';
+                toggleButton.textContent = 'リストを開く';
+                toggleButton.classList.remove('list-closed');
+            }
+        }
+
+function displayBookmarkList() {
+    const newsList = document.getElementById('newsList');
+    const weatherList = document.getElementById('weatherList');
+    const workList = document.getElementById('workList');
+    const hobbyList = document.getElementById('hobbyList');
+    const otherList = document.getElementById('otherList');
+
+    newsList.innerHTML = '<h3>ニュース</h3>';
+    weatherList.innerHTML = '<h3>天気</h3>';
+    workList.innerHTML = '<h3>仕事・学習</h3>';
+    hobbyList.innerHTML = '<h3>趣味</h3>';
+    otherList.innerHTML = '<h3>その他</h3>';
+
+    const keys = Object.keys(localStorage)
+        .filter(key => key.startsWith('bookmark_'))
+        .sort();
+
+    keys.forEach(key => {
+        const bookmark = JSON.parse(localStorage.getItem(key));
+        const siteName = bookmark.name;
+        const siteUrl = bookmark.url;
+        const category = key.split('_')[1];
+
+        const row = document.createElement('div');
+        row.className = 'output-row';
+
+        const siteNameDiv = document.createElement('div');
+        siteNameDiv.className = 'site-name';
+        siteNameDiv.textContent = siteName;
+        row.appendChild(siteNameDiv);
+
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'actions';
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = '削除';
+        deleteButton.onclick = () => {
+            localStorage.removeItem(key);
+            displayBookmarkList();
+        };
+        actionsDiv.appendChild(deleteButton);
+
+        const visitButton = document.createElement('button');
+        visitButton.className = 'visit-button';
+        visitButton.textContent = '移動';
+        visitButton.onclick = () => {
+            window.open(siteUrl, '_blank');
+        };
+        actionsDiv.appendChild(visitButton);
+
+        row.appendChild(actionsDiv);
+
+        if (category === '1') {
+            newsList.appendChild(row);
+        } else if (category === '2') {
+            weatherList.appendChild(row);
+        } else if (category === '3') {
+            workList.appendChild(row);
+        } else if (category === '4') {
+            hobbyList.appendChild(row);
+        } else if (category === '5') {
+            otherList.appendChild(row);
+        }
+    });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            displayBookmarkList();
+        });
+    </script>
+    
+  <!-- スクロールで表示されるTopボタン 5/5 -->
+  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+
+  <!-- JavaScript -->
+  <script>
+    // Topに戻る
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // スクロールしてボタン表示制御
+    window.addEventListener("scroll", function () {
+      const topBtn = document.getElementById("topBtn");
+      if (window.scrollY > 300) {
+        topBtn.style.display = "block";
+      } else {
+        topBtn.style.display = "none";
+      }
+    });
+  </script>
+  	
+	<!-- HTML末尾にこれを追加 5/5 -->
+	<div style="height: 80px;"></div>
+  	    
+</body>
+</html>

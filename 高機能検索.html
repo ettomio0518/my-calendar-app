@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高機能検索</title>
+    <link rel="stylesheet" href="styles.css">
+    
+	<style>   
+	/* 基本のスタイル */
+	body {
+	    font-family: Arial, sans-serif;
+	    font-size: 15px;
+	    margin: 7px;
+	    background-color: #ffffc4;
+	}
+
+	.container {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    padding: 20px;
+	    max-width: 600px;
+	    margin: auto;
+	    background-color: #cbe4e4;
+	}
+
+	header {
+	  background: #55aaaa;
+	  color: white;
+	  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+	  text-align: center;
+	  position: relative;
+	}
+	h1 {
+	  font-size: 20px;
+	  margin: 0;
+	}    	            
+
+	/* 入力ボックス */
+	input[type="text"] {
+	    all: unset;
+	    display: block;
+	    width: 100%;
+	    height: 40px;
+	    font-size: 16px;
+	    box-sizing: border-box;
+	    background-color: #ffffff; /* 背景を白 */
+	    color: #000000; /* 文字色を黒 */
+	    border: 1px solid #0000ff; /* 青い枠線 */
+	    padding: 5px; /* 内側の余白 */
+	    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 軽い影 */
+	}
+
+	input[type="text"]:focus {
+	    border-color: #ff0000; /* フォーカス時に赤い枠線 */
+	    outline: none; /* アウトライン削除 */
+	}
+
+	/* テーブルのスタイル */
+	.table-container {
+	    width: 100%;
+	    overflow-x: auto;
+	    margin-top: 20px;
+	}
+
+	table {
+	    width: 100%;
+	    border-collapse: collapse;
+	}
+
+	th, td {
+	    border: 1px solid #ddd;
+	    padding: 8px;
+	    text-align: left;
+	    word-wrap: break-word;
+	    white-space: pre-wrap;
+	}
+
+	th.keyword-column, td.keyword-column {
+	    width: 20%;
+	    max-width: 6ch; /* キーワードの文字数制限 */
+	}
+
+	th.content-column, td.content-column {
+	    width: 60%;
+	    max-width: 10ch; /* 内容の文字数制限 */
+	}
+
+	th.actions-column, td.actions-column {
+	    width: 20%;
+	    text-align: center;	   
+	}
+
+	td.actions-column button {
+	    display: inline-block; /* インラインブロックで中央寄せ */
+	}
+	
+	/* 詳細表示 */
+	#fullContent {
+	    width: 100%;
+	    border: 1px solid #ddd;
+	    padding: 10px;
+	    margin-top: 20px;
+	    background-color: #ffffff; /* 背景を白 */
+	    white-space: pre-wrap;
+	}
+
+	/* ボタン */
+	button {
+	    font-size: 14px;
+	    padding: 5px 10px;
+	    margin: 5px;
+	    border-radius: 5px;
+	    background-color: #f7eeff;
+	    color: black;
+	    border: 1px solid #0000ff;
+	    cursor: pointer;
+	}
+
+	
+	.closeButton {
+	    font-size: 16px;
+	    padding: 5px 10px;
+	    margin: 5px;
+	    border-radius: 5px;
+	    background-color: #c4ffc4;
+	    color: black;
+	    border: 1px solid #0000ff;
+	    cursor: pointer;
+	}
+    .btn-show-text {  /* 3/15に追加 */
+        font-size: 14px;
+        padding: 0px 2px;
+        padding: 3px 5px; /* ボタンの余白を調整 */
+        background-color: #ffeaf4;
+        color: black;
+        border: 1px solid #0000ff;
+        border-radius: 5px;            
+        cursor: pointer;
+        min-width: 60px;   /* 最小幅を設定 */
+        display: inline-block; /* 横並びにする */
+    }
+	/* 詳細コンテナ */
+	.detail-container {
+	    background-color: #f2f2f2;
+	    word-break: break-all;
+	}
+
+	button, a {
+	    cursor: pointer; /* カーソルを手の形に */
+	}
+	#saveButton, #closeButton {
+	    cursor: pointer; /* カーソルを手の形に */
+	}
+
+
+	/* メディアクエリによるスマホ対応 */
+	@media only screen and (max-width: 600px) {
+	    td.keyword-column {
+	        max-width: 6ch; /* キーワード列の幅制限 */
+	    }
+	    td.content-column {
+	        max-width: 10ch; /* 内容列の幅制限 */
+	    }
+	    table, th, td {
+	        font-size: 16px; /* テキストサイズ調整 */
+	    }
+	    #keywordInput {
+	        height: 30px; /* スマホ用の高さ */
+	    }
+	}
+	
+    #topButton {
+        margin-top: 20px; /* 上との余白 */
+        justify-content: center; /* 水平方向の中央揃え */        
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    #topButton:hover {
+        background-color: #0056b3;
+    }	
+    
+    /* Topボタン：最初は非表示にしておき、スクロールで表示 5/5 */
+    .top-button {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 9999;
+      display: none; /* 最初は非表示 */
+    }
+    .top-button:hover {
+      background: #0056b3;
+    }
+
+    /* 戻るボタン 5/6 */
+    .top-right-button {
+      width: auto; /* ボタンの幅を自動調整 */
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background-color: #ccffff;
+      color: black;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 14px;
+	  border: 1px solid black; /* 枠線を表示 */	      
+      cursor: pointer;
+    }
+    .top-right-button:hover {
+      background-color: #f4f4f4;
+    }
+	    	        
+	</style>
+	
+</head>
+
+<body>
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>高機能検索</h1>
+  	</header>
+  	
+    <div class="container">
+
+        <!-- キーワード入力ボックス -->
+        <div>
+            <label for="keywordInput">キーワード:</label>
+            <input type="text" id="keywordInput" oninput="searchMemos()" placeholder="検索キーワードを入力">
+        </div>
+
+        <!-- 検索結果表示 -->
+        <div id="searchResults" class="table-container"></div>
+
+        <!-- 詳細表示エリア -->
+        <div id="fullContent" class="detail-container" contenteditable="true"></div>
+        <button id="saveButton" style="display: none;" onclick="saveChanges()">修正して保存</button>
+        <button id="closeButton" class="closeButton" style="display: none;" onclick="closeFullContent()">詳細を閉じる</button>
+
+
+    <script>
+        let currentKey = null; // 現在表示しているkeyを保持
+
+        // URLをリンクに変換する関数
+        function makeUrlsClickable(text) {
+            const urlPattern = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        }
+
+        // 詳細を表示する関数
+        function displayFullContent(content, key) {
+            const fullContentDiv = document.getElementById('fullContent');
+            const saveButton = document.getElementById('saveButton');
+            const closeButton = document.getElementById('closeButton');
+
+            currentKey = key; // 現在のキーを保存
+            fullContentDiv.innerHTML = makeUrlsClickable(content); // クリッカブルURLを適用
+            fullContentDiv.contentEditable = true; // 編集可能に設定
+            fullContentDiv.style.display = 'block';
+            saveButton.style.display = 'block';
+            closeButton.style.display = 'block';
+            fullContentDiv.scrollIntoView({ behavior: 'smooth' });
+
+            // contenteditable内でのリンククリックを有効化
+            fullContentDiv.addEventListener('click', (e) => {
+                if (e.target.tagName === 'A') {
+                    e.preventDefault();
+                    window.open(e.target.href, '_blank', 'noopener,noreferrer'); // 新しいタブで開く
+                }
+            });
+        }
+
+        // 詳細を閉じる関数
+        function closeFullContent() {
+            const fullContentDiv = document.getElementById('fullContent');
+            const saveButton = document.getElementById('saveButton');
+            const closeButton = document.getElementById('closeButton');
+
+            fullContentDiv.style.display = 'none';
+            saveButton.style.display = 'none';
+            closeButton.style.display = 'none';
+            currentKey = null; // 現在のkeyをリセット
+        }
+
+        // 修正内容を保存する関数
+        function saveChanges() {
+            const fullContentDiv = document.getElementById('fullContent');
+            const newContent = fullContentDiv.innerText; // 修正後の内容を取得（プレーンテキスト）
+
+            if (currentKey) {
+                localStorage.setItem(currentKey, newContent); // ローカルストレージに保存
+                alert('内容を保存しました！');
+                searchMemos(); // 検索結果を更新
+            } else {
+                alert('保存する内容が見つかりません。');
+            }
+        }
+
+        // メモの検索と表示を行う関数
+        function searchMemos() {
+            const keyword = document.getElementById('keywordInput').value;
+            const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword');
+            const searchResults = keys.filter(key => {
+                const content = localStorage.getItem(key);
+                return content.includes(keyword); // キーワードが含まれているかチェック
+            });
+
+            searchResults.sort((a, b) => a.localeCompare(b));
+
+            const searchResultsList = document.getElementById('searchResults');
+            searchResultsList.innerHTML = '';
+
+            const table = document.createElement('table');
+            const headerRow = document.createElement('tr');
+            const keywordHeader = document.createElement('th');
+            keywordHeader.classList.add('keyword-column');
+            keywordHeader.textContent = 'key';
+            const contentHeader = document.createElement('th');
+            contentHeader.classList.add('content-column');
+            contentHeader.textContent = '内容';
+            const actionsHeader = document.createElement('th');
+            actionsHeader.classList.add('actions-column');
+            actionsHeader.textContent = '操作';
+            headerRow.appendChild(keywordHeader);
+            headerRow.appendChild(contentHeader);
+            headerRow.appendChild(actionsHeader);
+            table.appendChild(headerRow);
+
+            searchResults.forEach(key => {
+                const row = document.createElement('tr');
+                const keywordCell = document.createElement('td');
+                keywordCell.classList.add('keyword-column');
+                const contentCell = document.createElement('td');
+                contentCell.classList.add('content-column');
+                const actionsCell = document.createElement('td');
+                actionsCell.classList.add('actions-column');
+                const content = localStorage.getItem(key);
+
+                keywordCell.textContent = key.slice(0, 10);
+                contentCell.textContent = content.slice(0, 30) + '...';
+
+                const viewButton = document.createElement('button');
+                viewButton.textContent = '表示';
+				viewButton.classList.add('btn-show-text'); // クラスを追加                
+                viewButton.onclick = () => displayFullContent(content, key);
+
+                actionsCell.appendChild(viewButton);
+                row.appendChild(keywordCell);
+                row.appendChild(contentCell);
+                row.appendChild(actionsCell);
+                table.appendChild(row);
+            });
+
+            searchResultsList.appendChild(table);
+        }
+
+        // ページ読み込み時に初期化
+        window.onload = () => searchMemos();
+    </script>
+
+
+	  <!-- スクロールで表示されるTopボタン 5/5 -->
+	  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+
+	  <!-- JavaScript -->
+	  <script>
+	    // Topに戻る
+	    function scrollToTop() {
+	      window.scrollTo({
+	        top: 0,
+	        behavior: 'smooth'
+	      });
+	    }
+
+	    // スクロールしてボタン表示制御
+	    window.addEventListener("scroll", function () {
+	      const topBtn = document.getElementById("topBtn");
+	      if (window.scrollY > 300) {
+	        topBtn.style.display = "block";
+	      } else {
+	        topBtn.style.display = "none";
+	      }
+	    });
+	  </script>
+   	</div>
+	<!-- HTML末尾にこれを追加 5/5 -->
+	<div style="height: 80px;"></div>
+   	       
+</body>
+</html>

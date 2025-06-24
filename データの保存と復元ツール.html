@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>データの保存と復元</title>
+    <style>
+        body {
+            background-color: #cbe4e4;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+            font-size: 20px;
+        }
+        h2 {
+            font-size: 18px;
+        }
+        h3 {
+            font-size: 18px;
+            color: #0000ff;            
+        }
+        h4 {
+            font-size: 16px;
+            color: red;            
+        }
+        h5 {
+            font-size: 16px;
+            color: #804040;             
+        }                                
+        p {
+            font-size: 16px;
+        }
+        .note {
+            font-size: 14px;
+        }
+        button {
+            top: 10px;
+            right: 10px;
+            padding: 3px 10px;
+            background-color: #ccffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            width: auto;
+            border: 1px solid #0000ff;
+        }
+        button:hover {
+            background-color: #b2ebf2;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+        }
+        .right {
+            float: right;
+        }
+        
+		#button2 {
+		    padding: 3px 10px;
+		    background-color: #acffd6;
+		    border: 1px solid #ccc;
+		    border-radius: 5px;
+		    font-size: 14px;
+		    cursor: pointer;
+		    width: auto;
+		    border: 1px solid #0000ff;
+		}
+		#button2:hover {
+		    background-color: #e5e5e5;
+		}
+		
+		#button3 {
+		    padding: 3px 10px;
+		    background-color: #acffd6;
+		    border: 1px solid #ccc;
+		    border-radius: 5px;
+		    font-size: 14px;
+		    cursor: pointer;
+		    width: auto;
+		    border: 1px solid #0000ff;
+		}
+		#button3:hover {
+		    background-color: #e5e5e5;
+		}
+
+		#button4 {
+		    padding: 3px 10px;
+		    background-color: #ffffbd;
+		    border: 1px solid #ccc;
+		    border-radius: 5px;
+		    font-size: 14px;
+		    cursor: pointer;
+		    width: auto;
+		    border: 1px solid #0000ff;
+		}
+		#button2:hover {
+		    background-color: #e5e5e5;
+		}
+				                
+    </style>
+</head>
+<body>
+    <h1>データの保存と復元ツール</h1>
+    <button class="right" onclick="location.href='index-NNN.html'">戻る</button>
+
+    <h3>初めに:</h3>
+    <p>WebViewを使用する本アプリの操作に関する手順を説明します。現在、自動操作機能はOSの制約で実装できないため、手動操作が必要ですが以下の手順で対応してください。
+    <br>
+    <strong>なお、水色ボタンと黄緑のボタンと黄色のボタンを順番に使用すると若干操作は軽減されるかと思います。</strong>
+    </p>
+    <h3>必要なアプリの準備：</h3>    
+	<p>・GooglePlayで「ファイルマネージャー」か「Files by Google」をインストールします。
+	<br>
+	・テキストエディタは「QuickEdit」か「Jota＋」を推奨します。
+	</p>
+
+    <label for="output">出力結果:</label>
+    <textarea id="output"></textarea>
+
+    <h3>データの出力と保存:</h3>
+    <button onclick="outputJSON()">全データをjsonで出力</button>
+    <p class="note">アプリの全データが上のテキストボックスに出力されました。</p>
+    <button onclick="selectAllAndCopy()">全て選択してコピー</button>
+    <p class="note">全データが選択され、コピーされました。</p>
+	<p class="note"> ・「QuickEdit」または「Jota＋」で新規ファイルを作成し、データを貼り付けます。
+	<br>
+	・任意のファイル名（例：「データ保存」）で、拡張子を.txtまたは.jsonに設定して (UTF-8形式で) 保存します。保存場所は「Download」フォルダを指定します。
+	</p>
+	<button id="button2">外部ツールを呼び出し</button>
+    
+    
+    <h3>バックアップ:</h3>
+    <p>・「ファイルマネージャー」や「Files by Google」を使用し、保存したファイルをGoogleDriveやメールにてバックアップ。またはSDカードやUSBメモリに保存します。
+    
+    <h3>データの復元:</h3>
+	<p class="note">
+	・GoogleDriveやSDカードなどからファイルをダウンロードし、再度「Download」フォルダに保存します。<br>
+	・ファイルを開き、データをコピーして、「データの保存と復元.html」のテキストボックスに貼り付けます。</P>
+	<button id="button3">外部ツールを呼び出し</button>
+	<br><br>
+	<p class="note">上のテキストボックスにデータを貼り付けて下さい。</p>
+	<button id="button4">クリップボードから貼り付け</button>
+	<br>
+    <p><strong>・ここで失敗した場合は、上のテキストボックス内を長押しして『貼り付け』を実行してください。</strong></p>		
+    <button onclick="restoreData()">データの復元</button>	
+	<p class="note">データは復元されました。</p>
+        
+ 
+	<br>
+    <h5>(データの保存2:)</h5>
+    <h4>こちらは本Androidアプリでは使用できません。</h4>
+    <p>デスクトップあるいはスマホのブラウザ使用のみ有効です。</p>
+
+    <button onclick="downloadJSON1()">保存先を選択して保存「カレンダーデータ.json」</button>
+    <p class="note">全データが選択され、「カレンダーデータ.json」の名前で
+    保存されました。</p>
+    <p>予備</p>    
+    <button onclick="downloadJSON2()">保存先を選択して保存「key保存.json」</button>
+    <p class="note">全データが選択され、「key保存.json」の名前で
+    保存されました。</p>
+           
+    <h5>(データの復元2:)</h5>
+    <h4>こちらは本Androidアプリでは使用できません。</h4>
+    <p>デスクトップあるいはスマホのブラウザ使用のみ有効です。</p>
+        
+    <button onclick="uploadJSON()">ファイルを選択して復元</button>
+    <br><br>
+    <button onclick="restoreData()">データの復元</button>
+	<p class="note">データは復元されました。</p>
+    
+    
+	 <script>
+	    document.getElementById('button2').addEventListener('click', function () {
+	        window.open('https://ettomio0518.github.io/data-save-tool/data-save-tool-new.html', '_blank');
+	    });
+	    
+	        document.getElementById('button3').addEventListener('click', function () {
+        window.open('https://ettomio0518.github.io/data-load-tool/data-load-tool-new.html', '_blank');
+    });
+    
+	</script>
+
+	<script>
+	button4.addEventListener('click', async function () {
+	    try {
+	        const text = await navigator.clipboard.readText();
+	        document.getElementById('output').value = text;
+	    } catch (err) {
+	        alert('クリップボードの読み取りに失敗しました。\nブラウザやOSの制限が影響している可能性があります。');
+	        document.getElementById('output').focus();
+	        console.error('Clipboard read failed:', err);
+	        button4.style.display = 'none';  // 失敗時に非表示にする
+	    }
+	});
+	</script>
+
+	
+    <script>
+        function goBack() {
+            window.location.href = 'index-NNN.html';
+        }
+
+        function outputJSON() {
+            const allKeys = Object.keys(localStorage);
+            const jsonData = {};
+
+            allKeys.forEach(key => {
+                jsonData[key] = localStorage.getItem(key);
+            });
+
+            document.getElementById('output').value = JSON.stringify(jsonData);
+        }
+        
+        function selectAllAndCopy() {
+            const output = document.getElementById('output');
+            output.select();
+            document.execCommand('copy');
+        }
+        
+        function downloadJSON1() {
+            const jsonData = document.getElementById('output').value;
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'カレンダーデータ.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function downloadJSON2() {
+            const jsonData = document.getElementById('output').value;
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'key保存.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        function uploadJSON() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'application/json';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('output').value = e.target.result;
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function restoreData() {
+            const jsonData = document.getElementById('output').value;
+            
+            if (jsonData.trim() === "") {
+                alert("データが貼り付けられていません。中断します");
+                return;
+            }
+            
+            if (confirm("一応アプリ内のデータをクリアにします")) {
+                localStorage.clear();
+                const data = JSON.parse(jsonData);
+
+                for (const key in data) {
+                    localStorage.setItem(key, data[key]);
+                }
+
+                alert("データは復元されました");
+            }
+        }
+    </script>
+    <br>
+    <p>----- 250622 ettomio</p>
+</body>
+</html>

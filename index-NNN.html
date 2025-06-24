@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>音声カレンダー</title>
+	<meta name="description" content="忙しい毎日をサポート！音声カレンダーは、高機能でメモ付きのカレンダーアプリです。予定を入れておくと今日の予定を抽出して、女性アナウンサーが知らせてくれます。生活のハブとしての機能も充実！">
+	<meta name="keywords" content="音声カレンダー, 高機能カレンダー, メモ機能, 予定管理, 日記, 買い物電卓, 音声通知, ブックマーク, タスク管理">
+	<meta name="author" content="ettomio">
+
+    <style>
+        /* 全体のスタイル設定 */
+        body {
+            font-family: Arial, sans-serif; /* フォント設定 */
+            text-align: center; /* テキスト中央揃え */
+            position: relative; /* 位置を相対的に設定 */
+            background-color: #e6e6ff; /* 背景色 */
+        }
+        .container {
+            max-width: 600px; /* 最大幅を600pxに設定 */
+            margin: 10px auto; /* 上下20pxの余白と中央揃え */
+            padding: 10px; /* 内側余白 */
+            border: 1px solid #ccc; /* 枠の色 */
+            border-radius: 10px; /* 角を丸くする */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* シャドウ効果 */
+            background-color: #e7e7e7; /* 背景色 */
+        }
+        .container2 { /* このクラスは現在使用されていませんが、念のため残しておきます */
+            max-width: 580px;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #dbffdb;
+        }
+
+		header {
+		    background: #ffdcb9;
+		    color: #595959;
+		    padding: 0.1em;
+		    text-align: center;
+		}
+
+        h1 { font-size: 19px; }
+        h2 { font-size: 16px; }
+        h3 { font-size: 17px; color: #0000ff; }
+		h4 { font-size: 20px; margin: 0; }
+
+        input, textarea, button {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        textarea {
+            width: calc(100% - 22px);
+        }
+		.inline-elements {
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 5px;
+		    white-space: nowrap;
+		    flex-wrap: wrap; /* 必要に応じて折り返し */
+		}
+
+        
+		#displayText {
+		    text-align: left; /* 表示される内容だけ左揃え */
+		    width: 100%;
+		}
+
+		.key-input {
+		    width: 100%; /* 親要素の幅に合わせる */
+		    max-width: 200px; /* 画面サイズに応じた最大幅を設定 */
+		}
+		
+        .inline-elements button {
+            margin-left: 10px;
+        }
+        .output-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px 0;
+            text-align: left;
+        }
+        .output-row div {
+            flex-grow: 1;
+            margin-right: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+        .output-row button {
+            flex-shrink: 0;
+        }
+
+        /* カレンダーのスタイル設定 */
+        .calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .home-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        button {
+            width: auto;
+            flex-shrink: 0;
+            font-size: 16px;
+            padding: 3px 10px;
+            margin: 3px;
+            border-radius: 5px;
+            background-color: #ccffff;
+            color: black;
+    		border: 1px solid black;
+            cursor: pointer;
+        }
+
+
+		/* 「予定の確認」ボタンのスタイルを設定 */
+		.check-button {
+		    background-color:#bfffbf;
+		    color: black;
+		    padding:  3px 10px;
+		    border-radius: 5px;
+		    cursor: pointer;
+		}
+
+		.limit-button { /* このクラスは現在使用されていませんが、念のため残しておきます */
+		    background-color: white;
+		    color: #0000ff;
+		    padding:  3px 10px;
+		    border-radius: 5px;
+		    cursor: pointer;
+		}
+
+		/* 「予定の音声出力」ボタンだけ異なるスタイルを設定 */
+		.output-button {
+		    background-color: #ffdacc;
+		    color: black;
+		    padding:  3px 10px;
+		    border-radius: 5px;
+		    cursor: pointer;
+		}
+
+		/* 「保存」ボタンだけ異なるスタイルを設定 */
+		.save-button {
+		    font-size: 16px;
+		    padding: 3px 10px;
+		    background-color: #ffd5ff;
+		}
+
+		/* 「時計」ボタンだけスタイルを変更 */
+		.clock-button {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding: 3px 30px; /* ボタン全体の大きさを調整 */
+		    color: blue;
+		    background-color: #ffe8ff; /* 背景色も変更可能 */
+		}
+
+		/* 「カレンダー」ボタンだけ異なるスタイルを設定 */
+		.calendar-button {
+		    background-color: #ffffc4;/* 背景色も変更可能 */
+		    color: blue; /* 文字色の変更 */
+		}
+				
+		.month-number {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 0 4px;
+        }
+        .year-month {
+            font-size: 18px;
+            text-align: right;
+        }
+        .date-info {
+            font-size: 18px;
+            text-align: left;
+        }
+        .current-time {
+            font-size: 18px;
+            margin-top: 5px;
+        }
+        .current-date {
+            color: red;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            width: 14%;
+            /* 縦方向の圧縮を反映 */
+            padding: 6px 0;
+            border: 1px solid #ddd;
+            text-align: center;
+            font-size: 20px;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .today {
+            font-weight: bold;
+            animation: blink 1s step-start 0s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        .saturday { color: blue; }
+        .weekend { color: red; }
+        .holiday { color: #ff00ff; }
+        .navigation-buttons { margin-top: 20px; }
+        .bottom-home-button { margin-top: 20px; }
+
+		#listContainer {
+		    position: relative;
+		    /* padding-top: 35px; */ /* ボタンを動的に生成しないため、パディングは不要 */
+		}
+
+		#closeListButton {
+		    display: none; /* 初期状態で非表示 */
+            background-color: #eaea00; /* 元のデザインに近い色に変更 */
+            color: black;
+		}
+
+		#scheduleInput {
+		    height: 40px;
+		    line-height: 22px;
+		    resize: none;
+		}
+
+		.custom-alert {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #ffcccb;
+		    color: black;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
+		}
+		.custom-alert2 {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #e9e9e9;
+		    color: black;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
+		}
+		.custom-alert3 {
+		    background-color: #bfffbf;
+		    border: 1px solid #8000ff;
+		    padding: 10px;
+		    border-radius: 5px;
+		    position: fixed;
+		    top: 10px;
+		    left: 10px;
+		    z-index: 5000;
+		}
+
+		.key-label { /* 3/8に追加 */
+		    margin-bottom: 5px; /* p要素の下余白を調整 */
+		}
+
+		.logo-title {
+		    display: flex;
+		    flex-direction: row;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 10px;
+		}
+		.logo-title img {
+		    height: 64px;
+		    width: auto;
+		}
+
+        #keys {
+            display: inline-block; /* センター寄せ用 */
+            border: 1px solid #ccc; /* 枠線を表示 */
+            padding: 10px; /* 内側の余白 */
+            text-align: left; /* テキストを左寄せ */
+            width: 300px; /* 適切な幅に調整 */
+        }
+        #keys div {
+            margin: 5px 0; /* 各キーの間に余白 */
+        }
+        body {
+            text-align: center; /* #keys全体を中央に配置 */
+        }
+
+	    /* 戻るボタン（右上）を統一デザインに変更 5/5 */
+	    .top-right-button {
+	      position: absolute;
+	      top: 5px;
+	      right: 10px;
+	      background-color: #007bff;
+	      color: white;
+	      border: none;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #0056b3;
+	    }
+	    
+	    .top-button { 
+	        position: fixed;
+	        bottom: 20px;
+	        left: 50%;
+	        transform: translateX(-50%);
+	        background: #007bff;
+	        color: white;
+	        border: none;
+	        border-radius: 20px;
+	        padding: 10px 20px;
+	        font-size: 16px;
+	        cursor: pointer;
+	        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	        z-index: 9999;
+	        display: none;
+	    }
+	    .top-button:hover { background: #0056b3; }
+		.word-label { margin-bottom: 5px; font-size: 14px; }
+		.word-input { margin-top: 0; width: 35%; }
+	    .input-row { margin-bottom: 10px; }
+	    #scheduleDate { width: 130px; }
+	    
+        #keyButton {
+            background-color: #008040;
+            color: white;
+        }
+
+        #keyNButton {
+            background-color: #008040;
+            color: white;
+        }
+
+	    /* 6/23 */
+		#G-calendar-button {
+		    background-color: #ffffc4;/* 背景色も変更可能 */
+		    color: #994d4d; /* 文字色の変更 */
+    cursor: pointer;		    
+		}
+	  /* カスタムアラート4：黒背景・白文字 */
+	  .custom-alert4 {
+	    display: none;
+	    position: fixed;
+	    top: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background-color: #000;
+	    color: #fff;
+	    padding: 12px 20px;
+	    border-radius: 8px;
+	    font-size: 15px;
+	    z-index: 1000;
+	    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	  }
+	  		                	    
+    </style>
+</head>
+<body>
+
+	<img src="image64.png" alt="サンプル画像">
+    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+
+    <div class="calendar-header">
+        <button onclick="changeMonth(-1)">◁</button>
+        <div class="year-month">
+            <span id="year"></span>
+            <br>
+            <span id="month-name"></span>
+        </div>
+        <div class="month-number" id="month-number">11</div>
+        <div class="date-info">
+            <span id="current-time"></span>
+            <br>
+            <span id="current-date" class="current-date"></span>
+        </div>
+        <button onclick="changeMonth(1)">▷</button>
+    </div>
+
+    <div class="navigation-buttons">
+        <button onclick="changeYear(-1)">1年前</button>
+        <button onclick="goToCurrentMonth()">今月</button>
+        <button onclick="changeYear(1)">1年後</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th>
+            </tr>
+        </thead>
+        <tbody id="calendar-body"></tbody>
+    </table>
+
+    <script>
+        // --- ここからカレンダー描画のスクリプト ---
+        // CSVデータを配列として定義
+        const holidaysData = [
+		// 2020年
+		["2020/01/01 (水)","元日"],
+		["2020/01/13 (月)","成人の日"],
+		["2020/02/11 (火)","建国記念の日"],
+		["2020/02/23 (日)","天皇誕生日"],
+		["2020/02/24 (月)","振替休日"],
+		["2020/03/20 (金)","春分の日"],
+		["2020/04/29 (水)","昭和の日"],
+		["2020/05/03 (日)","憲法記念日"],
+		["2020/05/04 (月)","みどりの日"],
+		["2020/05/05 (火)","こどもの日"],
+		["2020/05/06 (水)","振替休日"],
+		["2020/07/23 (木)","海の日"],
+		["2020/07/24 (金)","スポーツの日"],
+		["2020/08/10 (月)","山の日"],
+		["2020/09/21 (月)","敬老の日"],
+		["2020/09/22 (火)","秋分の日"],
+		["2020/11/03 (火)","文化の日"],
+		["2020/11/23 (月)","勤労感謝の日"],
+		// 2021年        	
+		["2021/01/01 (金)","元日"],
+		["2021/01/11 (月)","成人の日"],
+		["2021/02/11 (木)","建国記念の日"],
+		["2021/02/23 (火)","天皇誕生日"],
+		["2021/03/20 (土)","春分の日"],
+		["2021/04/29 (木)","昭和の日"],
+		["2021/05/03 (月)","憲法記念日"],
+		["2021/05/04 (火)","みどりの日"],
+		["2021/05/05 (水)","こどもの日"],
+		["2021/07/19 (月)","海の日"],
+		["2021/08/11 (水)","山の日"],
+		["2021/09/20 (月)","敬老の日"],
+		["2021/09/23 (木)","秋分の日"],
+		["2021/10/11 (月)","スポーツの日"],
+		["2021/11/03 (水)","文化の日"],
+		["2021/11/23 (火)","勤労感謝の日"],
+		// 2022年
+		["2022/01/01 (土)","元日"],
+		["2022/01/10 (月)","成人の日"],
+		["2022/02/11 (金)","建国記念の日"],
+		["2022/02/23 (水)","天皇誕生日"],
+		["2022/03/21 (月)","春分の日"],
+		["2022/04/29 (金)","昭和の日"],
+		["2022/05/03 (火)","憲法記念日"],
+		["2022/05/04 (水)","みどりの日"],
+		["2022/05/05 (木)","こどもの日"],
+		["2022/07/18 (月)","海の日"],
+		["2022/08/11 (木)","山の日"],
+		["2022/09/19 (月)","敬老の日"],
+		["2022/09/23 (金)","秋分の日"],
+		["2022/10/10 (月)","スポーツの日"],
+		["2022/11/03 (木)","文化の日"],
+		["2022/11/23 (水)","勤労感謝の日"],
+		// 2023年
+		["2023/01/01 (日)","元日"],
+		["2023/01/02 (月)","振替休日"],
+		["2023/01/09 (月)","成人の日"],
+		["2023/02/11 (土)","建国記念の日"],
+		["2023/02/23 (木)","天皇誕生日"],
+		["2023/03/21 (火)","春分の日"],
+		["2023/04/29 (土)","昭和の日"],
+		["2023/05/03 (水)","憲法記念日"],
+		["2023/05/04 (木)","みどりの日"],
+		["2023/05/05 (金)","こどもの日"],
+		["2023/07/17 (月)","海の日"],
+		["2023/08/11 (金)","山の日"],
+		["2023/09/18 (月)","敬老の日"],
+		["2023/09/23 (土)","秋分の日"],
+		["2023/10/09 (月)","スポーツの日"],
+		["2023/11/03 (金)","文化の日"],
+		["2023/11/23 (木)","勤労感謝の日"],
+		// 2024年
+		["2024/01/01 (月)", "元日"],
+		["2024/01/08 (月)", "成人の日"],
+		["2024/02/11 (日)", "建国記念の日"],
+		["2024/02/12 (月)","振替休日"],
+		["2024/02/23 (金)","天皇誕生日"],
+		["2024/03/20 (水)","春分の日"],
+		["2024/04/29 (月)","昭和の日"],
+		["2024/05/03 (金)","憲法記念日"],
+		["2024/05/04 (土)","みどりの日"],
+		["2024/05/05 (日)","こどもの日"],
+		["2024/05/06 (月)","振替休日"],
+		["2024/07/15 (月)","海の日"],
+		["2024/08/11 (日)","山の日"],
+		["2024/08/12 (月)","振替休日"],
+		["2024/09/16 (月)","敬老の日"],
+		["2024/09/22 (日)","秋分の日"],
+		["2024/09/23 (月)","振替休日"],
+		["2024/10/14 (月)","スポーツの日"],
+		["2024/11/03 (日)","文化の日"],
+		["2024/11/04 (月)","振替休日"],
+		["2024/11/23 (土)","勤労感謝の日"],
+		// 2025年
+		["2025/01/01 (水)","元日"],
+		["2025/01/13 (月)","成人の日"],
+		["2025/02/11 (火)","建国記念の日"],
+		["2025/02/23 (日)","天皇誕生日"],
+		["2025/02/24 (月)","振替休日"],
+		["2025/03/20 (木)","春分の日"],
+		["2025/04/29 (火)","昭和の日"],
+		["2025/05/03 (土)","憲法記念日"],
+		["2025/05/04 (日)","みどりの日"],
+		["2025/05/05 (月)","こどもの日"],
+		["2025/05/06 (火)","振替休日"],
+		["2025/07/21 (月)","海の日"],
+		["2025/08/11 (月)","山の日"],
+		["2025/09/15 (月)","敬老の日"],
+		["2025/09/23 (火)","秋分の日"],
+		["2025/10/13 (月)","スポーツの日"],
+		["2025/11/03 (月)","文化の日"],
+		["2025/11/23 (日)","勤労感謝の日"],
+		["2025/11/24 (月)","振替休日"], 
+		// 2026年
+		["2026/01/01 (木)","元日"],
+		["2026/01/12 (月)","成人の日"],
+		["2026/02/11 (水)","建国記念の日"],
+		["2026/02/23 (月)","天皇誕生日"],
+		["2026/03/20 (金)","春分の日"],
+		["2026/04/29 (水)","昭和の日"],
+		["2026/05/03 (日)","憲法記念日"],
+		["2026/05/04 (月)","みどりの日"],
+		["2026/05/05 (火)","こどもの日"],
+		["2026/05/06 (水)","振替休日"],
+		["2026/07/20 (月)","海の日"],
+		["2026/08/11 (火)","山の日"],
+		["2026/09/21 (月)","敬老の日"],
+		["2026/09/22 (火)","国民の休日"],
+		["2026/09/23 (水)","秋分の日"],
+		["2026/10/12 (月)","スポーツの日"],
+		["2026/11/03 (火)","文化の日"],
+		["2026/11/23 (月)","勤労感謝の日"],
+		// 2027年
+		["2027/01/01 (金)","元日"],
+		["2027/01/11 (月)","成人の日"],
+		["2027/02/11 (木)","建国記念の日"],
+		["2027/02/23 (火)","天皇誕生日"],
+		["2027/03/21 (日)","春分の日"],
+		["2027/03/22 (月)","振替休日"],
+		["2027/04/29 (木)","昭和の日"],
+		["2027/05/03 (月)","憲法記念日"],
+		["2027/05/04 (火)","みどりの日"],
+		["2027/05/05 (水)","こどもの日"],
+		["2027/07/19 (月)","海の日"],
+		["2027/08/11 (水)","山の日"],
+		["2027/09/20 (月)","敬老の日"],
+		["2027/09/23 (木)","秋分の日"],
+		["2027/10/11 (月)","スポーツの日"],
+		["2027/11/03 (水)","文化の日"],
+		["2027/11/23 (火)","勤労感謝の日"],
+		// 2028年
+		["2028/01/01 (土)","元日"],
+		["2028/01/10 (月)","成人の日"],
+		["2028/02/11 (金)","建国記念の日"],
+		["2028/02/23 (水)","天皇誕生日"],
+		["2028/03/20 (月)","春分の日"],
+		["2028/04/29 (土)","昭和の日"],
+		["2028/05/03 (水)","憲法記念日"],
+		["2028/05/04 (木)","みどりの日"],
+		["2028/05/05 (金)","こどもの日"],
+		["2028/07/17 (月)","海の日"],
+		["2028/08/11 (金)","山の日"],
+		["2028/09/18 (月)","敬老の日"],
+		["2028/09/22 (金)","秋分の日"],
+		["2028/10/09 (月)","スポーツの日"],
+		["2028/11/03 (金)","文化の日"],
+		["2028/11/23 (木)","勤労感謝の日"],
+		// 2029年
+		["2029/01/01 (月)","元日"],
+		["2029/01/08 (月)","成人の日"],
+		["2029/02/11 (日)","建国記念の日"],
+		["2029/02/12 (月)","振替休日"],
+		["2029/02/23 (金)","天皇誕生日"],
+		["2029/03/20 (火)","春分の日"],
+		["2029/04/29 (日)","昭和の日"],
+		["2029/04/30 (月)","振替休日"],
+		["2029/05/03 (木)","憲法記念日"],
+		["2029/05/04 (金)","みどりの日"],
+		["2029/05/05 (土)","こどもの日"],
+		["2029/07/16 (月)","海の日"],
+		["2029/08/11 (土)","山の日"],
+		["2029/09/17 (月)","敬老の日"],
+		["2029/09/23 (日)","秋分の日"],
+		["2029/09/24 (月)","振替休日"],
+		["2029/10/08 (月)","スポーツの日"],
+		["2029/11/03 (土)","文化の日"],
+		["2029/11/23 (金)","勤労感謝の日"],
+		// 2030年
+		["2030/01/01 (火)","元日"],
+		["2030/01/14 (月)","成人の日"],
+		["2030/02/11 (月)","建国記念の日"],
+		["2030/02/23 (土)","天皇誕生日"],
+		["2030/03/20 (水)","春分の日"],
+		["2030/04/29 (月)","昭和の日"],
+		["2030/05/03 (金)","憲法記念日"],
+		["2030/05/04 (土)","みどりの日"],
+		["2030/05/05 (日)","こどもの日"],
+		["2030/05/06 (月)","振替休日"],
+		["2030/07/15 (月)","海の日"],
+		["2030/08/11 (日)","山の日"],
+		["2030/08/12 (月)","振替休日"],
+		["2030/09/16 (月)","敬老の日"],
+		["2030/09/23 (月)","秋分の日"],
+		["2030/10/14 (月)","スポーツの日"],
+		["2030/11/03 (日)","文化の日"],
+		["2030/11/04 (月)","振替休日"],
+		["2030/11/23 (土)","勤労感謝の日"],
+		// 2031年
+		["2031/01/01 (水)","元日"],
+		["2031/01/13 (月)","成人の日"],
+		["2031/02/11 (火)","建国記念の日"],
+		["2031/02/23 (日)","天皇誕生日"],
+		["2031/02/24 (月)","振替休日"],
+		["2031/03/21 (金)","春分の日"],
+		["2031/04/29 (火)","昭和の日"],
+		["2031/05/03 (土)","憲法記念日"],
+		["2031/05/04 (日)","みどりの日"],
+		["2031/05/05 (月)","こどもの日"],
+		["2031/05/06 (火)","振替休日"],
+		["2031/07/21 (月)","海の日"],
+		["2031/08/11 (月)","山の日"],
+		["2031/09/15 (月)","敬老の日"],
+		["2031/09/23 (火)","秋分の日"],
+		["2031/10/13 (月)","スポーツの日"],
+		["2031/11/03 (月)","文化の日"],
+		["2031/11/23 (日)","勤労感謝の日"],
+		["2031/11/24 (月)","振替休日"],
+		// 2032年
+		["2032/01/01 (木)","元日"],
+		["2032/01/12 (月)","成人の日"],
+		["2032/02/11 (水)","建国記念の日"],
+		["2032/02/23 (月)","天皇誕生日"],
+		["2032/03/20 (土)","春分の日"],
+		["2032/04/29 (木)","昭和の日"],
+		["2032/05/03 (月)","憲法記念日"],
+		["2032/05/04 (火)","みどりの日"],
+		["2032/05/05 (水)","こどもの日"],
+		["2032/07/19 (月)","海の日"],
+		["2032/08/11 (水)","山の日"],
+		["2032/09/20 (月)","敬老の日"],
+		["2032/09/21 (火)","国民の休日"],
+		["2032/09/22 (水)","秋分の日"],
+		["2032/10/11 (月)","スポーツの日"],
+		["2032/11/03 (水)","文化の日"],
+		["2032/11/23 (火)","勤労感謝の日"],
+		// 2033年
+		["2033/01/01 (土)","元日"],
+		["2033/01/10 (月)","成人の日"],
+		["2033/02/11 (金)","建国記念の日"],
+		["2033/02/23 (水)","天皇誕生日"],
+		["2033/03/20 (日)","春分の日"],
+		["2033/03/21 (月)","振替休日"],
+		["2033/04/29 (金)","昭和の日"],
+		["2033/05/03 (火)","憲法記念日"],
+		["2033/05/04 (水)","みどりの日"],
+		["2033/05/05 (木)","こどもの日"],
+		["2033/07/18 (月)","海の日"],
+		["2033/08/11 (木)","山の日"],
+		["2033/09/19 (月)","敬老の日"],
+		["2033/09/23 (金)","秋分の日"],
+		["2033/10/10 (月)","スポーツの日"],
+		["2033/11/03 (木)","文化の日"],
+		["2033/11/23 (水)","勤労感謝の日"],
+		// 2034年
+		["2034/01/01 (日)","元日"],
+		["2034/01/02 (月)","振替休日"],
+		["2034/01/09 (月)","成人の日"],
+		["2034/02/11 (土)","建国記念の日"],
+		["2034/02/23 (木)","天皇誕生日"],
+		["2034/03/20 (月)","春分の日"],
+		["2034/04/29 (土)","昭和の日"],
+		["2034/05/03 (水)","憲法記念日"],
+		["2034/05/04 (木)","みどりの日"],
+		["2034/05/05 (金)","こどもの日"],
+		["2034/07/17 (月)","海の日"],
+		["2034/08/11 (金)","山の日"],
+		["2034/09/18 (月)","敬老の日"],
+		["2034/09/23 (土)","秋分の日"],
+		["2034/10/09 (月)","スポーツの日"],
+		["2034/11/03 (金)","文化の日"],
+		["2034/11/23 (木)","勤労感謝の日"],
+		// 2035年
+		["2035/01/01 (月)","元日"],
+		["2035/01/08 (月)","成人の日"],
+		["2035/02/11 (日)","建国記念の日"],
+		["2035/02/12 (月)","振替休日"],
+		["2035/02/23 (金)","天皇誕生日"],
+		["2035/03/21 (水)","春分の日"],
+		["2035/04/29 (日)","昭和の日"],
+		["2035/04/30 (月)","振替休日"],
+		["2035/05/03 (木)","憲法記念日"],
+		["2035/05/04 (金)","みどりの日"],
+		["2035/05/05 (土)","こどもの日"],
+		["2035/07/16 (月)","海の日"],
+		["2035/08/11 (土)","山の日"],
+		["2035/09/17 (月)","敬老の日"],
+		["2035/09/23 (日)","秋分の日"],
+		["2035/09/24 (月)","振替休日"],
+		["2035/10/08 (月)","スポーツの日"],
+		["2035/11/03 (土)","文化の日"],
+		["2035/11/23 (金)","勤労感謝の日"],
+		["2035/12/24 (月)","振替休日"],
+		// 2036年
+		["2036/01/01 (火)","元日"],
+		["2036/01/14 (月)","成人の日"],
+		["2036/02/11 (月)","建国記念の日"],
+		["2036/02/23 (土)","天皇誕生日"],
+		["2036/03/20 (木)","春分の日"],
+		["2036/04/29 (火)","昭和の日"],
+		["2036/05/03 (土)","憲法記念日"],
+		["2036/05/04 (日)","みどりの日"],
+		["2036/05/05 (月)","こどもの日"],
+		["2036/05/06 (火)","振替休日"],
+		["2036/07/21 (月)","海の日"],
+		["2036/08/11 (月)","山の日"],
+		["2036/09/15 (月)","敬老の日"],
+		["2036/09/22 (月)","秋分の日"],
+		["2036/10/13 (月)","スポーツの日"],
+		["2036/11/03 (月)","文化の日"],
+		["2036/11/23 (日)","勤労感謝の日"],
+		["2036/11/24 (月)","振替休日"],
+		// 2037年
+		["2037/01/01 (木)","元日"],
+		["2037/01/12 (月)","成人の日"],
+		["2037/02/11 (水)","建国記念の日"],
+		["2037/02/23 (月)","天皇誕生日"],
+		["2037/03/20 (金)","春分の日"],
+		["2037/04/29 (水)","昭和の日"],
+		["2037/05/03 (日)","憲法記念日"],
+		["2037/05/04 (月)","みどりの日"],
+		["2037/05/05 (火)","こどもの日"],
+		["2037/05/06 (水)","振替休日"],
+		["2037/07/20 (月)","海の日"],
+		["2037/08/11 (火)","山の日"],
+		["2037/09/21 (月)","敬老の日"],
+		["2037/09/22 (火)","国民の休日"],
+		["2037/09/23 (水)","秋分の日"],
+		["2037/10/12 (月)","スポーツの日"],
+		["2037/11/03 (火)","文化の日"],
+		["2037/11/23 (月)","勤労感謝の日"],
+		// 2038年
+		["2038/01/01 (金)","元日"],
+		["2038/01/11 (月)","成人の日"],
+		["2038/02/11 (木)","建国記念の日"],
+		["2038/02/23 (火)","天皇誕生日"],
+		["2038/03/20 (土)","春分の日"],
+		["2038/04/29 (木)","昭和の日"],
+		["2038/05/03 (月)","憲法記念日"],
+		["2038/05/04 (火)","みどりの日"],
+		["2038/05/05 (水)","こどもの日"],
+		["2038/07/19 (月)","海の日"],
+		["2038/08/11 (水)","山の日"],
+		["2038/09/20 (月)","敬老の日"],
+		["2038/09/23 (木)","秋分の日"],
+		["2038/10/11 (月)","スポーツの日"],
+		["2038/11/03 (水)","文化の日"],
+		["2038/11/23 (火)","勤労感謝の日"],
+		// 2039年
+		["2039/01/01 (土)","元日"],
+		["2039/01/10 (月)","成人の日"],
+		["2039/02/11 (金)","建国記念の日"],
+		["2039/02/23 (水)","天皇誕生日"],
+		["2039/03/21 (月)","春分の日"],
+		["2039/04/29 (金)","昭和の日"],
+		["2039/05/03 (火)","憲法記念日"],
+		["2039/05/04 (水)","みどりの日"],
+		["2039/05/05 (木)","こどもの日"],
+		["2039/07/18 (月)","海の日"],
+		["2039/08/11 (木)","山の日"],
+		["2039/09/19 (月)","敬老の日"],
+		["2039/09/23 (金)","秋分の日"],
+		["2039/10/10 (月)","スポーツの日"],
+		["2039/11/03 (木)","文化の日"],
+		["2039/11/23 (水)","勤労感謝の日"],
+		// 2040年
+		["2040/01/01 (日)","元日"],
+		["2040/01/02 (月)","振替休日"],
+		["2040/01/09 (月)","成人の日"],
+		["2040/02/11 (土)","建国記念の日"],
+		["2040/02/23 (木)","天皇誕生日"],
+		["2040/03/20 (火)","春分の日"],
+		["2040/04/29 (日)","昭和の日"],
+		["2040/04/30 (月)","振替休日"],
+		["2040/05/03 (木)","憲法記念日"],
+		["2040/05/04 (金)","みどりの日"],
+		["2040/05/05 (土)","こどもの日"],
+		["2040/07/16 (月)","海の日"],
+		["2040/08/11 (土)","山の日"],
+		["2040/09/17 (月)","敬老の日"],
+		["2040/09/22 (土)","秋分の日"],
+		["2040/10/08 (月)","スポーツの日"],
+		["2040/11/03 (土)","文化の日"],
+		["2040/11/23 (金)","勤労感謝の日"],
+
+		// 以下に他のデータを追加してください...
+        ];
+        
+        let currentYear = new Date().getFullYear();
+        let currentMonth = new Date().getMonth();
+        const today = new Date();
+        const todayYear = today.getFullYear();
+        const todayMonth = today.getMonth();
+        const todayDate = today.getDate();
+        const todayDateString = `${todayYear}/${String(todayMonth + 1).padStart(2, '0')}/${String(todayDate).padStart(2, '0')}`;
+        let longPressTimer;
+
+        function showTodayInfo() {
+            document.getElementById("current-date").textContent = todayDateString;
+        }
+
+        function isHoliday(year, month, day) {
+            const dateString = `${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+            return holidaysData.some(h => h[0].startsWith(dateString));
+        }
+
+        function updateCalendar() {
+            const monthNames = ['-January-', '-February', '--March--', '---April---', '----May---', '---June---', '----July----', '--August--', 'September', 'October', 'November', 'December'];
+            document.getElementById("year").textContent = currentYear;
+            document.getElementById("month-name").textContent = monthNames[currentMonth];
+            document.getElementById("month-number").textContent = currentMonth + 1;
+
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            let calendarBody = document.getElementById("calendar-body");
+            calendarBody.innerHTML = "";
+            let row = document.createElement("tr");
+
+            for (let i = 0; i < firstDay; i++) {
+                row.appendChild(document.createElement("td"));
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                let cell = document.createElement("td");
+                cell.textContent = day;
+
+                if (currentYear === todayYear && currentMonth === todayMonth && day === todayDate) {
+                    cell.classList.add("today");
+                }
+                const weekDay = (firstDay + day - 1) % 7;
+                if (isHoliday(currentYear, currentMonth, day)) {
+                    cell.classList.add("holiday");
+                } else if (weekDay === 6) {
+                    cell.classList.add("saturday");
+                } else if (weekDay === 0) {
+                    cell.classList.add("weekend");
+                }
+
+                cell.style.cursor = "pointer";
+                cell.addEventListener("click", function() {
+                    displayScheduleForDate(currentYear, currentMonth, day);
+                });
+                cell.addEventListener("mousedown", function(event) {
+                    longPressTimer = setTimeout(() => displayHolidayInfo(currentYear, currentMonth, day), 500);
+                });
+                cell.addEventListener("mouseup", () => clearTimeout(longPressTimer));
+                cell.addEventListener("touchstart", function(event) {
+                    longPressTimer = setTimeout(() => displayHolidayInfo(currentYear, currentMonth, day), 500);
+                });
+                cell.addEventListener("touchend", () => clearTimeout(longPressTimer));
+
+                row.appendChild(cell);
+                if ((firstDay + day) % 7 === 0) {
+                    calendarBody.appendChild(row);
+                    row = document.createElement("tr");
+                }
+            }
+            if (row.children.length > 0) calendarBody.appendChild(row);
+        }
+
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            } else if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            updateCalendar();
+        }
+
+        function changeYear(delta) {
+            currentYear += delta;
+            updateCalendar();
+        }
+
+        function goToCurrentMonth() {
+            currentYear = todayYear;
+            currentMonth = todayMonth;
+            updateCalendar();
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ja-JP');
+            document.getElementById("current-time").textContent = timeString;
+        }
+
+        showTodayInfo();
+        updateCalendar();
+        updateTime();
+        setInterval(updateTime, 1000);
+        // --- カレンダー描画のスクリプトここまで ---
+    </script>
+
+	<div class="container">
+	    <h1>予定表</h1>
+	    <h3>予定入力</h3>
+
+	    <div class="input-row">
+	        <label for="scheduleDate">日付選択:</label>
+	        <input type="date" id="scheduleDate" class="word-input">
+	    </div>
+        <div class="input-row">
+            <label for="scheduleInput">予定:</label>
+            <textarea id="scheduleInput" rows="2" placeholder="例: 〇〇店にてポイント10倍"></textarea>
+	    </div>
+	    <button class="save-button" onclick="saveSchedule()">保存</button>
+
+	    <button id="toggleButton" class="check-button" onclick="toggleButtonFunction('check')">予定の確認</button>
+
+	    <div id="listContainer">
+	        <button id="closeListButton" onclick="closeList()">予定リストを閉じる</button>
+	        <div id="output"></div>
+	    </div>
+
+
+    <script>
+        // --- ここから予定管理のスクリプト ---
+
+        // 日付選択ツールで日付を選択したときの処理
+        document.getElementById('scheduleDate').addEventListener('change', function() {
+            const selectedDate = this.value; // YYYY-MM-DD
+            if (selectedDate) {
+                const [year, month, day] = selectedDate.split('-');
+                document.getElementById('scheduleInput').value = `${month}/${day} `;
+                document.getElementById('scheduleInput').focus();
+            }
+        });
+
+        let currentEditingKey = null;
+        let limitEnabled = true;
+
+        // --- 通知・音声関数 ---
+        function showCustomAlert(message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'custom-alert';
+            alertContainer.textContent = message;
+            document.body.appendChild(alertContainer);
+            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
+        }
+        function showCustomAlert2(message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'custom-alert2';
+            alertContainer.textContent = message;
+            document.body.appendChild(alertContainer);
+            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 1000);
+        }
+        function showCustomAlert3(message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'custom-alert3';
+            alertContainer.textContent = message;
+            document.body.appendChild(alertContainer);
+            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 3000);
+        }
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+                window.speechSynthesis.speak(utterance);
+            } else { showCustomAlert("ご使用のブラウザは音声合成をサポートしていません。"); }
+        }
+        function nativeSpeak(text) {
+            if (typeof Android !== 'undefined' && Android.speak) { Android.speak(text); } else { speakText(text); }
+        }
+
+        // --- 状態保存・読み込み (localStorage) ---
+        function saveState(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+        function loadState(key) {
+            const value = localStorage.getItem(key);
+            return value ? JSON.parse(value) : null;
+        }
+        const storedLimitEnabled = loadState("limitEnabled");
+        if (storedLimitEnabled !== null) { limitEnabled = storedLimitEnabled; }
+
+        function toggleLimit(enable) {
+            limitEnabled = enable;
+            saveState("limitEnabled", limitEnabled);
+            showCustomAlert(enable ? "予定入力の件数制限を有効にしました。" : "予定入力の件数制限を解除しました。");
+        }
+
+		// --- スケジュール保存関数 (年対応版) ---
+		function saveSchedule() {
+		    const dateInput = document.getElementById('scheduleDate');
+		    const scheduleInput = document.getElementById('scheduleInput');
+		    const selectedDateValue = dateInput.value; // YYYY-MM-DD
+		    const rawScheduleText = scheduleInput.value; // scheduleInputの生の値
+		    const trimmedScheduleText = rawScheduleText.trim(); // 前後の空白を削除した値
+
+		    const scheduleKeys = Object.keys(localStorage).filter(key => key.startsWith("ScheduledText"));
+		    if (limitEnabled && scheduleKeys.length >= 10 && !currentEditingKey) {
+		        showCustomAlert("予定入力の件数は10件までです。");
+		        nativeSpeak("入力件数は10件までです。生活を豊かにする機能充実の正規版への移行をお勧めします。");
+		        return; // 処理を中断
+		    }
+
+		    // 修正箇所1: selectedDateValue と trimmedScheduleText の両方が必須条件となる
+		    if (selectedDateValue && trimmedScheduleText) {
+		        const [year, month, day] = selectedDateValue.split('-');
+		        const dateForlocalStorageKey = `${year}${month.padStart(2, '0')}${day.padStart(2, '0')}`;
+
+		        let scheduleToStore = trimmedScheduleText; // 保存するテキストはトリム済みのものから始める
+
+		        // 修正箇所2: scheduleInput に自動挿入される "MM/DD " が含まれる場合を考慮
+		        // rawScheduleText が "MM/DD " で始まり、かつその後ろに実質的な内容がない場合は保存しない
+		        const autoInsertedPrefix = `${month.padStart(2, '0')}/${day.padStart(2, '0')} `;
+		        if (rawScheduleText.startsWith(autoInsertedPrefix) && trimmedScheduleText === autoInsertedPrefix.trim()) {
+		            // "MM/DD " だけが入力されており、ユーザーが何も追加していない場合
+		            showCustomAlert('予定欄に予定案件を入力してください。');
+		            return; // 保存せずに処理を中断
+		        }
+
+		        // 予定テキストが既に "MM/DD " で始まっているか確認し、なければ追加
+		        // ここでのチェックは rawScheduleText を使い、ユーザーが意図的に入力した MM/DD を尊重する
+		        if (!rawScheduleText.match(/^\d{1,2}\/\d{1,2}\s/)) {
+		            scheduleToStore = `${month.padStart(2, '0')}/${day.padStart(2, '0')} ${trimmedScheduleText}`;
+		        } else {
+		            // もし rawScheduleText が "MM/DD " で始まっているが、その後に何か内容がある場合は、
+		            // そのまま trimmedScheduleText を使う (MM/DD 部分は既に含まれているため)
+		            scheduleToStore = rawScheduleText; // 元のテキストをそのまま保存
+		        }
+
+
+		        if (currentEditingKey) {
+		            // 修正の場合
+		            localStorage.setItem(currentEditingKey, scheduleToStore);
+		            showCustomAlert('修正して保存しました。');
+		            currentEditingKey = null; // 編集モードを終了
+		        } else {
+		            // 新規保存の場合
+		            const randomSuffix = Math.floor(100 + Math.random() * 900).toString();
+		            const key = `ScheduledText${dateForlocalStorageKey}_${randomSuffix}`;
+		            localStorage.setItem(key, scheduleToStore);
+		            showCustomAlert('保存しました。');
+		        }
+
+		        dateInput.value = '';
+		        scheduleInput.value = '';
+		        // 予定リストが表示されている場合は更新
+		        if (document.getElementById('output').innerHTML !== '') {
+		            displayCheck();
+		        }
+		        applyScheduleColorsToCalendar(); // 予定保存後にカレンダーの色を更新
+		    } else {
+		        // 修正箇所3: どちらかが空の場合のメッセージを明確にする
+		        if (!selectedDateValue) {
+		            showCustomAlert('日付選択欄から日付を選択してください。');
+		        } else { // scheduleText が空の場合
+		            showCustomAlert('予定欄に予定案件を入力してください。');
+		        }
+		    }
+		}
+
+        // --- 予定修正関数 (年対応版) ---
+        function editSchedule(key) {
+            const schedule = localStorage.getItem(key);
+            if (schedule) {
+                document.getElementById('scheduleInput').value = schedule;
+                const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
+                if (dateMatch) {
+                    document.getElementById('scheduleDate').value = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+                }
+                currentEditingKey = key;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // --- リスト表示関連 ---
+        function closeList() {
+            const outputElement = document.getElementById('output');
+            const toggleButton = document.getElementById('toggleButton');
+            outputElement.innerHTML = '';
+            document.getElementById('closeListButton').style.display = 'none';
+            toggleButton.textContent = '予定の確認';
+            toggleButton.onclick = () => toggleButtonFunction('check');
+            toggleButton.className = 'check-button';
+            currentEditingKey = null;
+        }
+
+        function toggleButtonFunction(mode) {
+            const button = document.getElementById('toggleButton');
+            if (mode === 'check') {
+                displayCheck();
+                button.textContent = '予定の音声出力';
+                button.onclick = () => toggleButtonFunction('output');
+                button.className = 'output-button';
+            } else if (mode === 'output') {
+                displaySchedules();
+                button.textContent = '予定の確認';
+                button.onclick = () => toggleButtonFunction('check');
+                button.className = 'check-button';
+            }
+        }
+
+        // --- 「予定の確認」表示関数 (年対応版) ---
+        function displayCheck() {
+            const outputElement = document.getElementById('output');
+            outputElement.innerHTML = '';
+            document.getElementById('closeListButton').style.display = 'block';
+
+            const keys = Object.keys(localStorage)
+                .filter(key => key.startsWith('ScheduledText'))
+                .sort((a, b) => a.localeCompare(b)); // キー全体でソートすれば自然と年月日順になる
+
+            keys.forEach(key => {
+                const scheduleText = localStorage.getItem(key);
+                const dateMatchForKey = key.match(/ScheduledText\d{4}(\d{2})(\d{2})_/);
+                const displayDate = dateMatchForKey ? `${dateMatchForKey[1]}/${dateMatchForKey[2]}` : "";
+                const scheduleContent = scheduleText.replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim();
+
+                const row = document.createElement('div');
+                row.className = 'output-row';
+                const scheduleDiv = document.createElement('div');
+                scheduleDiv.textContent = `${displayDate} ${scheduleContent}`;
+                row.appendChild(scheduleDiv);
+
+                const editButton = document.createElement('button');
+                editButton.textContent = '確認修正';
+                editButton.onclick = () => editSchedule(key);
+                row.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '消去';
+                deleteButton.onclick = () => { localStorage.removeItem(key); displayCheck(); };
+                row.appendChild(deleteButton);
+                outputElement.appendChild(row);
+            });
+            if (keys.length === 0) {
+                outputElement.textContent = "登録されている予定はありません。";
+            }
+        }
+
+        // --- 「予定の音声出力」表示関数 (年対応版) ---
+        function displaySchedules() {
+            const outputElement = document.getElementById('output');
+            outputElement.innerHTML = '';
+            document.getElementById('closeListButton').style.display = 'block';
+
+            const todayForSchedule = new Date();
+            const todayKeyPrefix = `${todayForSchedule.getFullYear()}${(todayForSchedule.getMonth() + 1).toString().padStart(2, '0')}${todayForSchedule.getDate().toString().padStart(2, '0')}`;
+            
+            const keys = Object.keys(localStorage)
+                .filter(key => key.startsWith('ScheduledText'))
+                .sort((a, b) => a.localeCompare(b));
+
+            let todaySchedulesSpeech = [];
+            keys.forEach(key => {
+                const scheduleText = localStorage.getItem(key);
+                const keyDatePart = key.substring("ScheduledText".length, "ScheduledText".length + 8);
+                const dateMatchForKey = key.match(/ScheduledText\d{4}(\d{2})(\d{2})_/);
+                const displayDate = dateMatchForKey ? `${dateMatchForKey[1]}/${dateMatchForKey[2]}` : "";
+                const scheduleContent = scheduleText.replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim();
+                
+                if (keyDatePart === todayKeyPrefix) {
+                    todaySchedulesSpeech.push(scheduleContent);
+                }
+
+                const row = document.createElement('div');
+                row.className = 'output-row';
+                const scheduleDiv = document.createElement('div');
+                scheduleDiv.textContent = `${displayDate} ${scheduleContent}`;
+                row.appendChild(scheduleDiv);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = '消去';
+                deleteButton.onclick = () => { localStorage.removeItem(key); displaySchedules(); };
+                row.appendChild(deleteButton);
+                outputElement.appendChild(row);
+            });
+
+            if (keys.length === 0) {
+                outputElement.textContent = "登録されている予定はありません。";
+            }
+            
+            const speechText = todaySchedulesSpeech.length > 0
+                ? `今日 ${todayForSchedule.getMonth() + 1}月${todayForSchedule.getDate()}日の予定は、${todaySchedulesSpeech.join('。 ')}です。`
+                : `今日 ${todayForSchedule.getMonth() + 1}月${todayForSchedule.getDate()}日の予定は特にありません。`;
+            showCustomAlert(speechText.replace(/。/g, ' '));
+            nativeSpeak(speechText);
+        }
+
+		// --- 祝日・日付クリック関数 (年対応版) ---
+		function displayHolidayInfo(year, month, day) {
+		    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
+		    if (holiday) {
+		        const holidayName = holiday[1];
+		        const text = `${month + 1}月${day}日は${holidayName}です。`;
+		        showCustomAlert3(text);
+		        nativeSpeak(text);
+		    }
+		}
+
+		function displayScheduleForDate(year, month, day) {
+		    const datePrefixForKey = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
+		    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
+
+		    // 今日の日付を取得し、時刻をリセット
+		    const today = new Date();
+		    today.setHours(0, 0, 0, 0);
+
+		    // クリックされた日付のDateオブジェクトを作成し、時刻をリセット
+		    const clickedDate = new Date(year, month, day); // monthは0始まりなのでそのまま
+		    clickedDate.setHours(0, 0, 0, 0);
+
+		    if (keys.length > 0) {
+		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
+		        let text;
+
+		        // クリックされた日付が今日より過去かどうかを判定
+		        if (clickedDate < today) {
+		            // 過去の日付の場合：「6月12日の父25回忌です。」のように「予定は」を付けない
+		            text = `${month + 1}月${day}日は${schedules.join('。 ')}です。`;
+		        } else {
+		            // 今日または未来の日付の場合：「6月12日の予定は父25回忌です。」
+		            text = `${month + 1}月${day}日の予定は${schedules.join('。 ')}です。`;
+		        }
+
+		        showCustomAlert(text);
+		        nativeSpeak(text);
+		    } else {
+		        // 予定がない場合も、過去か未来かでメッセージを分けることも可能ですが、
+		        // 今回は「登録されていません。」で統一するとのことなので、そのままとします。
+		        showCustomAlert2(`${month + 1}月${day}日は何も登録されていません。`); // ここを修正
+		    }
+		}
+
+		// --- 初期化処理 --- 6/4
+		document.addEventListener('DOMContentLoaded', () => {
+		    showTodayInfo(); // 今日の情報を表示する関数
+		    updateCalendar(); // カレンダーを描画する関数
+		    applyScheduleColorsToCalendar();  // 6/15 ★ここを追加★：予定のある日付に色を付ける関数
+		    updateTime(); // 現在時刻を更新する関数
+		    setInterval(updateTime, 1000); // 1秒ごとに時刻を更新
+		});
+
+        // --- 予定管理のスクリプトここまで ---
+    </script>
+
+
+
+	<div class="container2">
+	<div class="link-buttons1">
+	    <button class="calendar-button" onclick="location.href='カレンダー.html'">カレンダー</button>
+	    <button class="clock-button" onclick="location.href='時計.html'">時計</button>
+	</div>
+	<br>
+	
+        <button onclick="location.href='お買い物計算.html'">お買い物電卓</button>
+        <br><br>
+        <button onclick="location.href='メモ.html'">メモ表示</button>
+
+        <button onclick="location.href='日記.html'">簡易日記</button>
+
+	    <h3>天気予報</h3>
+	    <p class="word-label">天気サイトのアドレスを入力して下さい。</p>
+	    <label for="weatherUrl">URL:</label>
+<input type="url" id="weatherUrl" placeholder="例: https://www.weather.com" class="word-input">
+
+	    <button onclick="navigate()">移動</button>
+	    <br>
+	    <button id="updateBtn" onclick="enableEditing()">入力と修正</button>
+	    <button id="saveBtn" onclick="saveNewUrl()" style="display:none;">保存</button>
+
+
+	    <h3>検索</h3>
+	    <div class="input-row">
+	    <p class="word-label">このアプリに入力された案件が対象です。</p>
+	        <label for="searchKeyword">キーワード:</label>
+	        <input type="text" id="searchKeyword" class="word-input2">
+	        <button id="searchButton" onclick="searchWords()">表示</button>
+
+	    <h3>さらに高機能検索</h3>	        
+	    <p class="word-label">このアプリに入力された案件が対象です。</p>
+		<button class="clock-button" onclick="location.href='高機能検索.html'">高機能検索に移動</button>
+	</div>
+
+		<button id="keyButton" onclick="displayKeys()">keyを表示</button>
+		<h2>ローカルストレージのKey出力</h2>
+		<button id="closeKeysButton" style="display: none;" onclick="closeKeys()">キーリストを閉じる</button>		
+		<div id="keys"></div>
+		<button id="closeKeysButtonN" style="display: none;" onclick="closeKeysN()">キーリストを閉じる</button>
+
+		<p class="key-label">Keyの詳細:</p>
+		<div class="inline-elements">
+		    <label for="keyInput">keyを入力:</label>
+		    <input type="text" id="keyInput" class="key-input">
+		<button onclick="displayText()">表示</button>
+		</div>
+
+		<div id="displayText"></div>
+		<button id="closeDetailsButton" style="display: none;" onclick="closeDetails()">詳細を閉じる</button>
+		<br>
+		<button id="deleteButton" style="display: none;" onclick="deleteKeyAndText()">Keyと本文を削除</button>
+		<br>
+		<button  id="keyNButton" onclick="location.href='データの保存と復元ツール.html'">keyのエクスポートとインポート</button>
+		<br><br>
+		
+        <button class="calendar-button" onclick="displayStorageUsage()">ローカルストレージの<br>使用量を表示</button>
+		<br>
+
+        <button onclick="location.href='電卓.html'">電卓</button>
+        <button onclick="location.href='年齢計算.html'">年齢計算</button>
+        <button onclick="location.href='度量衡.html'">度量衡</button>
+        <button onclick="location.href='ブックマーク.html'">ブックマーク</button> 
+        <button onclick="location.href='アルコールチェック.html'">アルコールチェック</button>         
+		<br>
+    <!-- おみくじボタンを作成 -->
+    <button id="omikujiButton">おみくじを引く</button>
+    	<br>
+    	
+	<!-- ボタンとアラート -->
+	<button id="G-calendar-button">Google カレンダー表示<br>読み取り専用</button>
+	<div class="custom-alert4" id="alertBox">このカレンダーは表示専用です。予定の編集はできません。</div>
+		<br>
+
+
+	    <script>
+	        document.getElementById('weatherUrl').value = localStorage.getItem("weatherUrl") || '';
+
+	        function enableEditing() {
+	            document.getElementById("weatherUrl").disabled = false;
+	            document.getElementById("saveBtn").style.display = "inline";
+	        }
+
+	        function saveNewUrl() {
+	            const newWeatherUrl = document.getElementById("weatherUrl").value;
+	            if (newWeatherUrl) {
+	                localStorage.setItem("weatherUrl", newWeatherUrl);
+	                alert("保存しました");
+	                document.getElementById("saveBtn").style.display = "none";
+	                document.getElementById("weatherUrl").disabled = true;
+	            } else {
+	                alert("新しいURLを入力してください。");
+	            }
+	        }
+	        
+        // ここに移動    
+        // ページロード時にローカルストレージからアドレスを復元
+        window.onload = function() {
+            const savedUrl = localStorage.getItem('weatherUrl');
+            if (savedUrl) {
+                document.getElementById('weatherUrl').value = savedUrl;
+            }
+        };
+
+        // 入力されたアドレスをローカルストレージに保存して移動
+		function navigate() {
+		    const url = document.getElementById('weatherUrl').value;
+		    if (url) {
+		        localStorage.setItem('weatherUrl', url); // アドレスを保存
+		        window.open(url, '_blank'); // 新しいタブで入力されたURLを開く
+		    } else {
+		        alert("アドレスを入力してください");
+		    }
+		}
+
+
+		function searchWords() {
+		    const keyword = document.getElementById('searchKeyword').value.trim();
+		    if (keyword.length > 0) {
+		        localStorage.setItem('searchKeyword', keyword);
+		        location.href = '検索結果.html';
+		        document.getElementById('searchKeyword').value = ''; // テキストボックスの内容を消去
+		    }
+		}
+
+
+		// ローカルストレージの全てのキーを表示（昇順）
+		function displayKeys() {
+		    const keys = Object.keys(localStorage).sort((a, b) => a.localeCompare(b)); // 正しく昇順に並べ替え
+		    const keysElement = document.getElementById('keys');
+		    keysElement.innerHTML = ''; // 初期化
+		    keys.forEach(key => {
+		        const div = document.createElement('div');
+		        div.textContent = key;
+		        keysElement.appendChild(div);
+		    });
+		    document.getElementById('closeKeysButton').style.display = 'block';     // 閉じるボタンを表示
+		    document.getElementById('closeKeysButtonN').style.display = 'block';     // 閉じるボタンNを表示
+
+		    // カスタムアラートで通知
+		    const message = `ローカルストレージのキーの総数は ${keys.length} 個です。`;
+		    showCustomAlert(message);
+		    nativeSpeak(message);
+		}
+
+		// キーリストを非表示にする
+		function closeKeys() {
+		    const keysElement = document.getElementById('keys');
+		    keysElement.innerHTML = ''; // リスト内容をクリア
+		    document.getElementById('closeKeysButton').style.display = 'none'; 	// 閉じるボタンを非表示
+		    document.getElementById('closeKeysButtonN').style.display = 'none'; // 閉じるボタンNを非表示
+		}
+
+		// キーリストを非表示にするN
+		function closeKeysN() {
+		    const keysElement = document.getElementById('keys');
+		    keysElement.innerHTML = ''; // リスト内容をクリア
+		    document.getElementById('closeKeysButton').style.display = 'none'; // 閉じるボタンを非表示
+		    document.getElementById('closeKeysButtonN').style.display = 'none'; // 閉じるボタンNを非表示
+		}
+		
+		// 指定したキーの詳細を表示
+		function displayText() {
+		    const key = document.getElementById('keyInput').value;
+		    const text = localStorage.getItem(key);
+		    const time = localStorage.getItem(key + 'Time'); // 時間が保存されていると仮定
+		    const displayTextElement = document.getElementById('displayText');
+
+		    if (text) {
+		        displayTextElement.innerText = `内容: ${text}\n時間: ${time || '保存日時なし'}`;
+		        document.getElementById('deleteButton').style.display = 'block'; // 削除ボタンを表示
+		    } else {
+		        displayTextElement.innerText = '指定したキーは存在しません';
+		    }
+
+		    document.getElementById('closeDetailsButton').style.display = 'block'; // 閉じるボタンを表示
+		}
+
+		// 詳細を非表示にする
+		function closeDetails() {
+		    const displayTextElement = document.getElementById('displayText');
+		    const keyInputElement = document.getElementById('keyInput');
+
+		    displayTextElement.innerHTML = ''; // 表示内容をクリア
+		    keyInputElement.value = ''; // キー入力欄をクリア
+		    document.getElementById('closeDetailsButton').style.display = 'none'; // 閉じるボタンを非表示
+		    document.getElementById('deleteButton').style.display = 'none'; // 削除ボタンを非表示
+		}
+
+		// Keyと本文を削除する
+		function deleteKeyAndText() {
+		    const key = document.getElementById('keyInput').value;
+		    localStorage.removeItem(key);
+		    localStorage.removeItem(key + 'Time'); // 時間も削除
+
+		    closeDetails(); // 詳細表示を閉じる
+		    closeKeys(); // キーリストを閉じる
+		    alert('Keyと本文が削除されました');
+		}
+
+
+        // ローカルストレージの使用容量を計算
+        function getLocalStorageUsage() {
+            let total = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                total += key.length + value.length;
+            }
+            return total; // 使用容量（バイト数）
+        }
+
+		// 使用量表示
+		function displayStorageUsage() {
+		    const usage = getLocalStorageUsage();
+		    const usedKB = (usage / 1024).toFixed(2); // 使用量（KB）
+		    const maxStorageKB = 5120; // 最大容量 5MB
+		    const bytesPerSheet = 800; // 1枚の原稿用紙のバイト数
+		    const usedSheets = Math.round((usage / bytesPerSheet)); // 原稿用紙枚数
+		    const remainingKB = (maxStorageKB - usedKB).toFixed(2);
+		    const remainingSheets = Math.round(((remainingKB * 1024) / bytesPerSheet));
+		    
+		    // 100の位以下を切り捨てた値 3/27追加
+		    const remainingSheetsS = Math.floor(remainingSheets / 100) * 100;
+
+		    const message = (
+		        `ローカルストレージの使用量は` +
+		        `原稿用紙約　　${usedSheets} 枚分です。` +
+		        `あと、理論上は` +
+		        `${remainingSheetsS} 枚分程度の空き容量です。`
+		    );
+
+		    // アラートで表示
+		    showCustomAlert(
+		        `ローカルストレージの使用量は　　　${usedKB} KB\n` +
+		        `原稿用紙約　　${usedSheets} 枚分です。\n` +
+		        `あと、　　　　${remainingKB} KB、　　　　${remainingSheets} 枚分程度の空き容量です。`
+		    );
+
+		    nativeSpeak(message);
+		}
+
+
+    <!-- JavaScript の埋め込み -->
+        document.getElementById('omikujiButton').addEventListener('click', () => {
+            const omikujiResults = [
+                {
+                    text: "やったね。大吉だよ。最高だね。気を抜かないで好調をキープしよう。",
+                    speechText: "やったね。だいきちだよ。さいこうだね。きをぬかないでこうちょうをキープしよう。"
+                },
+                {
+                    text: "吉だよ。いいね。今の幸運をキープしよう。",
+                    speechText: "きちだよ。いいね。いまのこううんをキープしよう。"
+                },
+                {
+                    text: "中吉だね。吉の半分ってとこかな。心がけ次第だよ。",
+                    speechText: "ちゅうきちだね。きちのはんぶんってとこかな。こころがけしだいだよ。"
+                },
+                {
+                    text: "小吉だね。でも、いいんじゃなあい ? ささやかな幸せを楽しもう。",
+                    speechText: "しょうきちだね。でも、いいんじゃなあい ? ささやかなしあわせをたのしもう。"
+                },
+                {
+                    text: "末吉だね。今よくなくても、これから運は開けていくよ。",
+                    speechText: "すえきちだね。いまよくなくても、これからうんはひらけていくよ。"
+                },
+                {
+                    text: "ガーン！凶だね。でもこれから上がっていくだけだよ。何回も引くと制限かけるよ。",
+                    speechText: "ガーン！きょうだね。でもこれからあがっていくだけだよ。なんかいもひくとせいげんかけるよ。"
+                }
+            ];
+
+            // 1から6までのランダムな数字を取得
+            const randomIndex = Math.floor(Math.random() * omikujiResults.length);
+            const result = omikujiResults[randomIndex];
+
+            // カスタム通知と音声を表示
+            showCustomAlert(result.text);
+            nativeSpeak(result.speechText);
+        });
+    </script>
+
+	<script>
+	  document.getElementById('G-calendar-button').addEventListener('click', function () {
+	    const alertBox = document.getElementById('alertBox');
+	    alertBox.style.display = 'block';
+
+	    // 3秒後にカレンダーに遷移
+	    setTimeout(function () {
+	      alertBox.style.display = 'none';
+	      window.open('https://ettomio0518.github.io/my-google-calendar/my-google-calendar.html', '_blank');
+	    }, 3000);
+	  });
+	</script>
+    
+	</div>
+	</div>
+
+		<p>© 2025 ettomio. Version 10.2 (2025-06-23)</p>
+
+	<!-- 3keyを削除ボタン 4/23追加 -->
+	<button onclick="deleteThreeKeys()">3keyを削除</button>
+	<br>
+	
+	<script>
+	function deleteThreeKeys() {
+	    // 削除対象のキー
+	    const keysToDelete = ["limitEnabled", "visibility", "backgroundColor"];
+	    
+	    // 各キーを削除
+	    keysToDelete.forEach(key => {
+	        localStorage.removeItem(key);
+	    });
+
+	    // ユーザーに通知（お好みで音声案内なども可）
+	    alert("3つのキーを削除しました。ページを再読み込みすると初期状態に戻ります。");
+	}
+	</script>
+
+	  <!-- スクロールで表示されるTopボタン 5/5 -->
+	  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+
+	  <!-- JavaScript -->
+	  <script>
+	    // Topに戻る
+	    function scrollToTop() {
+	      window.scrollTo({
+	        top: 0,
+	        behavior: 'smooth'
+	      });
+	    }
+
+	    // スクロールしてボタン表示制御
+	    window.addEventListener("scroll", function () {
+	      const topBtn = document.getElementById("topBtn");
+	      if (window.scrollY > 300) {
+	        topBtn.style.display = "block";
+	      } else {
+	        topBtn.style.display = "none";
+	      }
+	    });
+  </script>
+  
+	<!-- HTML末尾にこれを追加 5/5 -->
+	<div style="height: 80px;"></div>
+
+</body>
+
+</html>
+
