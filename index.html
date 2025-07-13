@@ -333,6 +333,23 @@
         .has-schedule {
             background-color: #fff59b !important; /* 予定がある日 */
         }
+
+		/* 日付選択行の中央揃え 7/13 */
+		.input-row.date-row {
+		    display: flex;
+		    justify-content: center; /* 水平方向の中央揃え */
+		    align-items: center; /* 垂直方向の中央揃え */
+		    gap: 10px; /* 要素間のスペース */
+		}
+
+		/* 予定入力行のスタイルはそのまま 7/13 */
+		.input-row {
+		    margin-bottom: 15px; /* デフォルトの余白を保持 */
+		}
+		        	    
+		#voiceInputButton {
+		    display: none; /* 初期状態で非表示に設定 */
+		}
         	    
     </style>
 </head>
@@ -895,14 +912,19 @@
 	    <h1>予定表</h1>
 	    <h3>予定入力</h3>
 
-	    <div class="input-row">
-	        <label for="scheduleDate">日付選択:</label>
-	        <input type="date" id="scheduleDate" class="word-input">
-	    </div>
-        <div class="input-row">
-            <label for="scheduleInput">予定:</label>
-            <textarea id="scheduleInput" rows="2" placeholder="例: 〇〇店にてポイント10倍"></textarea>
-	    </div>
+		<div class="input-row date-row">
+		    <label for="scheduleDate">日付選択:</label>
+		    <input type="date" id="scheduleDate" class="word-input">
+		    <!-- 音声入力ボタン 7/13追加-->
+		    <button id="voiceInputButton" onclick="startVoiceInput()">音声入力</button>
+		</div>
+
+		<div class="input-row">
+		    <label for="scheduleInput">予定:</label>
+		    <textarea id="scheduleInput" rows="2" placeholder="例: 〇〇店にてポイント10倍"></textarea>
+		</div>
+
+	    
 	    <button class="save-button" onclick="saveSchedule()">保存</button>
 
 	    <button id="toggleButton" class="check-button" onclick="toggleButtonFunction('check')">予定の確認</button>
@@ -916,18 +938,46 @@
     <script>
         // --- ここから予定管理のスクリプト ---
 
-        // 日付選択ツールで日付を選択したときの処理
-        document.getElementById('scheduleDate').addEventListener('change', function() {
-            const selectedDate = this.value; // YYYY-MM-DD
-            if (selectedDate) {
-                const [year, month, day] = selectedDate.split('-');
-                document.getElementById('scheduleInput').value = `${month}/${day} `;
-                document.getElementById('scheduleInput').focus();
-            }
-        });
+		// 日付選択ツールで日付を選択したときの処理
+		document.getElementById('scheduleDate').addEventListener('change', function() {
+		    const selectedDate = this.value; // YYYY-MM-DD
+		    if (selectedDate) {
+		        const [year, month, day] = selectedDate.split('-');
+		        document.getElementById('scheduleInput').value = `${month}/${day} `;
+		        document.getElementById('scheduleInput').focus();
+
+        // 「音声入力」ボタンを再表示
+        const voiceInputButton = document.getElementById('voiceInputButton');
+        voiceInputButton.style.display = "block";
+    }
+});
 
         let currentEditingKey = null;
         let limitEnabled = true;
+
+	    // 音声入力ボタンの制御
+	    const voiceInputButton = document.getElementById("voiceInputButton");
+	    const scheduleInput = document.getElementById("scheduleInput");
+
+	    // 音声認識オブジェクトの設定
+	    const recognition = new webkitSpeechRecognition();
+	    recognition.lang = "ja-JP";
+	    recognition.interimResults = false;
+
+	    // 音声入力開始処理
+	    function startVoiceInput() {
+	        recognition.start();
+	    }
+
+	    recognition.onresult = (event) => {
+	        const transcript = event.results[0][0].transcript;
+	        scheduleInput.value += transcript;
+	    };
+
+	    recognition.onerror = (event) => {
+	        console.error("音声認識エラー:", event.error);
+	    };
+
 
         // --- 通知・音声関数 ---
         function showCustomAlert(message) {
@@ -977,13 +1027,19 @@
             showCustomAlert(enable ? "予定入力の件数制限を有効にしました。" : "予定入力の件数制限を解除しました。");
         }
 
-		// --- スケジュール保存関数 (年対応版) ---
+		// スケジュール保存関数
 		function saveSchedule() {
+		    const voiceInputButton = document.getElementById("voiceInputButton");
 		    const dateInput = document.getElementById('scheduleDate');
 		    const scheduleInput = document.getElementById('scheduleInput');
-		    const selectedDateValue = dateInput.value; // YYYY-MM-DD
-		    const rawScheduleText = scheduleInput.value; // scheduleInputの生の値
-		    const trimmedScheduleText = rawScheduleText.trim(); // 前後の空白を削除した値
+
+		    // 音声入力ボタンを非表示にする
+		    voiceInputButton.style.display = "none";	
+				    //const dateInput = document.getElementById('scheduleDate');
+				    //const scheduleInput = document.getElementById('scheduleInput');
+				    const selectedDateValue = dateInput.value; // YYYY-MM-DD
+				    const rawScheduleText = scheduleInput.value; // scheduleInputの生の値
+				    const trimmedScheduleText = rawScheduleText.trim(); // 前後の空白を削除した値
 
 		    const scheduleKeys = Object.keys(localStorage).filter(key => key.startsWith("ScheduledText"));
 		    if (limitEnabled && scheduleKeys.length >= 10 && !currentEditingKey) {
@@ -1503,7 +1559,7 @@
 
     <button onclick="location.href='紹介N.html'">紹介ページ</button>
     
-    <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 10.3 (2025-07-12)</p>
+    <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 10.4 (2025-07-13)</p>
 
     <!-- 3/25差別化機能を追加 -->
 	<!-- 差別化ボタン（6つ）→ 非表示にしておく 4/19 -->
