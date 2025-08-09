@@ -241,6 +241,8 @@
         <!-- キーワード入力ボックス -->
         <div>
             <label for="keywordInput">キーワード:</label>
+            <!-- 音声入力ボタン -->
+<button id="voiceButton" onclick="startVoiceInput()">🎤 音声入力</button>
             <input type="text" id="keywordInput" oninput="searchMemos()" placeholder="検索キーワードを入力">
         </div>
 
@@ -254,6 +256,63 @@
 
 
     <script>
+		// 8/10 追加　CoPilot    
+    	let recognition;
+		let isListening = false;
+
+		// 音声入力を開始する関数
+		function startVoiceInput() {
+		    if (!('webkitSpeechRecognition' in window)) {
+		        alert('音声認識はこのブラウザではサポートされていません。');
+		        return;
+		    }
+
+		    if (!recognition) {
+		        recognition = new webkitSpeechRecognition();
+		        recognition.lang = 'ja-JP';
+		        recognition.interimResults = false;
+		        recognition.maxAlternatives = 1;
+
+		        recognition.onresult = function(event) {
+		            const transcript = event.results[0][0].transcript;
+		            document.getElementById('keywordInput').value = transcript;
+		            searchMemos();
+		            toggleVoiceButton(true); // 「クリア」ボタンに切り替え
+		        };
+
+		        recognition.onerror = function(event) {
+		            alert('音声認識エラー: ' + event.error);
+		        };
+
+		        recognition.onend = function() {
+		            isListening = false;
+		        };
+		    }
+
+		    recognition.start();
+		    isListening = true;
+		}
+
+		// ボタン表示を切り替える関数
+		function toggleVoiceButton(isClearMode) {
+		    const voiceButton = document.getElementById('voiceButton');
+		    if (isClearMode) {
+		        voiceButton.textContent = '❌ クリア';
+		        voiceButton.onclick = clearVoiceInput;
+		    } else {
+		        voiceButton.textContent = '🎤 音声入力';
+		        voiceButton.onclick = startVoiceInput;
+		    }
+		}
+
+		// キーワードをクリアして全リスト表示に戻す関数
+		function clearVoiceInput() {
+		    document.getElementById('keywordInput').value = '';
+		    searchMemos();
+		    toggleVoiceButton(false); // 「音声入力」ボタンに戻す
+		}
+		// ここまで		
+
         let currentKey = null; // 現在表示しているkeyを保持
 
         // URLをリンクに変換する関数
@@ -373,7 +432,7 @@
         window.onload = () => searchMemos();
     </script>
 
-
+  
 	  <!-- スクロールで表示されるTopボタン 5/5 -->
 	  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
 
@@ -397,7 +456,15 @@
 	      }
 	    });
 	  </script>
+	  
+ 	  
    	</div>
+   	
+	<footer style="text-align: center;">
+	<br>
+	  © 20250810 ettomio
+	</footer>
+     	
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
    	       
