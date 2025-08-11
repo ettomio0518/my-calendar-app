@@ -224,7 +224,45 @@
     .top-right-button:hover {
       background-color: #f4f4f4;
     }
-	    	        
+
+	/* 8/11 追加 */	
+	#voiceButton {
+	    color: #4d0000;
+	    background-color: #c8ffe3;
+	    border-radius: 5px;
+	    border: 1px solid #0000ff;
+	}
+
+	@keyframes blink {
+	  0% { opacity: 1; }
+	  50% { opacity: 0.3; }
+	  100% { opacity: 1; }
+	}
+
+	.blinking {
+	  animation: blink 1s infinite;
+	}
+
+	#voiceButton.recording {
+	    color: red !important;
+	    background-color: #ffd0d0 !important;
+	}
+
+	/* カスタムアラート */
+	.custom-alert { 
+	    position: fixed; 
+	    top: 20px; 
+	    left: 50%; 
+	    transform: translateX(-50%); 
+	    background-color: #333; 
+	    color: white; 
+	    padding: 15px 25px; 
+	    border-radius: 5px; 
+	    box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+	    z-index: 1000; 
+	    font-size: 1em; 
+	}
+		
 	</style>
 	
 </head>
@@ -256,12 +294,28 @@
 
 
     <script>
-		// 8/10 追加　CoPilot    
-    	let recognition;
+		// 8/10,8/11 追加　CoPilot    
+		let recognition;
 		let isListening = false;
 
+	    // カスタム通知を表示する関数 8/12 追加
+	    function showCustomAlert(message) {
+	        const alertContainer = document.createElement('div');
+	        alertContainer.className = 'custom-alert';
+	        alertContainer.textContent = message;
+
+	        document.body.appendChild(alertContainer);
+
+	        // 2秒後に通知を自動的に消去
+	        setTimeout(() => {
+	            document.body.removeChild(alertContainer);
+	        }, 2000);
+	    }
+	    
 		// 音声入力を開始する関数
 		function startVoiceInput() {
+		    const voiceButton = document.getElementById('voiceButton');
+
 		    if (!('webkitSpeechRecognition' in window)) {
 		        alert('音声認識はこのブラウザではサポートされていません。');
 		        return;
@@ -282,15 +336,27 @@
 
 		        recognition.onerror = function(event) {
 		            alert('音声認識エラー: ' + event.error);
-		        };
-
-		        recognition.onend = function() {
-		            isListening = false;
-		        };
+	                showCustomAlert('手動入力をお願いします');
+	                // 音声入力ボタンを非表示にする
+		            voiceButton.style.display = "none";
+	        	};
 		    }
+
+			// 手動入力が始まったら「❌ クリア」ボタンを表示
+			document.getElementById('keywordInput').addEventListener('input', function () {
+			    const voiceButton = document.getElementById('voiceButton');
+			    if (this.value.trim() !== '') {
+			        voiceButton.style.display = "inline-block";
+			        toggleVoiceButton(true); // 「❌ クリア」モードに切り替え
+			    }
+			});
 
 		    recognition.start();
 		    isListening = true;
+
+		    // 録音中スタイルを追加
+		    voiceButton.classList.add("blinking");
+		    voiceButton.classList.add("recording");
 		}
 
 		// ボタン表示を切り替える関数
@@ -299,9 +365,13 @@
 		    if (isClearMode) {
 		        voiceButton.textContent = '❌ クリア';
 		        voiceButton.onclick = clearVoiceInput;
+		        voiceButton.classList.remove("blinking");
+		        voiceButton.classList.remove("recording");
 		    } else {
 		        voiceButton.textContent = '🎤 音声入力';
 		        voiceButton.onclick = startVoiceInput;
+		        voiceButton.classList.remove("blinking");
+		        voiceButton.classList.remove("recording");
 		    }
 		}
 
@@ -311,6 +381,7 @@
 		    searchMemos();
 		    toggleVoiceButton(false); // 「音声入力」ボタンに戻す
 		}
+
 		// ここまで		
 
         let currentKey = null; // 現在表示しているkeyを保持
@@ -462,7 +533,7 @@
    	
 	<footer style="text-align: center;">
 	<br>
-	  © 20250810 ettomio
+	  © 20250812 ettomio
 	</footer>
      	
 	<!-- HTML末尾にこれを追加 5/5 -->
