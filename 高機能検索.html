@@ -530,7 +530,27 @@
 	  
  	  
    	</div>
-   	
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const voiceButton = document.getElementById("voiceButton");
+
+            if (!('webkitSpeechRecognition' in window)) {
+                voiceButton.style.display = "none";
+                showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
+            }
+
+            const recognition = new webkitSpeechRecognition();
+            recognition.onerror = function(event) {
+                alert('音声認識エラー: ' + event.error);
+                showCustomAlert('手動入力をお願いします');
+                voiceButton.style.display = "none";
+            };
+
+            // 他の recognition 設定やイベントもここに追加可能
+        });
+    </script>
+ 	
 	<footer style="text-align: center;">
 	<br>
 	  © 20250812 ettomio
