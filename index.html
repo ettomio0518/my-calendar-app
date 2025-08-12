@@ -1020,28 +1020,6 @@
 	        scheduleInput.value += transcript;
 	    };
 
-        recognition.onerror = function(event) {
-            alert('音声認識エラー: ' + event.error);
-            showCustomAlert4('手動入力をお願いします');
-		    // 音声入力ボタンを非表示にする
-		    voiceInputButton.style.display = "none";            
-        };
-
-let voiceErrorCount = 0; // 音声認識エラー回数
-
-recognition.onerror = function(event) {
-    voiceErrorCount++;
-
-    alert('音声認識エラー: ' + event.error);
-
-    if (voiceErrorCount >= 3) {
-        showCustomAlert4('やはり、手動入力してください');
-        voiceInputButton.style.display = "none"; // 完全に非表示
-    } else {
-        showCustomAlert4('手動入力をお願いします');
-        voiceInputButton.style.display = "none"; // 一時的に非表示
-    }
-};
 
 		// 手動入力欄に何か入力されたら再表示 8/12
 document.getElementById('scheduleInput').addEventListener('input', function () {
@@ -1050,6 +1028,21 @@ document.getElementById('scheduleInput').addEventListener('input', function () {
     }
 });
 
+		let voiceErrorCount = 0; // 音声認識エラー回数 8/12
+
+		recognition.onerror = function(event) {
+		    voiceErrorCount++;
+
+		    alert('音声認識エラー: ' + event.error);
+
+		    if (voiceErrorCount >= 3) {
+		        showCustomAlert4('やはり、手動入力してください');
+		        voiceInputButton.style.display = "none"; // 完全に非表示
+		    } else {
+		        showCustomAlert4('手動入力をお願いします');
+		        voiceInputButton.style.display = "none"; // 一時的に非表示
+		    }
+		};
 
         // --- 通知・音声関数 ---
         function showCustomAlert(message) {
@@ -1772,38 +1765,52 @@ document.getElementById('scheduleInput').addEventListener('input', function () {
 
     // 初期化をページロード時に実行 (DOMContentLoaded イベントの代替)
     // window.onload = initializeState; // これは削除またはコメントアウト4/25
-  </script>
+  	</script>
 
 
-	  <!-- スクロールで表示されるTopボタン -->
-	  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<!-- スクロールで表示されるTopボタン -->
+		<button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
 
-	  <!-- JavaScript -->
-	  <script>
-	    // Topに戻る
-	    function scrollToTop() {
-	      window.scrollTo({
-	        top: 0,
-	        behavior: 'smooth'
-	      });
-	    }
+		<!-- JavaScript -->
+		<script>
+		    // Topに戻る
+		    function scrollToTop() {
+		        window.scrollTo({
+		            top: 0,
+		            behavior: 'smooth'
+		        });
+		    }
 
-	    // スクロールしてボタン表示制御
-	    window.addEventListener("scroll", function () {
-	      const topBtn = document.getElementById("topBtn");
-	      if (window.scrollY > 300) {
-	        topBtn.style.display = "block";
-	      } else {
-	        topBtn.style.display = "none";
-	      }
-	    });
-  </script>
-  
-    <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 10.8 (2025-08-12)</p>
-      
-	<!-- HTML末尾にこれを追加 5/5 -->
-	<div style="height: 80px;"></div>
-  
+		    // スクロールしてボタン表示制御
+		    window.addEventListener("scroll", function () {
+		        const topBtn = document.getElementById("topBtn");
+		        if (window.scrollY > 300) {
+		            topBtn.style.display = "block";
+		        } else {
+		            topBtn.style.display = "none";
+		        }
+		    });
+		</script>
+
+		<script>
+		    // ✅ DOMContentLoaded を使った初期化処理は一番最後に書く
+		    document.addEventListener("DOMContentLoaded", function () {
+		        const voiceInputButton = document.getElementById("voiceInputButton");
+
+		        if (!('webkitSpeechRecognition' in window)) {
+		            voiceInputButton.style.display = "none";
+		            showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。');
+		        }
+		    });
+		</script>
+
+		<!-- バージョン情報 -->
+		<p id="version-number" onclick="handleClick();">
+		    © 2025 ettomio. All rights reserved. | Version 10.8 (2025-08-12)
+		</p>
+
+		<!-- HTML末尾にこれを追加 5/5 -->
+		<div style="height: 80px;"></div>
 </body>
 </html>
 
