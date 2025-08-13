@@ -294,35 +294,39 @@
 
 
     <script>
-		// 8/10,8/11 追加　CoPilot    
+		// 8/10,8/11 8/13追加　CoPilot    
 		let recognition;
 		let isListening = false;
 
-	    // カスタム通知を表示する関数 8/12 追加
-	    function showCustomAlert(message) {
-	        const alertContainer = document.createElement('div');
-	        alertContainer.className = 'custom-alert';
-	        alertContainer.textContent = message;
+		// カスタム通知を表示する関数
+		function showCustomAlert(message) {
+		    const alertContainer = document.createElement('div');
+		    alertContainer.className = 'custom-alert';
+		    alertContainer.textContent = message;
 
-	        document.body.appendChild(alertContainer);
+		    document.body.appendChild(alertContainer);
 
-	        // 2秒後に通知を自動的に消去
-	        setTimeout(() => {
-	            document.body.removeChild(alertContainer);
-	        }, 2000);
-	    }
-	    
+		    setTimeout(() => {
+		        document.body.removeChild(alertContainer);
+		    }, 2000);
+		}
+
 		// 音声入力を開始する関数
 		function startVoiceInput() {
 		    const voiceButton = document.getElementById('voiceButton');
 
-		    if (!('webkitSpeechRecognition' in window)) {
-		        alert('音声認識はこのブラウザではサポートされていません。');
-		        return;
-		    }
-
 		    if (!recognition) {
-		        recognition = new webkitSpeechRecognition();
+		        if ('webkitSpeechRecognition' in window) {
+		            recognition = new webkitSpeechRecognition();
+		        } else if ('SpeechRecognition' in window) {
+		            recognition = new SpeechRecognition();
+		        } else {
+		            recognition = null;
+		            voiceButton.style.display = "none";
+		            showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
+		            return;
+		        }
+
 		        recognition.lang = 'ja-JP';
 		        recognition.interimResults = false;
 		        recognition.maxAlternatives = 1;
@@ -331,30 +335,19 @@
 		            const transcript = event.results[0][0].transcript;
 		            document.getElementById('keywordInput').value = transcript;
 		            searchMemos();
-		            toggleVoiceButton(true); // 「クリア」ボタンに切り替え
+		            toggleVoiceButton(true); // 「❌ クリア」ボタンに切り替え
 		        };
 
 		        recognition.onerror = function(event) {
 		            alert('音声認識エラー: ' + event.error);
-	                showCustomAlert('手動入力をお願いします');
-	                // 音声入力ボタンを非表示にする
+		            showCustomAlert('手動入力をお願いします');
 		            voiceButton.style.display = "none";
-	        	};
+		        };
 		    }
-
-			// 手動入力が始まったら「❌ クリア」ボタンを表示
-			document.getElementById('keywordInput').addEventListener('input', function () {
-			    const voiceButton = document.getElementById('voiceButton');
-			    if (this.value.trim() !== '') {
-			        voiceButton.style.display = "inline-block";
-			        toggleVoiceButton(true); // 「❌ クリア」モードに切り替え
-			    }
-			});
 
 		    recognition.start();
 		    isListening = true;
 
-		    // 録音中スタイルを追加
 		    voiceButton.classList.add("blinking");
 		    voiceButton.classList.add("recording");
 		}
@@ -381,6 +374,28 @@
 		    searchMemos();
 		    toggleVoiceButton(false); // 「音声入力」ボタンに戻す
 		}
+
+		// DOM読み込み後の初期化
+		document.addEventListener('DOMContentLoaded', function () {
+		    const voiceButton = document.getElementById('voiceButton');
+		    const keywordInput = document.getElementById('keywordInput');
+
+		    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+		        voiceButton.style.display = "none";
+		        showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
+		    } else {
+		        voiceButton.onclick = startVoiceInput;
+		        toggleVoiceButton(false);
+		    }
+
+		    // 手動入力が始まったら「❌ クリア」ボタンに切り替え
+		    keywordInput.addEventListener('input', function () {
+		        if (this.value.trim() !== '') {
+		            voiceButton.style.display = "inline-block";
+		            toggleVoiceButton(true);
+		        }
+		    });
+		});
 
 		// ここまで		
 
@@ -530,30 +545,10 @@
 	  
  	  
    	</div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const voiceButton = document.getElementById("voiceButton");
-
-            if (!('webkitSpeechRecognition' in window)) {
-                voiceButton.style.display = "none";
-                showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
-            }
-
-            const recognition = new webkitSpeechRecognition();
-            recognition.onerror = function(event) {
-                alert('音声認識エラー: ' + event.error);
-                showCustomAlert('手動入力をお願いします');
-                voiceButton.style.display = "none";
-            };
-
-            // 他の recognition 設定やイベントもここに追加可能
-        });
-    </script>
- 	
+   	
 	<footer style="text-align: center;">
 	<br>
-	  © 20250812 ettomio
+	  © 20250813 ettomio
 	</footer>
      	
 	<!-- HTML末尾にこれを追加 5/5 -->
