@@ -980,7 +980,13 @@
 	    const scheduleInput = document.getElementById("scheduleInput");
 
 	    // 音声認識オブジェクトの設定
-	    const recognition = new webkitSpeechRecognition();
+	    // 8/14 Gemini
+		let recognition;
+		if ('webkitSpeechRecognition' in window) {
+		    recognition = new webkitSpeechRecognition();
+		} else if ('SpeechRecognition' in window) {
+		    recognition = new SpeechRecognition();
+		}
 	    recognition.lang = "ja-JP";
 	    recognition.interimResults = false;
 
@@ -1788,7 +1794,7 @@
     });
   </script>
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 10.8 (2025-08-13)</p>
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 10.8 (2025-08-14)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
