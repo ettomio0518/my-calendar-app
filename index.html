@@ -1418,27 +1418,50 @@ function displayScheduleForDate(year, month, day) {
 		    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
 		    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
 		    
-		    let alertMessage = '';
+		    let hasSchedule = keys.length > 0;
+		    let hasHoliday = !!holiday;
 		    let speechText = '';
-		    let alertType = 'custom-alert2';
+		    let alertMessage = '';
+		    let alertType;
 
-		    const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
-		    const hasSchedule = schedules.length > 0;
-		    const hasHoliday = !!holiday;
-
+		    // 1. 予定のメッセージを生成
 		    if (hasSchedule) {
-		        speechText += `${month + 1}月${day}日の予定は${schedules.join('。 ')}です。`;
-		        alertMessage += `予定：${schedules.join('、')}`;
+		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
+		        
+		        const today = new Date();
+		        today.setHours(0, 0, 0, 0);
+		        const clickedDate = new Date(year, month, day);
+		        clickedDate.setHours(0, 0, 0, 0);
+
+		        if (clickedDate < today) {
+		            // 過去の日付の場合
+		            speechText += `${month + 1}月${day}日は${schedules.join('。 ')}です。`;
+		            alertMessage += `過去の予定：${schedules.join('、 ')}`;
+		        } else {
+		            // 今日または未来の日付の場合
+		            speechText += `${month + 1}月${day}日の予定は${schedules.join('。 ')}です。`;
+		            alertMessage += `予定：${schedules.join('、 ')}`;
+		        }
 		        alertType = 'custom-alert';
 		    }
 
+		    // 2. 祝日のメッセージを生成
 		    if (hasHoliday) {
 		        const holidayName = holiday[1];
-		        speechText += ` ${month + 1}月${day}日は${holidayName}です。`;
-		        alertMessage += `${hasSchedule ? '\n' : ''}祝日：${holidayName}`;
-		        alertType = hasSchedule ? 'custom-alert' : 'custom-alert3';
+		        
+		        if (hasSchedule) {
+		            // 予定も祝日もある場合
+		            speechText += ` そして、${month + 1}月${day}日は${holidayName}です。`;
+		            alertMessage += `\n祝日：${holidayName}`;
+		        } else {
+		            // 祝日のみの場合
+		            speechText += `${month + 1}月${day}日は${holidayName}です。`;
+		            alertMessage += `祝日：${holidayName}`;
+		            alertType = 'custom-alert3';
+		        }
 		    }
 		    
+		    // 3. 予定も祝日もない場合の処理
 		    if (!hasSchedule && !hasHoliday) {
 		        speechText = `${month + 1}月${day}日は何も登録されていません。`;
 		        alertMessage = `${month + 1}月${day}日は何も登録されていません。`;
@@ -1457,7 +1480,7 @@ function displayScheduleForDate(year, month, day) {
 		    nativeSpeak(speechText);
 		}
 		
-
+		
 		// --- image64.pngクリック時の処理 8/21追加---
 		document.addEventListener('DOMContentLoaded', () => {
 		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
