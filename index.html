@@ -382,6 +382,50 @@
 		    color: red !important;
 		    background-color: #ffd0d0 !important; /* 薄めの赤 */
 		}
+
+		/* 8/21追加 360度回転*/
+		@keyframes spinAround {
+		    0%   { transform: rotate(0deg); }
+		    100% { transform: rotate(360deg); }
+		}
+		.spin-around {
+		    animation: spinAround 0.8s ease-in-out;
+		}
+		
+		/* 8/21追加 ウィンク
+		@keyframes mascotWink {
+		    0% { transform: scale(1); }
+		    50% { transform: scale(1.1) rotate(5deg); }
+		    100% { transform: scale(1); }
+		}
+		.mascot-animate {
+		    animation: mascotWink 0.6s ease-in-out;
+		}
+		*/
+		
+		/* 8/21追加 ダブルウィンク
+		@keyframes doubleWink {
+		    0%   { transform: rotate(0deg); }
+		    25%  { transform: rotate(5deg); }
+		    50%  { transform: rotate(0deg); }
+		    75%  { transform: rotate(5deg); }
+		    100% { transform: rotate(0deg); }
+		}
+		.double-wink {
+		    animation: doubleWink 1s ease-in-out;
+		}
+		*/
+		
+		/* 8/21追加 ジャンプ 
+		.mascot-animate {
+		    animation: bounce 0.6s ease;
+		}
+		@keyframes bounce {
+		    0%   { transform: translateY(0); }
+		    50%  { transform: translateY(-10px); }
+		    100% { transform: translateY(0); }
+		}
+ 		*/
 		
     </style>
 </head>
@@ -1047,7 +1091,7 @@
             alertContainer.className = 'custom-alert2';
             alertContainer.textContent = message;
             document.body.appendChild(alertContainer);
-            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 1000);
+            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 2000);
         }
         function showCustomAlert3(message) {
             const alertContainer = document.createElement('div');
@@ -1410,6 +1454,51 @@
 		        // 予定がない場合も、過去か未来かでメッセージを分けることも可能ですが、
 		        // 今回は「登録されていません。」で統一するとのことなので、そのままとします。
 		        showCustomAlert2(`${month + 1}月${day}日は何も登録されていません。`); // ここを修正
+		    }
+		}
+
+
+		// --- image64.pngクリック時の処理 8/21追加---
+		document.addEventListener('DOMContentLoaded', () => {
+		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
+
+		    if (logoImage) {
+		        logoImage.addEventListener('click', () => {
+		            // アニメーション開始（doubleWink）
+		            logoImage.classList.add('spin-around');
+
+		            // 1秒後にアニメーション終了
+		            setTimeout(() => logoImage.classList.remove('spin-around'), 800);
+		            
+		            // 1秒後にアラートと音声処理を実行（アニメーションと同時）
+		            setTimeout(() => {
+		                if (window.confirm("今日の予定を音声出力しますか？")) {
+		                    speakTodaySchedule();
+		                }
+		            }, 1000);
+		        });
+		    }
+		});
+
+
+		function speakTodaySchedule() {
+		    const today = new Date();
+		    const year = today.getFullYear();
+		    const month = today.getMonth() + 1;
+		    const day = today.getDate();
+
+		    const datePrefixForKey = `ScheduledText${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
+		    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
+
+		    if (keys.length > 0) {
+		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
+		        const fullScheduleText = `今日、${month}月${day}日の予定は${schedules.join('。 ')}です。`;
+		        showCustomAlert(fullScheduleText);
+		        nativeSpeak(fullScheduleText);
+		    } else {
+		        const noScheduleText = `今日、${month}月${day}日、登録されている予定はありません。`;
+		        showCustomAlert2(noScheduleText);
+		        nativeSpeak(noScheduleText);
 		    }
 		}
 
@@ -1794,7 +1883,7 @@
     });
   </script>
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 10.9 (2025-08-18)</p>
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.0 (2025-08-21)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
