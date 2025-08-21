@@ -1411,52 +1411,52 @@
                 }
             });
         }
-        
-		// --- 祝日・日付クリック関数 (年対応版) ---
-		function displayHolidayInfo(year, month, day) {
-		    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
-		    if (holiday) {
-		        const holidayName = holiday[1];
-		        const text = `${month + 1}月${day}日は${holidayName}です。`;
-		        showCustomAlert3(text);
-		        nativeSpeak(text);
-		    }
-		}
 
-		function displayScheduleForDate(year, month, day) {
+		// --- 祝日・日付クリック関数 (年対応版) 8/21書き換え---        
+function displayScheduleForDate(year, month, day) {
 		    const datePrefixForKey = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
 		    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
+		    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
+		    
+		    let alertMessage = '';
+		    let speechText = '';
+		    let alertType = 'custom-alert2';
 
-		    // 今日の日付を取得し、時刻をリセット
-		    const today = new Date();
-		    today.setHours(0, 0, 0, 0);
+		    const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
+		    const hasSchedule = schedules.length > 0;
+		    const hasHoliday = !!holiday;
 
-		    // クリックされた日付のDateオブジェクトを作成し、時刻をリセット
-		    const clickedDate = new Date(year, month, day); // monthは0始まりなのでそのまま
-		    clickedDate.setHours(0, 0, 0, 0);
-
-		    if (keys.length > 0) {
-		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
-		        let text;
-
-		        // クリックされた日付が今日より過去かどうかを判定
-		        if (clickedDate < today) {
-		            // 過去の日付の場合：「6月12日の父25回忌です。」のように「予定は」を付けない
-		            text = `${month + 1}月${day}日は${schedules.join('。 ')}です。`;
-		        } else {
-		            // 今日または未来の日付の場合：「6月12日の予定は父25回忌です。」
-		            text = `${month + 1}月${day}日の予定は${schedules.join('。 ')}です。`;
-		        }
-
-		        showCustomAlert(text);
-		        nativeSpeak(text);
-		    } else {
-		        // 予定がない場合も、過去か未来かでメッセージを分けることも可能ですが、
-		        // 今回は「登録されていません。」で統一するとのことなので、そのままとします。
-		        showCustomAlert2(`${month + 1}月${day}日は何も登録されていません。`); // ここを修正
+		    if (hasSchedule) {
+		        speechText += `${month + 1}月${day}日の予定は${schedules.join('。 ')}です。`;
+		        alertMessage += `予定：${schedules.join('、')}`;
+		        alertType = 'custom-alert';
 		    }
-		}
 
+		    if (hasHoliday) {
+		        const holidayName = holiday[1];
+		        speechText += ` ${month + 1}月${day}日は${holidayName}です。`;
+		        alertMessage += `${hasSchedule ? '\n' : ''}祝日：${holidayName}`;
+		        alertType = hasSchedule ? 'custom-alert' : 'custom-alert3';
+		    }
+		    
+		    if (!hasSchedule && !hasHoliday) {
+		        speechText = `${month + 1}月${day}日は何も登録されていません。`;
+		        alertMessage = `${month + 1}月${day}日は何も登録されていません。`;
+		        alertType = 'custom-alert2';
+		    }
+
+		    // 最終的なアラートと音声出力
+		    if (alertType === 'custom-alert') {
+		        showCustomAlert(alertMessage);
+		    } else if (alertType === 'custom-alert3') {
+		        showCustomAlert3(alertMessage);
+		    } else {
+		        showCustomAlert2(alertMessage);
+		    }
+		    
+		    nativeSpeak(speechText);
+		}
+		
 
 		// --- image64.pngクリック時の処理 8/21追加---
 		document.addEventListener('DOMContentLoaded', () => {
@@ -1883,7 +1883,7 @@
     });
   </script>
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.0 (2025-08-21)</p>
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.1 (2025-08-22)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
