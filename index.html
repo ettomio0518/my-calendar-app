@@ -383,7 +383,7 @@
 		    background-color: #ffd0d0 !important; /* 薄めの赤 */
 		}
 
-		/* 8/21追加 360度回転*/
+		/* 8/21追加 マスコットの360度回転*/
 		@keyframes spinAround {
 		    0%   { transform: rotate(0deg); }
 		    100% { transform: rotate(360deg); }
@@ -426,6 +426,58 @@
 		    100% { transform: translateY(0); }
 		}
  		*/
+
+		/* 8/23追加 ダイアログボックス */
+		.dialog-overlay {
+		  position: fixed;
+		  top: 0; left: 0;
+		  width: 100%; height: 100%;
+		  background: rgba(0, 0, 0, 0.5);
+		  backdrop-filter: blur(4px); /* 背景をぼかすことで透け防止 */
+		  z-index: 9999; /* 最前面に表示 */
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		}
+
+		.dialog-box {
+		  background: white;
+		  padding: 20px;
+		  border-radius: 12px;
+		  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		  text-align: center;
+		  max-width: 90%;
+		  animation: fadeIn 0.3s ease-out;
+		  display: flex;
+		  flex-direction: column;
+		  align-items: center;
+		}
+
+		.dialog-box button {
+		  width: 100%;
+		  max-width: 300px;
+		  box-sizing: border-box;
+		  margin: 10px 0;
+		  padding: 10px 20px;
+		  font-size: 16px;
+		  border: none;
+		  border-radius: 6px;
+		  background-color: #0078D4;
+		  color: white;
+		  cursor: pointer;
+		  transition: background-color 0.2s;
+		}
+
+		.dialog-box button:hover {
+		  background-color: #005A9E;
+		}
+
+		/* モーダルのフェードイン演出 */
+		@keyframes fadeIn {
+		  from { opacity: 0; transform: scale(0.95); }
+		  to { opacity: 1; transform: scale(1); }
+		}
+
 		
     </style>
 </head>
@@ -437,6 +489,18 @@
 	        <h4>音声カレンダー ♪</h4>
 	    </div>
 	</header>
+
+		<div id="customDialog" style="display:none;" class="dialog-overlay">
+		  <div class="dialog-box">
+		    <p>どちらに進みますか？</p>
+		    <button id="btnSchedule">今日の予定を音声出力</button>
+		    <button id="btnSearch">高機能検索に進む</button>
+		    <button id="btnSearch2">メモに進む</button>
+		    <button id="btnSearch3">簡易日記に進む</button>
+		    <button id="btnSearch4">お買い物電卓に進む</button>
+		    <button id="btnClose">閉じる</button>
+		  </div>
+		</div>
 
     <div class="calendar-header">
         <button onclick="changeMonth(-1)">◁</button>
@@ -1416,10 +1480,10 @@
         }
 
 		// --- 祝日・日付クリック関数 (年対応版) 8/21書き換え---        
-function displayScheduleForDate(year, month, day) {
-		    const datePrefixForKey = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
-		    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
-		    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
+		function displayScheduleForDate(year, month, day) {
+				    const datePrefixForKey = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
+				    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
+				    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
 		    
 		    let hasSchedule = keys.length > 0;
 		    let hasHoliday = !!holiday;
@@ -1484,27 +1548,55 @@ function displayScheduleForDate(year, month, day) {
 		}
 		
 		
-		// --- image64.pngクリック時の処理 8/21追加---
+		// --- image64.pngクリック時の処理 8/21,8/23追加---
 		document.addEventListener('DOMContentLoaded', () => {
 		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
 
-		    if (logoImage) {
-		        logoImage.addEventListener('click', () => {
-		            // アニメーション開始（doubleWink）
-		            logoImage.classList.add('spin-around');
+		    if (!logoImage) return;
 
-		            // 1秒後にアニメーション終了
-		            setTimeout(() => logoImage.classList.remove('spin-around'), 800);
-		            
-		            // 1秒後にアラートと音声処理を実行（アニメーションと同時）
-		            setTimeout(() => {
-		                if (window.confirm("今日の予定を音声出力しますか？")) {
-		                    speakTodaySchedule();
-		                }
-		            }, 1000);
-		        });
-		    }
+		    // ダイアログ表示処理
+		    const showDialog = () => {
+		        document.getElementById("customDialog").style.display = "flex";
+		    };
+
+		    // ダイアログ非表示処理
+		    const hideDialog = () => {
+		        document.getElementById("customDialog").style.display = "none";
+		    };
+
+		    // 各ボタンの処理設定
+		    document.getElementById("btnSchedule").onclick = () => {
+		        speakTodaySchedule();
+		        hideDialog();
+		    };
+
+		    document.getElementById("btnSearch").onclick = () => {
+		        window.location.href = "高機能検索.html";
+		    };
+
+		    document.getElementById("btnSearch2").onclick = () => {
+		        window.location.href = "メモ.html";
+		    };
+
+		    document.getElementById("btnSearch3").onclick = () => {
+		        window.location.href = "日記.html";
+		    };
+
+		    document.getElementById("btnSearch4").onclick = () => {
+		        window.location.href = "お買い物計算.html";
+		    };
+
+		    document.getElementById("btnClose").onclick = hideDialog;
+
+		    // 画像クリック時の処理
+		    logoImage.addEventListener('click', () => {
+		        logoImage.classList.add('spin-around');
+
+		        setTimeout(() => logoImage.classList.remove('spin-around'), 800);
+		        setTimeout(showDialog, 1000);
+		    });
 		});
+
 
 
 		function speakTodaySchedule() {
@@ -1909,7 +2001,7 @@ function displayScheduleForDate(year, month, day) {
     });
   </script>
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.1 (2025-08-23)</p>
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.2 (2025-08-24)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
