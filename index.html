@@ -918,24 +918,27 @@
                 const weekDay = (firstDay + day - 1) % 7;
                 if (isHoliday(currentYear, currentMonth, day)) {
                     cell.classList.add("holiday");
-                } else if (weekDay === 6) {
+                } else if (weekDay === 6) { // 土曜日
                     cell.classList.add("saturday");
-                } else if (weekDay === 0) {
+                } else if (weekDay === 0) { // 日曜日
                     cell.classList.add("weekend");
                 }
 
                 cell.style.cursor = "pointer";
+                // クリックイベント: displayScheduleForDate に currentYear を渡す                
                 cell.addEventListener("click", function() {
                     displayScheduleForDate(currentYear, currentMonth, day);
                 });
-                cell.addEventListener("mousedown", function(event) {
-                    longPressTimer = setTimeout(() => displayHolidayInfo(currentYear, currentMonth, day), 500);
-                });
-                cell.addEventListener("mouseup", () => clearTimeout(longPressTimer));
-                cell.addEventListener("touchstart", function(event) {
-                    longPressTimer = setTimeout(() => displayHolidayInfo(currentYear, currentMonth, day), 500);
-                });
-                cell.addEventListener("touchend", () => clearTimeout(longPressTimer));
+                // 長押しイベント (デスクトップ)                
+                // cell.addEventListener("mousedown", function(event) {
+                //     longPressTimer = setTimeout(() => displayHolidayInfo(currentYear, currentMonth, day), 500);
+                // });
+                // cell.addEventListener("mouseup", () => clearTimeout(longPressTimer));
+                // 長押しイベント (モバイル)                
+                // cell.addEventListener("touchstart", function(event) {
+                //     longPressTimer = setTimeout(() => displayHolidayInfo(currentYear, currentMonth, day), 500);
+                // });
+                // cell.addEventListener("touchend", () => clearTimeout(longPressTimer));
 
                 row.appendChild(cell);
                 if ((firstDay + day) % 7 === 0) {
@@ -1906,7 +1909,7 @@ function displayScheduleForDate(year, month, day) {
     });
   </script>
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.1 (2025-08-22)</p>
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.1 (2025-08-23)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
