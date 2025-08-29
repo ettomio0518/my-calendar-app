@@ -480,7 +480,20 @@
 
 		
     </style>
-</head>
+    
+	<script>
+function openQRReader() {
+  if (typeof Android !== "undefined" && Android.openQrReader) {
+    Android.openQrReader(); // WebView内ならアプリ側へ
+  } else {
+    window.open('https://ettomio0518.github.io/ettomio-qr-reader/', '_blank'); // 通常ブラウザなら直接開く
+  }
+}
+
+	</script>
+	
+</head>	
+		
 <body>
 
 	<header>
@@ -498,7 +511,8 @@
 		    <button id="btnSearch2">メモに進む</button>
 		    <button id="btnSearch3">簡易日記に進む</button>
 		    <button id="btnSearch4">お買い物電卓に進む</button>
-		    <button id="btnClose">閉じる</button>
+		    <button id="btnSearch5">QRコードリーダーに進む</button>
+		    <button id="btnClose">閉じる</button>		    
 		  </div>
 		</div>
 
@@ -1083,6 +1097,8 @@
 	    </div>
 
 
+
+
     <script>
         // --- ここから予定管理のスクリプト ---
 
@@ -1586,6 +1602,11 @@
 		        window.location.href = "お買い物計算.html";
 		    };
 
+			document.getElementById("btnSearch5").onclick = () => {
+			    openQRReader(); // ← WebViewでもChromeでも対応
+			    hideDialog();   // ダイアログを閉じる
+			};
+		    
 		    document.getElementById("btnClose").onclick = hideDialog;
 
 		    // 画像クリック時の処理
@@ -1596,7 +1617,6 @@
 		        setTimeout(showDialog, 1000);
 		    });
 		});
-
 
 
 		function speakTodaySchedule() {
@@ -1674,13 +1694,15 @@
         <button onclick="location.href='電卓.html'">電卓</button>
         <button onclick="location.href='年齢計算.html'">年齢計算</button>
         <button onclick="location.href='度量衡.html'">度量衡</button>
-        <button onclick="location.href='ブックマーク.html'">ブックマーク</button> 
-        <button onclick="location.href='アルコールチェック.html'">アルコールチェック</button>
-                 
-		<br>
+		        <button onclick="location.href='ブックマーク.html'">ブックマーク</button> 
+		        <button onclick="location.href='アルコールチェック.html'">アルコールチェック</button>
+				<br>
+		<button onclick="openQRReader()">QRコードリーダー</button>
+		<br>		
      <button id="omikujiButton">おみくじを引く</button>
 		<br>
 
+		
 	    <script>
 	        document.getElementById('weatherUrl').value = localStorage.getItem("weatherUrl") || '';
 
@@ -2001,7 +2023,8 @@
     });
   </script>
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.2 (2025-08-24)</p>
+
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.3 (2025-08-28)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
