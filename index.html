@@ -482,16 +482,27 @@
     </style>
     
 	<script>
-function openQRReader() {
-  if (typeof Android !== "undefined" && Android.openQrReader) {
-    Android.openQrReader(); // WebView内ならアプリ側へ
-  } else {
-    window.open('https://ettomio0518.github.io/ettomio-qr-reader/', '_blank'); // 通常ブラウザなら直接開く
-  }
-}
-
+	function openQRReader() {
+	  if (typeof Android !== "undefined" && Android.openQrReader) {
+	    Android.openQrReader(); // WebView内ならアプリ側へ
+	  } else {
+	    window.open('https://ettomio0518.github.io/ettomio-qr-reader/', '_blank'); // 通常ブラウザなら直接開く
+	  }
+	}
 	</script>
-	
+
+    <script> // 9/23追加
+    function openTodayCalendar() {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const dateStr = `${yyyy}-${mm}-${dd}`;
+      const url = `https://calendar.google.com/calendar/u/0/r/day/${dateStr}`;
+      window.open("https://calendar.google.com/calendar/u/0/r", "_blank");
+    }
+    </script>
+  	
 </head>	
 		
 <body>
@@ -499,7 +510,7 @@ function openQRReader() {
 	<header>
 	    <div class="logo-title">
 	        <img src="image64.png" alt="サンプル画像">
-	        <h4>音声カレンダー ♪</h4>
+	        <h4>舞い ♪ カレンダー</h4>
 	    </div>
 	</header>
 
@@ -512,6 +523,7 @@ function openQRReader() {
 		    <button id="btnSearch3">簡易日記に進む</button>
 		    <button id="btnSearch4">お買い物電卓に進む</button>
 		    <button id="btnSearch5">QRコードリーダーに進む</button>
+		    <button id="btnSearch6">簡易版Googleカレンダーに進む</button>
 		    <button id="btnClose">閉じる</button>		    
 		  </div>
 		</div>
@@ -1604,9 +1616,12 @@ function openQRReader() {
 
 			document.getElementById("btnSearch5").onclick = () => {
 			    openQRReader(); // ← WebViewでもChromeでも対応
-			    hideDialog();   // ダイアログを閉じる
 			};
-		    
+
+			document.getElementById("btnSearch6").onclick = () => {
+			    openTodayCalendar(); // ← WebViewでもChromeでも対応
+			};
+					    
 		    document.getElementById("btnClose").onclick = hideDialog;
 
 		    // 画像クリック時の処理
@@ -1694,12 +1709,17 @@ function openQRReader() {
         <button onclick="location.href='電卓.html'">電卓</button>
         <button onclick="location.href='年齢計算.html'">年齢計算</button>
         <button onclick="location.href='度量衡.html'">度量衡</button>
-		        <button onclick="location.href='ブックマーク.html'">ブックマーク</button> 
-		        <button onclick="location.href='アルコールチェック.html'">アルコールチェック</button>
-				<br>
+		<button onclick="location.href='ブックマーク.html'">ブックマーク</button> 
+		<button onclick="location.href='アルコールチェック.html'">アルコールチェック</button>
+		<br>
 		<button onclick="openQRReader()">QRコードリーダー</button>
-		<br>		
-     <button id="omikujiButton">おみくじを引く</button>
+		<br>
+		<button onclick="openTodayCalendar()">簡易版Googleカレンダー</button>
+		<div id="calendarHint" style="font-size: 14px; color: #666; margin-top: 8px;">
+		  🦊 カレンダーが小さく表示された場合は、二本指でふわっと広げてください♪
+		</div>
+		<br>				
+        <button id="omikujiButton">おみくじを引く</button>
 		<br>
 
 		
@@ -2024,12 +2044,11 @@ function openQRReader() {
   </script>
 
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.3 (2025-08-28)</p>
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.4 (2025-09-24)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
   
 </body>
 </html>
-
 
