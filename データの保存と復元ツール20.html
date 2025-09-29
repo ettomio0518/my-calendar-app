@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>データの保存と復元</title>
+  <style>
+    body {
+      background-color: #cbe4e4;
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+      font-size: 20px;
+    }
+    h2, h3 {
+      font-size: 18px;
+    }
+    h3 {
+      color: #0000ff;
+    }
+    h4 {
+      font-size: 16px;
+      color: red;
+    }
+    h5 {
+      font-size: 16px;
+      color: #804040;
+    }
+    h6 {
+      text-align: center;
+      font-size: 18px;
+      color: #0000ff;
+    }
+    p {
+      font-size: 16px;
+    }
+    .note {
+      font-size: 14px;
+    }
+    button {
+      padding: 3px 10px;
+      background-color: #ccffff;
+      border: 1px solid #0000ff;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b2ebf2;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+    }
+    .right {
+      float: right;
+    }
+    #button2, #button3 {
+      background-color: #acffd6;
+    }
+    #button4 {
+      background-color: #ffffbd;
+    }
+    #button2:hover, #button3:hover, #button4:hover {
+      background-color: #e5e5e5;
+    }
+  </style>
+</head>
+<body>
+  <h1>データの保存と復元ツール</h1>
+  <button class="right" onclick="location.href='index.html'">戻る</button>
+  <br />
+
+  <label for="output">出力結果:</label>
+  <textarea id="output"></textarea>
+
+  <h3>データの出力と保存:</h3>
+  <button onclick="outputJSON()">全データをjsonで出力</button>
+  <p class="note">アプリの全データが上のテキストボックスに出力されました。</p>
+  <button onclick="selectAllAndCopy()">全て選択してコピー</button>
+  <p class="note">全データが選択され、コピーされました。</p>
+  <br />
+
+  <h3>データの保存:</h3>
+  <h4>こちらはAndroidアプリ版では使用できません。</h4>
+  <p>Web版使用のみ有効です。</p>
+  <button onclick="downloadJSON1()">保存先を選択して保存「カレンダーデータ.json」</button>
+  <p class="note">全データが「カレンダーデータ.json」の名前で保存されました。</p>
+  <button onclick="downloadJSON2()">保存先を選択して保存「key保存.json」</button>
+  <p class="note">全データが「key保存.json」の名前で保存されました。</p>
+
+  <h3>データの復元:</h3>
+  <h4>こちらはAndroidアプリ版では使用できません。</h4>
+  <p>Web版使用のみ有効です。</p>
+  <button onclick="uploadJSON()">ファイルを選択して復元</button>
+  <br /><br />
+  <button onclick="restoreData()">データの復元</button>
+  <p class="note">データは復元されました。</p>
+
+  <script>
+    document.getElementById('button4')?.addEventListener('click', async function () {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById('output').value = text;
+      } catch (err) {
+        alert('クリップボードの読み取りに失敗しました。\nブラウザやOSの制限が影響している可能性があります。');
+        document.getElementById('output').focus();
+        document.getElementById('button4').style.display = 'none';
+        console.error('Clipboard read failed:', err);
+      }
+    });
+
+    function outputJSON() {
+      const allKeys = Object.keys(localStorage);
+      const jsonData = {};
+      allKeys.forEach(key => {
+        jsonData[key] = localStorage.getItem(key);
+      });
+      document.getElementById('output').value = JSON.stringify(jsonData);
+    }
+
+    function selectAllAndCopy() {
+      const output = document.getElementById('output');
+      output.select();
+      document.execCommand('copy');
+    }
+
+    function downloadJSON1() {
+      const jsonData = document.getElementById('output').value;
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'カレンダーデータ.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadJSON2() {
+      const jsonData = document.getElementById('output').value;
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'key保存.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function uploadJSON() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'application/json';
+      input.onchange = function (event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('output').value = e.target.result;
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+
+    function restoreData() {
+      const jsonData = document.getElementById('output').value;
+      if (jsonData.trim() === "") {
+        alert("データが貼り付けられていません。中断します");
+        return;
+      }
+      if (confirm("一応アプリ内のデータをクリアにします")) {
+        localStorage.clear();
+        const data = JSON.parse(jsonData);
+        for (const key in data) {
+          localStorage.setItem(key, data[key]);
+        }
+        alert("データは復元されました");
+      }
+    }
+  </script>
+
+  <br />
+  <p>----- 250929 ettomio</p>
+</body>
+</html>
