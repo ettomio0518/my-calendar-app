@@ -13,7 +13,7 @@
       text-align: center;
       font-size: 20px;
     }
-    h2, h3 {
+    h2, h3, h7 {
       font-size: 18px;
     }
     h3 {
@@ -32,6 +32,12 @@
       font-size: 18px;
       color: #0000ff;
     }
+	.h7 {
+	  font-size: 18px;
+	  color: #008000;
+	  font-weight: bold;
+	}
+   
     p {
       font-size: 16px;
     }
@@ -65,7 +71,32 @@
     #button2:hover, #button3:hover, #button4:hover {
       background-color: #e5e5e5;
     }
-  </style>
+    
+    #keyNButton {
+        background-color: #008040;
+        color: white;
+    }
+
+	/* 6/28 */
+	.custom-alert5 {
+	    position: fixed;
+	    top: 10px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background-color:  #000;
+	    color: #fff;
+	    padding: 10px 20px;
+	    border: 1px solid red;
+	    border-radius: 5px;
+	    font-size: 16px;
+	    z-index: 1000;
+	}
+
+    h10 {
+      font-size: 18px;
+    }
+
+   </style>
 </head>
 <body>
   <h1>データの保存と復元ツール</h1>
@@ -89,7 +120,8 @@
   <p class="note">全データが「カレンダーデータ.json」の名前で保存されました。</p>
   <button onclick="downloadJSON2()">保存先を選択して保存「key保存.json」</button>
   <p class="note">全データが「key保存.json」の名前で保存されました。</p>
-
+  <br />
+  
   <h3>データの復元:</h3>
   <h4>こちらはAndroidアプリ版では使用できません。</h4>
   <p>Web版使用のみ有効です。</p>
@@ -97,7 +129,17 @@
   <br /><br />
   <button onclick="restoreData()">データの復元</button>
   <p class="note">データは復元されました。</p>
+  <br />
+  
+　<p class="h7">全データの削除:</p>
+  <strong>Androidアプリではアンインストールするとデータは削除されます。</strong>
+  <h4>Web版では以下のボタンをクリックして削除します。</h4>
+  
+  <!--6/28 -->
+  <button id="keyNButton2">全keyを消去</button>
 
+　<br>
+　　
   <script>
     document.getElementById('button4')?.addEventListener('click', async function () {
       try {
@@ -178,9 +220,53 @@
         alert("データは復元されました");
       }
     }
+    
   </script>
 
-  <br />
+	<script> // 6/28
+	document.addEventListener('DOMContentLoaded', function() {
+	    // ボタン要素を新しいIDで取得
+	    const keyNButton = document.getElementById('keyNButton2'); // ここを keyNButton2 に変更
+
+	    // カスタムアラートのコンテナを作成し、新しいクラス名を適用
+	    const customAlertContainer = document.createElement('div');
+	    customAlertContainer.className = 'custom-alert5'; // ここを custom-alert5 に変更
+	    customAlertContainer.style.display = 'none'; // 最初は非表示
+	    document.body.appendChild(customAlertContainer); // bodyにアラートコンテナを追加
+
+	    if (keyNButton) {
+	        keyNButton.addEventListener('click', function() {
+	            // 本当に全データを削除しますか？のアラート表示
+	            const confirmation = confirm('本当に全データを削除しますか？');
+
+	            if (confirmation) {
+	                // ローカルストレージの全データを消去
+	                localStorage.clear();
+
+	                // データは消去されましたのアラート表示
+	                showCustomAlert('データは消去されました');
+        		    nativeSpeak('データは消去されました');
+ 	            } else {
+	                // キャンセルされた場合、何もしない
+	                // showCustomAlert('データ削除はキャンセルされました'); // 必要であればキャンセルのメッセージも表示
+	            }
+	        });
+	    }
+
+	    // カスタムアラートを表示する関数
+	    function showCustomAlert(message) {
+	        customAlertContainer.textContent = message;
+	        customAlertContainer.style.display = 'block';
+
+	        // 3秒後にアラートを非表示にする
+	        setTimeout(() => {
+	            customAlertContainer.style.display = 'none';
+	        }, 3000);
+	    }
+	});
+	</script>
+	
+
   <p>----- 250929 ettomio</p>
 </body>
 </html>
