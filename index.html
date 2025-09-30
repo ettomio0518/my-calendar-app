@@ -515,7 +515,7 @@
 	<header>
 	    <div class="logo-title">
 	        <img src="image64.png" alt="サンプル画像">
-	        <h4>音声カレンダー ♪</h4>
+	        <h4>舞い ♪ カレンダー</h4>
 	    </div>
 	</header>
 
@@ -1718,6 +1718,7 @@
 		    <h3>どちらのツールを使用しますか？</h3>
 		    <button id="androidBtn">Androidアプリ版ツール</button>
 		    <button id="webBtn">Web版ツール</button>
+		    <button id="keyListBtn">Keyリスト</button> <!-- ← 追加 -->
 		    <button id="closeBtn">閉じる</button>
 		  </div>
 		</div>
@@ -1744,7 +1745,7 @@
 
 
 		<script>
-		  // ボタンを押したらモーダル表示 9/29
+		  // ダイアログ表示（keyNButtonを押したとき）9/30
 		  document.getElementById("keyNButton").addEventListener("click", function () {
 		    document.getElementById("dialogOverlay").style.display = "flex";
 		  });
@@ -1759,11 +1760,17 @@
 		    location.href = "データの保存と復元ツール20.html";
 		  });
 
+		  // Keyリストへ移動 9/30追加
+		  document.getElementById("keyListBtn").addEventListener("click", function () {
+		    location.href = "keyリスト.html";
+		  });
+
 		  // 閉じる
 		  document.getElementById("closeBtn").addEventListener("click", function () {
 		    document.getElementById("dialogOverlay").style.display = "none";
 		  });
 		</script>
+
 		
 	    <script>
 	        document.getElementById('weatherUrl').value = localStorage.getItem("weatherUrl") || '';
@@ -2086,11 +2093,12 @@
   </script>
 
 
-	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.5 (2025-09-29)</p>
+	 <p id="version-number" onclick="handleClick();">  © 2025 ettomio. All rights reserved. | Version 11.5 (2025-09-30)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
-  
+
+
 </body>
 </html>
 
