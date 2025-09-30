@@ -118,6 +118,21 @@
 		    font-size: 16px;
 		    z-index: 1000;
 		}
+
+		/* 6/28 */
+		.custom-alert5 {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color:  #000;
+		    color: #fff;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
+		}
 		        	       	    
     </style>
 </head>
@@ -251,19 +266,6 @@
             if (typeof Android !== 'undefined' && Android.speak) { Android.speak(text); } else { speakText(text); }
         }
         	
-	</script>
-
-	<script>
-	  document.getElementById('G-calendar-button').addEventListener('click', function () {
-	    const alertBox = document.getElementById('alertBox');
-	    alertBox.style.display = 'block';
-
-	    // 3秒後にカレンダーに遷移
-	    setTimeout(function () {
-	      alertBox.style.display = 'none';
-	      window.open('https://ettomio0518.github.io/my-google-calendar/my-google-calendar.html', '_blank');
-	    }, 3000);
-	  });
 	</script>
 
 	<script> // 6/28
