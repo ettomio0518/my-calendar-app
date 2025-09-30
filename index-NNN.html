@@ -345,11 +345,6 @@
             color: white;
         }
 
-        #keyNButton {
-            background-color: #008040;
-            color: white;
-        }
-
 	    /* 6/28 */
         #keyNButton2 {
             background-color: #008040;
@@ -360,7 +355,7 @@
 		#G-calendar-button {
 		    background-color: #ffffc4;/* 背景色も変更可能 */
 		    color: #994d4d; /* 文字色の変更 */
-    cursor: pointer;		    
+    		cursor: pointer;		    
 		}
 	  /* カスタムアラート4：黒背景・白文字 */
 	  .custom-alert4 {
@@ -1444,14 +1439,6 @@
 		    document.getElementById('closeKeysButtonN').style.display = 'none'; // 閉じるボタンNを非表示
 		}
 
-		// キーリストを非表示にするN
-		function closeKeysN() {
-		    const keysElement = document.getElementById('keys');
-		    keysElement.innerHTML = ''; // リスト内容をクリア
-		    document.getElementById('closeKeysButton').style.display = 'none'; // 閉じるボタンを非表示
-		    document.getElementById('closeKeysButtonN').style.display = 'none'; // 閉じるボタンNを非表示
-		}
-		
 		// 指定したキーの詳細を表示
 		function displayText() {
 		    const key = document.getElementById('keyInput').value;
@@ -1675,7 +1662,7 @@
 	    });
   </script>
   
-	<p>© 2025 ettomio. Version 11.3 (2025-08-28)</p>
+	<p>© 2025 ettomio. Version 11.5 (2025-09-30)</p>
 		  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
