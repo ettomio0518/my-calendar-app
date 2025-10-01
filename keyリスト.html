@@ -82,7 +82,7 @@
 	        color: white;
 	    }
 
-	    #keyNButton2 {
+	    #keyButton2 {
 	        background-color: #800040;
 	        color: white;
 	    }
@@ -120,7 +120,7 @@
 		}
 
 		/* 6/28 */
-		.custom-alert5 {
+		.custom-alert2 {
 		    position: fixed;
 		    top: 10px;
 		    left: 50%;
@@ -148,7 +148,7 @@
 		<h2>ローカルストレージのKey出力</h2>
 		<button id="closeKeysButton" style="display: none;" onclick="closeKeys()">キーリストを閉じる</button>		
 		<div id="keys"></div>
-		<button id="closeKeysButtonN" style="display: none;" onclick="closeKeysN()">キーリストを閉じる</button>
+		<button id="closeKeysButtonN" style="display: none;" onclick="closeKeys()">キーリストを閉じる</button>
 
 		<p class="key-label">Keyの詳細:</p>
 		<div class="inline-elements">
@@ -162,7 +162,7 @@
 		<br>
 		<button id="deleteButton" style="display: none;" onclick="deleteKeyAndText()">Keyと本文を削除</button>
 		<br>
-		<button id="keyNButton2">全keyを消去</button>
+		<button id="keyButton2">全keyを消去</button>
 				
 	</div>
 
@@ -198,14 +198,8 @@
 		    document.getElementById('closeKeysButton').style.display = 'none'; 	// 閉じるボタンを非表示
 		    document.getElementById('closeKeysButtonN').style.display = 'none'; // 閉じるボタンNを非表示
 		}
-
-		// キーリストを非表示にする
-		function closeKeysN() {
-		    const keysElement = document.getElementById('keys');
-		    keysElement.innerHTML = ''; // リスト内容をクリア
-		    document.getElementById('closeKeysButton').style.display = 'none'; 	// 閉じるボタンを非表示
-		    document.getElementById('closeKeysButtonN').style.display = 'none'; // 閉じるボタンNを非表示
-		}
+		
+		// キーリストを非表示にする前述と同じcloseKeysNは削除 10/1
 		
 		// 指定したキーの詳細を表示
 		function displayText() {
@@ -253,7 +247,7 @@
             alertContainer.className = 'custom-alert';
             alertContainer.textContent = message;
             document.body.appendChild(alertContainer);
-            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
+            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 3000);
         }
         function speakText(text) {
             if ('speechSynthesis' in window) {
@@ -271,11 +265,11 @@
 	<script> // 6/28
 	document.addEventListener('DOMContentLoaded', function() {
 	    // ボタン要素を新しいIDで取得
-	    const keyNButton = document.getElementById('keyNButton2'); // ここを keyNButton2 に変更
+	    const keyNButton = document.getElementById('keyButton2'); // ここを keyButton2 に変更
 
 	    // カスタムアラートのコンテナを作成し、新しいクラス名を適用
 	    const customAlertContainer = document.createElement('div');
-	    customAlertContainer.className = 'custom-alert5'; // ここを custom-alert5 に変更
+	    customAlertContainer.className = 'custom-alert2'; // ここを custom-alert2 に変更
 	    customAlertContainer.style.display = 'none'; // 最初は非表示
 	    document.body.appendChild(customAlertContainer); // bodyにアラートコンテナを追加
 
