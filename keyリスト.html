@@ -201,22 +201,28 @@
 		
 		// キーリストを非表示にする前述と同じcloseKeysNは削除 10/1
 		
-		// 指定したキーの詳細を表示
+		// 指定したキーの詳細を表示 10/1 書き換え
 		function displayText() {
-		    const key = document.getElementById('keyInput').value;
-		    const text = localStorage.getItem(key);
-		    const time = localStorage.getItem(key + 'Time'); // 時間が保存されていると仮定
-		    const displayTextElement = document.getElementById('displayText');
+		  const key = document.getElementById('keyInput').value; // 必要なら .trim() を使う（注意：実際に空白を含むキーを使っている場合はtrimしない）
+		  const val = localStorage.getItem(key);
+		  const time = localStorage.getItem(key + 'Time');
+		  const displayTextElement = document.getElementById('displayText');
 
-		    if (text) {
-		        displayTextElement.innerText = `内容: ${text}\n時間: ${time || '保存日時なし'}`;
-		        document.getElementById('deleteButton').style.display = 'block'; // 削除ボタンを表示
-		    } else {
-		        displayTextElement.innerText = '指定したキーは存在しません';
-		    }
+		  // 改行をそのまま表示する
+		  displayTextElement.style.whiteSpace = 'pre-wrap';
 
-		    document.getElementById('closeDetailsButton').style.display = 'block'; // 閉じるボタンを表示
+		  if (val !== null) { // null は「存在しない」を意味する
+		    const content = (val === '') ? '(空文字)' : val;
+		    displayTextElement.textContent = `内容: ${content}\n時間: ${time || '保存日時なし'}`;
+		    document.getElementById('deleteButton').style.display = 'block';
+		  } else {
+		    displayTextElement.textContent = '指定したキーは存在しません';
+		    document.getElementById('deleteButton').style.display = 'none';
+		  }
+
+		  document.getElementById('closeDetailsButton').style.display = 'block';
 		}
+
 
 		// 詳細を非表示にする
 		function closeDetails() {
@@ -229,15 +235,21 @@
 		    document.getElementById('deleteButton').style.display = 'none'; // 削除ボタンを非表示
 		}
 
-		// Keyと本文を削除する
+		// Keyと本文を削除する 10/1書き換え
 		function deleteKeyAndText() {
-		    const key = document.getElementById('keyInput').value;
-		    localStorage.removeItem(key);
-		    localStorage.removeItem(key + 'Time'); // 時間も削除
+		  const key = document.getElementById('keyInput').value;
+		  if (localStorage.getItem(key) === null) {
+		    showCustomAlert('指定したキーは存在しません');
+		    return;
+		  }
 
-		    closeDetails(); // 詳細表示を閉じる
-		    closeKeys(); // キーリストを閉じる
-		    alert('Keyと本文が削除されました');
+		  localStorage.removeItem(key);
+		  localStorage.removeItem(key + 'Time');
+
+		  closeDetails();
+		  closeKeys();
+		  showCustomAlert('Keyと本文が削除されました');
+		  nativeSpeak('Keyと本文が削除されました');
 		}
 
 
