@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>keyリスト</title>
+	<meta name="author" content="ettomio">
+
+    <style>
+        /* 全体のスタイル設定 */
+        body {
+            font-family: Arial, sans-serif; /* フォント設定 */
+            text-align: center; /* テキスト中央揃え */
+            position: relative; /* 位置を相対的に設定 */
+            background-color: #e6e6ff; /* 背景色 */
+        }
+        .container {
+            max-width: 600px; /* 最大幅を600pxに設定 */
+            margin: 10px auto; /* 上下20pxの余白と中央揃え */
+            padding: 10px; /* 内側余白 */
+            border: 1px solid #ccc; /* 枠の色 */
+            border-radius: 10px; /* 角を丸くする */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* シャドウ効果 */
+            background-color: #e7e7e7; /* 背景色 */
+        }
+
+        h2 { font-size: 16px; }
+        h3 { font-size: 19px; color: #0000ff; }
+
+        button {
+            width: auto;
+            flex-shrink: 0;
+            font-size: 16px;
+            padding: 3px 10px;
+            margin: 3px;
+            border-radius: 5px;
+            background-color: #ccffff;
+            color: black;
+    		border: 1px solid black;
+            cursor: pointer;
+        }
+        
+	    /* 戻るボタン（右上）を統一デザインに変更 5/5 */
+	    .top-right-button {
+	      position: absolute;
+	      top: 5px;
+	      right: 10px;
+	      background-color: #007bff;
+	      color: white;
+	      border: none;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #0056b3;
+	    }
+
+		.bottom-button {
+		  position: fixed;
+		  bottom: 20px;
+		  left: 50%;
+		  transform: translateX(-50%);
+		  background: #007bff;
+		  color: white;
+		  border: none;
+		  border-radius: 20px;
+		  padding: 10px 20px;
+		  font-size: 16px;
+		  cursor: pointer;
+		  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		  z-index: 9999;
+		  display: none;
+		}
+		.bottom-button:hover {
+		  background: #0056b3;
+		}
+	    
+	    #keyButton {
+	        background-color: #008040;
+	        color: white;
+	    }
+
+	    #keyButton2 {
+	        background-color: #800040;
+	        color: white;
+	    }
+
+	    #keyButton3 {
+	        background-color: #0080c0;
+	        color: white;
+	    }
+	    	    
+		.key-label { 
+		    margin-bottom: 5px; /* p要素の下余白を調整 */
+		}
+
+	        #keys {
+	        display: inline-block; /* センター寄せ用 */
+	        border: 1px solid #ccc; /* 枠線を表示 */
+	        padding: 10px; /* 内側の余白 */
+	        text-align: left; /* テキストを左寄せ */
+	        width: 300px; /* 適切な幅に調整 */
+	    }
+	    #keys div {
+	        margin: 5px 0; /* 各キーの間に余白 */
+	    }
+	    body {
+	        text-align: center; /* #keys全体を中央に配置 */
+	    }
+
+	    /* 10/2追加　テキスト左揃え */
+		#displayText {
+		    text-align: left; /* 表示される内容だけ左揃え */
+		    width: 100%;
+		}
+		
+		.custom-alert {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #6868b5;
+		    color: white;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
+		}
+
+		/* 6/28 */
+		.custom-alert2 {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color:  #000;
+		    color: #fff;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
+		}
+		        	       	    
+    </style>
+</head>
+<body>
+    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+
+	<div class="container">
+	    <h3>データkeyリスト</h3>
+
+	    <p>このファイルは慎重に扱ってください。</p>
+	    	    	
+		<button id="keyButton" onclick="displayKeys()">keyを表示</button>
+		<h2>ローカルストレージのKey出力</h2>
+		<button id="closeKeysButton" style="display: none;" onclick="closeKeys()">キーリストを閉じる</button>		
+		<div id="keys"></div>
+		<button id="closeKeysButtonN" style="display: none;" onclick="closeKeys()">キーリストを閉じる</button>
+
+		<p class="key-label">Keyの詳細:</p>
+		<div class="inline-elements">
+		    <label for="keyInput">keyを入力:</label>
+		    <input type="text" id="keyInput" class="key-input">
+		<button onclick="displayText()">表示</button>
+		</div>
+
+		<div id="displayText"></div>
+		<button id="closeDetailsButton" style="display: none;" onclick="closeDetails()">詳細を閉じる</button>
+		<br>
+		<button id="deleteButton" style="display: none;" onclick="deleteKeyAndText()">Keyと本文を削除</button>
+		<br>
+        <button id="keyButton3" onclick="displayStorageUsage()">ローカルストレージの使用量を表示</button>
+		<br><br>
+		<button id="keyButton2">全keyを消去</button>
+				
+	</div>
+
+	<!-- Bottomボタン 9/30 -->
+	<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	<!-- 10/2 100pxから30pxに -->
+	<div style="height: 30px;"></div>
+
+	<script>
+		// ローカルストレージの全てのキーを表示（昇順）
+		function displayKeys() {
+		    const keys = Object.keys(localStorage).sort((a, b) => a.localeCompare(b)); // 正しく昇順に並べ替え
+		    const keysElement = document.getElementById('keys');
+		    keysElement.innerHTML = ''; // 初期化
+		    keys.forEach(key => {
+		        const div = document.createElement('div');
+		        div.textContent = key;
+		        keysElement.appendChild(div);
+		    });
+		    document.getElementById('closeKeysButton').style.display = 'block';     // 閉じるボタンを表示
+		    document.getElementById('closeKeysButtonN').style.display = 'block';     // 閉じるボタンNを表示
+
+		    // カスタムアラートで通知
+		    const message = `ローカルストレージのキーの総数は ${keys.length} 個です。`;
+		    showCustomAlert(message);
+		    nativeSpeak(message);
+		}
+
+		// キーリストを非表示にする
+		function closeKeys() {
+		    const keysElement = document.getElementById('keys');
+		    keysElement.innerHTML = ''; // リスト内容をクリア
+		    document.getElementById('closeKeysButton').style.display = 'none'; 	// 閉じるボタンを非表示
+		    document.getElementById('closeKeysButtonN').style.display = 'none'; // 閉じるボタンNを非表示
+		}
+		
+		// キーリストを非表示にする前述と同じcloseKeysNは削除 10/1
+
+		
+		// 指定したキーの詳細を表示 10/1 書き換え
+		function displayText() {
+		  const key = document.getElementById('keyInput').value; // 必要なら .trim() を使う（注意：実際に空白を含むキーを使っている場合はtrimしない）
+		  const val = localStorage.getItem(key);
+		  const time = localStorage.getItem(key + 'Time');
+		  const displayTextElement = document.getElementById('displayText');
+
+		  // 改行をそのまま表示する
+		  displayTextElement.style.whiteSpace = 'pre-wrap';
+
+		  if (val !== null) { // null は「存在しない」を意味する
+		    const content = (val === '') ? '(空文字)' : val;
+		    displayTextElement.textContent = `内容: ${content}\n時間: ${time || '保存日時なし'}`;
+		    document.getElementById('deleteButton').style.display = 'block';
+		  } else {
+		    displayTextElement.textContent = '指定したキーは存在しません';
+		    document.getElementById('deleteButton').style.display = 'none';
+		  }
+
+		  document.getElementById('closeDetailsButton').style.display = 'block';
+		}
+
+
+		// 詳細を非表示にする
+		function closeDetails() {
+		    const displayTextElement = document.getElementById('displayText');
+		    const keyInputElement = document.getElementById('keyInput');
+
+		    displayTextElement.innerHTML = ''; // 表示内容をクリア
+		    keyInputElement.value = ''; // キー入力欄をクリア
+		    document.getElementById('closeDetailsButton').style.display = 'none'; // 閉じるボタンを非表示
+		    document.getElementById('deleteButton').style.display = 'none'; // 削除ボタンを非表示
+		}
+
+        // ローカルストレージの使用容量を計算
+        function getLocalStorageUsage() {
+            let total = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                total += key.length + value.length;
+            }
+            return total; // 使用容量（バイト数）
+        }
+
+		// 使用量表示
+		function displayStorageUsage() {
+		    const usage = getLocalStorageUsage();
+		    const usedKB = (usage / 1024).toFixed(2); // 使用量（KB）
+		    const maxStorageKB = 5120; // 最大容量 5MB
+		    const bytesPerSheet = 800; // 1枚の原稿用紙のバイト数
+		    const usedSheets = Math.round((usage / bytesPerSheet)); // 原稿用紙枚数
+		    const remainingKB = (maxStorageKB - usedKB).toFixed(2);
+		    const remainingSheets = Math.round(((remainingKB * 1024) / bytesPerSheet));
+		    
+		    // 100の位以下を切り捨てた値 3/27追加
+		    const remainingSheetsS = Math.floor(remainingSheets / 100) * 100;
+
+		    const message = (
+		        `ローカルストレージの使用量は` +
+		        `原稿用紙約　　${usedSheets} 枚分です。` +
+		        `あと、理論上は` +
+		        `${remainingSheetsS} 枚分程度の空き容量です。`
+		    );
+
+		    // アラートで表示
+		    showCustomAlert(
+		        `ローカルストレージの使用量は　　　${usedKB} KB\n` +
+		        `原稿用紙約　　${usedSheets} 枚分です。\n` +
+		        `あと、　　　　${remainingKB} KB、　　　　${remainingSheets} 枚分程度の空き容量です。`
+		    );
+
+		    nativeSpeak(message);
+		}
+
+		// Keyと本文を削除する 10/1書き換え
+		function deleteKeyAndText() {
+		  const key = document.getElementById('keyInput').value;
+		  if (localStorage.getItem(key) === null) {
+		    showCustomAlert('指定したキーは存在しません');
+		    return;
+		  }
+
+		  localStorage.removeItem(key);
+		  localStorage.removeItem(key + 'Time');
+
+		  closeDetails();
+		  closeKeys();
+		  showCustomAlert('Keyと本文が削除されました');
+		  nativeSpeak('Keyと本文が削除されました');
+		}
+
+
+        // --- 通知・音声関数 ---
+        function showCustomAlert(message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'custom-alert';
+            alertContainer.textContent = message;
+            document.body.appendChild(alertContainer);
+            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 3000);
+        }
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ja-JP';
+                window.speechSynthesis.speak(utterance);
+            } else { showCustomAlert("ご使用のブラウザは音声合成をサポートしていません。"); }
+        }
+        function nativeSpeak(text) {
+            if (typeof Android !== 'undefined' && Android.speak) { Android.speak(text); } else { speakText(text); }
+        }
+        	
+	</script>
+
+	<script> // 6/28
+	document.addEventListener('DOMContentLoaded', function() {
+	    // ボタン要素を新しいIDで取得
+	    const keyNButton = document.getElementById('keyButton2'); // ここを keyButton2 に変更
+
+	    // カスタムアラートのコンテナを作成し、新しいクラス名を適用
+	    const customAlertContainer = document.createElement('div');
+	    customAlertContainer.className = 'custom-alert2'; // ここを custom-alert2 に変更
+	    customAlertContainer.style.display = 'none'; // 最初は非表示
+	    document.body.appendChild(customAlertContainer); // bodyにアラートコンテナを追加
+
+	    if (keyNButton) {
+	        keyNButton.addEventListener('click', function() {
+	            // 本当に全データを削除しますか？のアラート表示
+	            const confirmation = confirm('本当に全データを削除しますか？');
+
+	            if (confirmation) {
+	                // ローカルストレージの全データを消去
+	                localStorage.clear();
+
+	                // データは消去されましたのアラート表示
+	                showCustomAlert('データは消去されました');
+        		    nativeSpeak('データは消去されました');
+	            } else {
+	                // キャンセルされた場合、何もしない
+	                // showCustomAlert('データ削除はキャンセルされました'); // 必要であればキャンセルのメッセージも表示
+	            }
+	        });
+	    }
+
+	    // カスタムアラートを表示する関数
+	    function showCustomAlert(message) {
+	        customAlertContainer.textContent = message;
+	        customAlertContainer.style.display = 'block';
+
+	        // 3秒後にアラートを非表示にする
+	        setTimeout(() => {
+	            customAlertContainer.style.display = 'none';
+	        }, 3000);
+	    }
+	});
+	</script>
+	
+		<script>
+		  <!-- スクロールで表示されるbottomボタン9/30 -->
+		function scrollToBottom() {
+		  window.scrollTo({
+		    top: document.body.scrollHeight,
+		    behavior: 'smooth'
+		  });
+		}
+
+		window.addEventListener("scroll", function () {
+		  const bottomBtn = document.getElementById("bottomBtn");
+		  if (window.scrollY < document.body.scrollHeight - window.innerHeight - 300) {
+		    bottomBtn.style.display = "block";
+		  } else {
+		    bottomBtn.style.display = "none";
+		  }
+		});
+	
+       </script>
+ 
+	<footer>
+	© 20251005 ettomio
+	</footer>
+   
+	<!-- HTML末尾にこれを追加 5/5 -->
+	<div style="height: 80px;"></div>
+		
+</body>
+
+</html>
