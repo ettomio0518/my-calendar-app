@@ -105,6 +105,12 @@
 	        text-align: center; /* #keys全体を中央に配置 */
 	    }
 
+	    /* 10/2追加　テキスト左揃え */
+		#displayText {
+		    text-align: left; /* 表示される内容だけ左揃え */
+		    width: 100%;
+		}
+		
 		.custom-alert {
 		    position: fixed;
 		    top: 10px;
@@ -168,8 +174,8 @@
 
 	<!-- Bottomボタン 9/30 -->
 	<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
-
-	<div style="height: 100px;"></div>
+	<!-- 10/2 100pxから30pxに -->
+	<div style="height: 30px;"></div>
 
 	<script>
 		// ローカルストレージの全てのキーを表示（昇順）
@@ -200,6 +206,7 @@
 		}
 		
 		// キーリストを非表示にする前述と同じcloseKeysNは削除 10/1
+
 		
 		// 指定したキーの詳細を表示 10/1 書き換え
 		function displayText() {
@@ -337,7 +344,10 @@
 	
        </script>
  
- 
+	<footer>
+	© 20251002 ettomio
+	</footer>
+   
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
 		
