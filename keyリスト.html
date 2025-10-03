@@ -86,7 +86,12 @@
 	        background-color: #800040;
 	        color: white;
 	    }
-	    
+
+	    #keyButton3 {
+	        background-color: #0080c0;
+	        color: white;
+	    }
+	    	    
 		.key-label { 
 		    margin-bottom: 5px; /* p要素の下余白を調整 */
 		}
@@ -168,6 +173,8 @@
 		<br>
 		<button id="deleteButton" style="display: none;" onclick="deleteKeyAndText()">Keyと本文を削除</button>
 		<br>
+        <button id="keyButton3" onclick="displayStorageUsage()">ローカルストレージの使用量を表示</button>
+		<br><br>
 		<button id="keyButton2">全keyを消去</button>
 				
 	</div>
@@ -240,6 +247,47 @@
 		    keyInputElement.value = ''; // キー入力欄をクリア
 		    document.getElementById('closeDetailsButton').style.display = 'none'; // 閉じるボタンを非表示
 		    document.getElementById('deleteButton').style.display = 'none'; // 削除ボタンを非表示
+		}
+
+        // ローカルストレージの使用容量を計算
+        function getLocalStorageUsage() {
+            let total = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+                total += key.length + value.length;
+            }
+            return total; // 使用容量（バイト数）
+        }
+
+		// 使用量表示
+		function displayStorageUsage() {
+		    const usage = getLocalStorageUsage();
+		    const usedKB = (usage / 1024).toFixed(2); // 使用量（KB）
+		    const maxStorageKB = 5120; // 最大容量 5MB
+		    const bytesPerSheet = 800; // 1枚の原稿用紙のバイト数
+		    const usedSheets = Math.round((usage / bytesPerSheet)); // 原稿用紙枚数
+		    const remainingKB = (maxStorageKB - usedKB).toFixed(2);
+		    const remainingSheets = Math.round(((remainingKB * 1024) / bytesPerSheet));
+		    
+		    // 100の位以下を切り捨てた値 3/27追加
+		    const remainingSheetsS = Math.floor(remainingSheets / 100) * 100;
+
+		    const message = (
+		        `ローカルストレージの使用量は` +
+		        `原稿用紙約　　${usedSheets} 枚分です。` +
+		        `あと、理論上は` +
+		        `${remainingSheetsS} 枚分程度の空き容量です。`
+		    );
+
+		    // アラートで表示
+		    showCustomAlert(
+		        `ローカルストレージの使用量は　　　${usedKB} KB\n` +
+		        `原稿用紙約　　${usedSheets} 枚分です。\n` +
+		        `あと、　　　　${remainingKB} KB、　　　　${remainingSheets} 枚分程度の空き容量です。`
+		    );
+
+		    nativeSpeak(message);
 		}
 
 		// Keyと本文を削除する 10/1書き換え
@@ -345,7 +393,7 @@
        </script>
  
 	<footer>
-	© 20251002 ettomio
+	© 20251005 ettomio
 	</footer>
    
 	<!-- HTML末尾にこれを追加 5/5 -->
