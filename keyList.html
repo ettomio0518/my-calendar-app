@@ -270,8 +270,8 @@
 		    const remainingKB = (maxStorageKB - usedKB).toFixed(2);
 		    const remainingSheets = Math.round(((remainingKB * 1024) / bytesPerSheet));
 		    
-		    // 100の位以下を切り捨てた値 3/27追加
-		    const remainingSheetsS = Math.floor(remainingSheets / 100) * 100;
+		    // 100の位以下を切り捨てた値 3/27追加 10/11 10の位以下を切り捨て
+		    const remainingSheetsS = Math.floor(remainingSheets / 10) * 10;
 
 		    const message = (
 		        `ローカルストレージの使用量は` +
@@ -393,7 +393,7 @@
        </script>
  
 	<footer>
-	© 20251005 ettomio
+	© 20251011 ettomio
 	</footer>
    
 	<!-- HTML末尾にこれを追加 5/5 -->
