@@ -1163,54 +1163,50 @@
         }
     });
 
-    // 日付音声入力の処理 10/8
-    function startVoiceInput2() {
-        const voiceInputButton2 = document.getElementById("voiceInputButton2");
-        voiceInputButton2.classList.add("blinking");
-        voiceInputButton2.classList.add("recording");
+    // 日付音声入力の処理 10/8 10/11
+	function startVoiceInput2() {
+	    const voiceInputButton2 = document.getElementById("voiceInputButton2");
+	    voiceInputButton2.classList.add("blinking");
+	    voiceInputButton2.classList.add("recording2"); // ← ここを修正！10/11
 
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'ja-JP';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
+	    const recognition = new webkitSpeechRecognition();
+	    recognition.lang = 'ja-JP';
+	    recognition.interimResults = false;
+	    recognition.maxAlternatives = 1;
 
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            console.log("認識された日付:", transcript);
+	    recognition.onresult = (event) => {
+	        const transcript = event.results[0][0].transcript;
+	        console.log("認識された日付:", transcript);
 
-            const parsedDate = parseJapaneseDate(transcript);
-            if (parsedDate) {
-                document.getElementById("scheduleDate").value = parsedDate;
+	        const parsedDate = parseJapaneseDate(transcript);
+	        if (parsedDate) {
+	            document.getElementById("scheduleDate").value = parsedDate;
 
-                const dateObj = new Date(parsedDate);
-                const mmdd = `${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')}`;
-                document.getElementById("scheduleInput").value = mmdd + " ";
+	            const dateObj = new Date(parsedDate);
+	            const mmdd = `${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')}`;
+	            document.getElementById("scheduleInput").value = mmdd + " ";
 
-                // 🎤 日付音声入力ボタンを非表示
-                document.getElementById("voiceInputButton2").style.display = "none";
+	            document.getElementById("voiceInputButton2").style.display = "none";
+	            document.getElementById("voiceInputButton").style.display = "inline-block";
+	            startVoiceInput();
+	        } else {
+	            alert("日付の認識に失敗しました。もう一度お試しください。");
+	        }
+	    };
 
-                // 🎤 予定音声入力ボタンを表示
-                document.getElementById("voiceInputButton").style.display = "inline-block";
+	    recognition.onerror = (event) => {
+	        alert('音声認識エラー: ' + event.error);
+	        voiceInputButton2.style.display = "none";
+	    };
 
-                // 🎤 自動で予定音声入力を開始
-                startVoiceInput();
-            } else {
-                alert("日付の認識に失敗しました。もう一度お試しください。");
-            }
-        };
+	    recognition.onend = () => {
+	        voiceInputButton2.classList.remove("blinking");
+	        voiceInputButton2.classList.remove("recording2"); // ← ここも修正！
+	    };
 
-        recognition.onerror = (event) => {
-            alert('音声認識エラー: ' + event.error);
-            voiceInputButton2.style.display = "none";
-        };
+	    recognition.start();
+	}
 
-        recognition.onend = () => {
-            voiceInputButton2.classList.remove("blinking");
-            voiceInputButton2.classList.remove("recording");
-        };
-
-        recognition.start();
-    }
 
     // 日付テキストを yyyy-mm-dd に変換する関数
     function parseJapaneseDate(text) {
@@ -2154,7 +2150,7 @@
 
 
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 11.7 (2025-10-10)</p>
+	 © 2025 ettomio. All rights reserved. | Version 11.8 (2025-10-11)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
