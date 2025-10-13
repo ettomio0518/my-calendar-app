@@ -258,7 +258,7 @@
 		}
 
 		/* カスタムアラート */
-		.custom-alert, .custom-alert2, .custom-alert3, .custom-alert4 { 
+		.custom-alert, .custom-alert2, .custom-alert3, .custom-alert4{ 
 		    position: fixed; 
 		    top: 20px; 
 		    left: 50%; 
@@ -285,7 +285,7 @@
 		    background-color: #333; 
 		    color: white;  
 		} /* 音声入力 8/12 */
-		
+
 		.logo-title {
 		    display: flex;
 		    flex-direction: row;
@@ -1156,10 +1156,10 @@
         const voiceInputButton = document.getElementById("voiceInputButton");
         const voiceInputButton2 = document.getElementById("voiceInputButton2");
 
-        if (!('webkitSpeechRecognition' in window)) {
-            voiceInputButton.style.display = "none";
-            voiceInputButton2.style.display = "none";
-            showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。');
+		if (!('webkitSpeechRecognition' in window)) {
+		    voiceInputButton.style.display = "none";
+		    voiceInputButton2.style.display = "none";
+		    showCustomAlert4('この端末では音声入力が使えません。iPhoneでWeb版をご利用の場合は、Safari 14.1以降で直接開いてください。');
         }
     });
 
@@ -1196,6 +1196,7 @@
 
 	    recognition.onerror = (event) => {
 	        alert('音声認識エラー: ' + event.error);
+            showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。Web版をiPhoneでご利用の方はSafari 14.1以降で開いてください。詳しくは「紹介ページ」をご覧ください。');	        
 	        voiceInputButton2.style.display = "none";
 	    };
 
@@ -1256,7 +1257,7 @@
 
         recognition.onerror = function (event) {
             alert('音声認識エラー: ' + event.error);
-            showCustomAlert4('手動入力をお願いします');
+            showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。Web版をiPhoneでご利用の方はSafari 14.1以降で開いてください。詳しくは「紹介ページ」をご覧ください。');
             voiceInputButton.style.display = "none";
         };
 
@@ -1317,7 +1318,7 @@
             alertContainer.className = 'custom-alert4';
             alertContainer.textContent = message;
             document.body.appendChild(alertContainer);
-            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 1000);
+            setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
         }    
         function speakText(text) {
             if ('speechSynthesis' in window) {
@@ -2150,7 +2151,7 @@
 
 
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 11.8 (2025-10-11)</p>
+	 © 2025 ettomio. All rights reserved. | Version 11.9 (2025-10-13)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
