@@ -340,7 +340,7 @@
 
 		        recognition.onerror = function(event) {
 		            alert('音声認識エラー: ' + event.error);
-		            showCustomAlert('手動入力をお願いします');
+		            showCustomAlert('この端末では音声入力が使えません。iPhoneでWeb版をご利用の場合は、Safari 14.1以降で直接開いてください。');
 		            voiceButton.style.display = "none";
 		        };
 		    }
@@ -440,7 +440,7 @@
             saveButton.style.display = 'none';
             closeButton.style.display = 'none';
             currentKey = null; // 現在のkeyをリセット
-            scrollToTop(); // Topに戻る 9/6
+            scrollToTop() // Topに戻る 9/6
         }
 
         // 修正内容を保存する関数
@@ -549,7 +549,7 @@
    	
 	<footer style="text-align: center;">
 	<br>
-	  © 20251006 ettomio
+	  © 20251013 ettomio
 	</footer>
      	
 	<!-- HTML末尾にこれを追加 5/5 -->
