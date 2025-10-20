@@ -283,7 +283,7 @@
 
 	<script>
 	    // ==========================================================
-	    // ★ 予定リスト関連の定数・変数の定義 (他の場所の定義は削除済み)
+	    // ★ 予定リスト関連の定数・変数の定義
 	    // ==========================================================
 	    const PREFIX = 'ScheduledText'; // 予定データのキー接頭辞
 
@@ -298,7 +298,7 @@
 	    let currentKey = null; // 現在修正対象のキーを保持
 
 	    // ==========================================================
-	    // ★ 共通ユーティリティ (アラート/音声/ストレージ)
+	    // ★ 共通ユーティリティ (アラート/音声/ストレージ/日付)
 	    // ==========================================================
 
 	    const customAlertContainer = document.createElement('div');
@@ -343,6 +343,25 @@
 	        }
 	        return total; // 使用容量（バイト数）
 	    }
+	    
+	    // YYYY/MM/DD形式で返す
+	    function getDisplayDate(key) {
+	        const datePart = key.substring(PREFIX.length, PREFIX.length + 8);
+	        const year = datePart.substring(0, 4); // 年（YYYY）を抽出
+	        const month = datePart.substring(4, 6);
+	        const day = datePart.substring(6, 8);
+	        return `${year}/${month}/${day}`; // YYYY/MM/DD 形式
+	    }
+
+	    // 今日を YYYY/MM/DD 形式の文字列で取得するヘルパー関数
+	    function getTodayDateString() {
+	        const today = new Date();
+	        const year = today.getFullYear();
+	        const month = String(today.getMonth() + 1).padStart(2, '0');
+	        const day = String(today.getDate()).padStart(2, '0');
+	        return `${year}/${month}/${day}`;
+	    }
+
 
 	    // ==========================================================
 	    // ★ キーリスト機能 (displayKeys/closeKeys/displayText/deleteKeyAndText)
@@ -363,7 +382,6 @@
 	        const message = `ローカルストレージのキーの総数は ${keys.length} 個です。`;
 	        showCustomAlert(message);
 	        nativeSpeak(message);
-	        // キーリストを表示した直後もスクロールボタンの表示をチェック
 	        showScrollButtonsIfPageLong(); 
 	    }
 
@@ -372,7 +390,6 @@
 	        keysElement.innerHTML = '';
 	        document.getElementById('closeKeysButton').style.display = 'none';
 	        document.getElementById('closeKeysButtonN').style.display = 'none';
-	         // キーリストを閉じた後もスクロールボタンの表示をチェック
 	        showScrollButtonsIfPageLong();
 	    }
 	    
@@ -476,15 +493,6 @@
 	        return keys;
 	    }
 
-	    // YYYY/MM/DD形式で返す
-	    function getDisplayDate(key) {
-	        const datePart = key.substring(PREFIX.length, PREFIX.length + 8);
-	        const year = datePart.substring(0, 4); // 年（YYYY）を抽出
-	        const month = datePart.substring(4, 6);
-	        const day = datePart.substring(6, 8);
-	        return `${year}/${month}/${day}`; // YYYY/MM/DD 形式
-	    }
-
 	    function hideDetailArea() {
 	        detailArea.classList.add('hidden');
 	        detailTextarea.value = '';
@@ -492,11 +500,28 @@
 	        currentKey = null;
 	    }
 
+	    // ★修正済み: 過去は「案件」、今日以降は「予定」と表示を切り替える
 	    function showDetailArea(key, dateStr, content) {
 	        currentKey = key;
 	        detailArea.classList.remove('hidden');
-	        // dateStrがYYYY/MM/DD形式で渡されるため、表示もその形式になる
-	        detailDateSpan.textContent = `${dateStr} の予定`; 
+
+	        // 1. 今日（YYYY/MM/DD）を取得
+	        const todayStr = getTodayDateString();
+	        
+	        let suffixText = '';
+	        
+	        // 2. 日付を比較 (YYYY/MM/DD 形式で文字列比較が可能)
+	        if (dateStr < todayStr) {
+	            // 過去の日付の場合
+	            suffixText = 'の案件'; 
+	        } else {
+	            // 今日、または未来の日付の場合
+	            suffixText = 'の予定';
+	        }
+
+	        // 3. 表示テキストを設定
+	        detailDateSpan.textContent = `${dateStr} ${suffixText}`;
+	        
 	        detailTextarea.value = content;
 	        
 	        detailArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -534,7 +559,7 @@
 	            
 	            let displayContent = fullContent;
 	            
-	            // ★修正点: MM/DD形式を使用して内容の先頭の日付（例: "01/02" や "01/02 "）がある場合は削除
+	            // MM/DD形式を使用して内容の先頭の日付（例: "01/02" や "01/02 "）がある場合は削除
 	            const datePattern = new RegExp(`^${monthDayStr}\\s*`);
 	            if (datePattern.test(fullContent)) {
 	                displayContent = fullContent.replace(datePattern, '').trim();
@@ -692,7 +717,7 @@
 	</script>
 	
     <footer>
-	© 20251020 ettomio
+	© 20251021 ettomio
 	</footer>
 	<div style="height: 80px;"></div>
 	
