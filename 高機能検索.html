@@ -329,354 +329,380 @@
 </head>
 
 <body>
-  	<header>
-    <!-- Homeに戻るボタン 5/6 -->
-	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
-	    <h1>高機能検索</h1>
-  	</header>
-  	
+    <header>
+        <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+        <h1>高機能検索</h1>
+    </header>
+
     <div class="container">
 
-        <!-- キーワード入力ボックス -->
         <div>
             <label for="keywordInput">キーワード:</label>
-            <!-- 音声入力ボタン -->
-<button id="voiceButton" onclick="startVoiceInput()">🎤 音声入力</button>
+            <button id="voiceButton" onclick="startVoiceInput()">🎤 音声入力</button>
             <input type="text" id="keywordInput" oninput="searchMemos()" placeholder="検索キーワードを入力">
         </div>
 
-        <!-- 検索結果表示 -->
         <div id="searchResults" class="table-container"></div>
 
-        <!-- 詳細表示エリア -->
         <div id="fullContent" class="detail-container" contenteditable="true"></div>
         <button id="saveButton" style="display: none;" onclick="saveChanges()">修正して保存</button>
         <button id="closeButton" class="closeButton" style="display: none;" onclick="closeFullContent()">詳細を閉じる</button>
 
 
-    <script>
-	// 8/10,8/11 8/13追加　CoPilot 10/22 Gemini
-	// ★★★ 変数宣言をここに統一し、重複を解消します ★★★
-	let recognition = null;
-	let isListening = false;
-	let currentKey = null; // 現在表示しているkeyを保持
+        <script>
+            // ★★★ 変数宣言をここに統一し、重複を解消します ★★★
+            let recognition = null; // Web Speech API用オブジェクト
+            let isListening = false;
+            let currentKey = null; // 現在表示しているkeyを保持
+            
+            // --- UI/UX 補助関数 ---
 
-	// カスタム通知を表示する関数
-	function showCustomAlert(message) {
-	    const alertContainer = document.createElement('div');
-	    alertContainer.className = 'custom-alert';
-	    alertContainer.textContent = message;
+            // カスタム通知を表示する関数
+            function showCustomAlert(message) {
+                const alertContainer = document.createElement('div');
+                alertContainer.className = 'custom-alert';
+                alertContainer.textContent = message;
 
-	    document.body.appendChild(alertContainer);
+                document.body.appendChild(alertContainer);
 
-	    setTimeout(() => {
-	        document.body.removeChild(alertContainer);
-	    }, 2000);
-	}
-
-	// 音声入力を開始する関数
-	function startVoiceInput() {
-	    const voiceButton = document.getElementById('voiceButton');
-
-	    // 認識オブジェクトがまだ作成されていない場合に初期化
-	    if (!recognition) {
-	        if ('webkitSpeechRecognition' in window) {
-	            recognition = new webkitSpeechRecognition();
-	        } else if ('SpeechRecognition' in window) {
-	            recognition = new SpeechRecognition();
-	        } else {
-	            recognition = null;
-	            voiceButton.style.display = "none";
-	            showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
-	            return;
-	        }
-
-recognition.lang = 'ja-JP';
-        recognition.interimResults = false;
-        
-        // 最大3つの候補を取得するように設定
-        recognition.maxAlternatives = 3; 
-
-        // 結果イベントのハンドラ
-        recognition.onresult = function(event) {
-            const result = event.results[0];
-            const alternativesContainer = document.getElementById('alternativeButtons');
-            alternativesContainer.innerHTML = ''; // ボタンをクリア
-
-            // 取得した全ての候補（最大3つ）をボタンとして作成
-            for (let i = 0; i < result.length; i++) {
-                const transcript = result[i].transcript;
-                const button = document.createElement('button');
-                button.textContent = transcript;
-                
-                // ボタンがクリックされたときの処理を設定
-                button.onclick = () => selectAlternative(transcript);
-                
-                alternativesContainer.appendChild(button);
+                setTimeout(() => {
+                    document.body.removeChild(alertContainer);
+                }, 2000);
             }
 
-            // 候補が一つもなかった場合（稀）はエラー扱い
-            if (result.length === 0) {
-                 recognition.onerror({ error: 'no-speech' });
-                 return;
+            // ボタン表示を切り替える関数
+            function toggleVoiceButton(isClearMode) {
+                const voiceButton = document.getElementById('voiceButton');
+                if (isClearMode) {
+                    voiceButton.textContent = '❌ クリア';
+                    voiceButton.onclick = clearVoiceInput;
+                    voiceButton.classList.remove("blinking", "recording");
+                } else {
+                    voiceButton.textContent = '🎤 音声入力';
+                    voiceButton.onclick = startVoiceInput;
+                    voiceButton.classList.remove("blinking", "recording");
+                }
+            }
+
+            // キーワードをクリアして全リスト表示に戻す関数
+            function clearVoiceInput() {
+                document.getElementById('keywordInput').value = '';
+                searchMemos();
+                toggleVoiceButton(false); // 「音声入力」ボタンに戻す
             }
             
-            // ★修正点: ダイアログを表示する★
-            document.getElementById('alternativesModal').style.display = 'block';
+            // ユーザーが候補を選択したときの処理
+            function selectAlternative(transcript) {
+                document.getElementById('keywordInput').value = transcript;
+                document.getElementById('alternativesModal').style.display = 'none';
+                searchMemos();
+                toggleVoiceButton(true); 
+            }
 
-            // 認識が完了したので、ボタンの点滅を解除
-            toggleVoiceButton(false);
-            isListening = false;
-        };
+            // ダイアログのキャンセルボタンの処理
+            function closeAlternativesModal() {
+                document.getElementById('alternativesModal').style.display = 'none';
+            }
 
-	        recognition.onerror = function(event) {
-	            alert('音声認識エラー: ' + event.error);
-	            showCustomAlert('この端末では音声入力が使えません。iPhoneでWeb版をご利用の場合は、Safari 14.1以降で直接開いてください。');
-	            voiceButton.style.display = "none";
-	            toggleVoiceButton(false); // エラー時もボタンをリセット
-	        };
-	        
-	        // 認識終了時の処理をリセット
-	        recognition.onend = function() {
-	            isListening = false;
-	            voiceButton.classList.remove("blinking");
-	            voiceButton.classList.remove("recording");
-	        };
-	    }
+            // ------------------------------------------------
+            // ★★★ メイン: 音声認識と環境の切り替えロジック ★★★
+            // ------------------------------------------------
 
-	    // 認識開始
-	    if (!isListening) { // 重複スタート防止
-	        recognition.start();
-	        isListening = true;
+            // ネイティブ側から結果を受け取る関数 (Kotlinから呼ばれる)
+            // WebView(アプリ)環境でのみ使用
+            function receiveNativeAlternatives(alternatives) {
+                const voiceButton = document.getElementById('voiceButton');
+                const alternativesContainer = document.getElementById('alternativeButtons');
+                alternativesContainer.innerHTML = ''; 
+                
+                isListening = false;
+                voiceButton.classList.remove("blinking", "recording");
 
-	        voiceButton.classList.add("blinking");
-	        voiceButton.classList.add("recording");
-	    }
-	}
+                if (alternatives.length === 0) {
+                    showCustomAlert('音声認識ができませんでした。');
+                    toggleVoiceButton(false);
+                    return;
+                }
 
-	// ボタン表示を切り替える関数
-	function toggleVoiceButton(isClearMode) {
-	    const voiceButton = document.getElementById('voiceButton');
-	    if (isClearMode) {
-	        voiceButton.textContent = '❌ クリア';
-	        voiceButton.onclick = clearVoiceInput;
-	        voiceButton.classList.remove("blinking");
-	        voiceButton.classList.remove("recording");
-	    } else {
-	        voiceButton.textContent = '🎤 音声入力';
-	        voiceButton.onclick = startVoiceInput;
-	        voiceButton.classList.remove("blinking");
-	        voiceButton.classList.remove("recording");
-	    }
-	}
+                // 候補をボタンとして作成し、ダイアログを表示
+                alternatives.forEach(transcript => {
+                    const button = document.createElement('button');
+                    button.textContent = transcript;
+                    button.onclick = () => selectAlternative(transcript); 
+                    alternativesContainer.appendChild(button);
+                });
+                
+                document.getElementById('alternativesModal').style.display = 'block';
+            }
+            
+            // Web Speech APIの初期化と実行ロジック (ブラウザ環境でのみ使用)
+            function startWebSpeechAPI() {
+                 if (!recognition) {
+                    if ('webkitSpeechRecognition' in window) {
+                        recognition = new webkitSpeechRecognition();
+                    } else if ('SpeechRecognition' in window) {
+                        recognition = new SpeechRecognition();
+                    } else {
+                        recognition = null;
+                        document.getElementById('voiceButton').style.display = "none";
+                        showCustomAlert('このブラウザでは音声入力が使えません。');
+                        return;
+                    }
 
-	// キーワードをクリアして全リスト表示に戻す関数
-	function clearVoiceInput() {
-	    document.getElementById('keywordInput').value = '';
-	    searchMemos();
-	    toggleVoiceButton(false); // 「音声入力」ボタンに戻す
-	}
+                    recognition.lang = 'ja-JP';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 3; 
+                    
+                    recognition.onresult = function(event) {
+                        const result = event.results[0];
+                        const alternativesContainer = document.getElementById('alternativeButtons');
+                        alternativesContainer.innerHTML = ''; 
+                        
+                        // Web Speech APIの結果を処理
+                        const alternatives = Array.from(result).map(r => r.transcript);
 
-	// ユーザーが候補を選択したときの処理 10/22
-	function selectAlternative(transcript) {
-	    // 選択された候補を入力フィールドに反映
-	    document.getElementById('keywordInput').value = transcript;
-	    
-	    // ダイアログを閉じる
-	    document.getElementById('alternativesModal').style.display = 'none';
+                        if (alternatives.length === 0) {
+                            recognition.onerror({ error: 'no-speech' });
+                            return;
+                        }
+                        
+                        // 候補をボタンとして作成し、ダイアログを表示
+                        alternatives.forEach(transcript => {
+                            const button = document.createElement('button');
+                            button.textContent = transcript;
+                            button.onclick = () => selectAlternative(transcript);
+                            alternativesContainer.appendChild(button);
+                        });
+                        
+                        document.getElementById('alternativesModal').style.display = 'block';
+                        
+                        // UIリセット
+                        toggleVoiceButton(false);
+                        isListening = false;
+                    };
 
-	    // 検索処理を実行
-	    searchMemos();
-	    
-	    // 「❌ クリア」ボタンに切り替え
-	    toggleVoiceButton(true); 
-	}
+                    recognition.onerror = function(event) {
+                        // ブラウザ固有のエラーメッセージを分かりやすく
+                        console.error('Web Speech API Error:', event.error);
+                        showCustomAlert('音声認識エラーが発生しました。ブラウザをご確認ください。');
+                        toggleVoiceButton(false);
+                        isListening = false;
+                    };
+                    
+                    recognition.onend = function() {
+                        isListening = false;
+                        document.getElementById('voiceButton').classList.remove("blinking", "recording");
+                    };
+                }
 
-	// ダイアログのキャンセルボタンの処理
-	function closeAlternativesModal() {
-	    document.getElementById('alternativesModal').style.display = 'none';
-	    // キャンセル時は入力フィールドの値をクリア（または元の値に戻す）するなどの処理も検討
-	}
+                if (recognition && !isListening) { 
+                    recognition.start();
+                    isListening = true;
+                    document.getElementById('voiceButton').classList.add("blinking", "recording");
+                }
+            }
 
-	// DOM読み込み後の初期化処理に、モーダルを閉じるイベントを設定
-	document.addEventListener('DOMContentLoaded', function () {
-	    // ... (既存のDOMContentLoadedロジック)
 
-	    // モーダルのキャンセルボタンに処理を割り当てる
-	    document.getElementById('closeModalButton').onclick = closeAlternativesModal;
-	    
-	    // ... (既存のDOMContentLoadedロジックの続き)
-	});
+            // 音声入力を開始するメイン関数 (HTMLのonclickから呼ばれる)
+            function startVoiceInput() {
+                const voiceButton = document.getElementById('voiceButton');
+                
+                // 1. 【アプリ環境判定】: Androidインターフェースが存在するか
+                if (typeof Android !== 'undefined' && Android.startVoiceRecognition) {
+                    // ★アプリ(WebView)として実行されている場合: ネイティブコードを呼び出す
+                    Android.startVoiceRecognition();
+                    isListening = true; 
+                    voiceButton.classList.add("blinking", "recording");
+                } 
+                // 2. 【ブラウザ環境判定】: Web Speech APIの機能が使えるか
+                else if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    // ★ブラウザとして実行されている場合: Web Speech APIを使用
+                    startWebSpeechAPI();
+                }
+                // 3. 【非対応環境】
+                else {
+                    voiceButton.style.display = "none";
+                    showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
+                }
+            }
+            
+            // ------------------------------------------------
+            // --- 既存の検索・詳細ロジック ---
+            // ------------------------------------------------
 
-	// URLをリンクに変換する関数
-	function makeUrlsClickable(text) {
-	    const urlPattern = /(https?:\/\/[^\s]+)/g;
-	    return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
-	}
+            // URLをリンクに変換する関数
+            function makeUrlsClickable(text) {
+                const urlPattern = /(https?:\/\/[^\s]+)/g;
+                return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+            }
 
-	// 詳細を表示する関数
-	function displayFullContent(content, key) {
-	    const fullContentDiv = document.getElementById('fullContent');
-	    const saveButton = document.getElementById('saveButton');
-	    const closeButton = document.getElementById('closeButton');
+            // 詳細を表示する関数
+            function displayFullContent(content, key) {
+                const fullContentDiv = document.getElementById('fullContent');
+                const saveButton = document.getElementById('saveButton');
+                const closeButton = document.getElementById('closeButton');
 
-	    currentKey = key; // 現在のキーを保存
-	    fullContentDiv.innerHTML = makeUrlsClickable(content); // クリッカブルURLを適用
-	    fullContentDiv.contentEditable = true; // 編集可能に設定
-	    fullContentDiv.style.display = 'block';
-	    saveButton.style.display = 'block';
-	    closeButton.style.display = 'block';
-	    fullContentDiv.scrollIntoView({ behavior: 'smooth' });
+                currentKey = key;
+                fullContentDiv.innerHTML = makeUrlsClickable(content);
+                fullContentDiv.contentEditable = true;
+                fullContentDiv.style.display = 'block';
+                saveButton.style.display = 'block';
+                closeButton.style.display = 'block';
+                fullContentDiv.scrollIntoView({ behavior: 'smooth' });
 
-	    // contenteditable内でのリンククリックを有効化
-	    fullContentDiv.addEventListener('click', (e) => {
-	        if (e.target.tagName === 'A') {
-	            e.preventDefault();
-	            window.open(e.target.href, '_blank', 'noopener,noreferrer'); // 新しいタブで開く
-	        }
-	    });
-	}
+                fullContentDiv.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'A') {
+                        e.preventDefault();
+                        window.open(e.target.href, '_blank', 'noopener,noreferrer');
+                    }
+                });
+            }
 
-	// 詳細を閉じる関数
-	function closeFullContent() {
-	    const fullContentDiv = document.getElementById('fullContent');
-	    const saveButton = document.getElementById('saveButton');
-	    const closeButton = document.getElementById('closeButton');
+            // 詳細を閉じる関数
+            function closeFullContent() {
+                document.getElementById('fullContent').style.display = 'none';
+                document.getElementById('saveButton').style.display = 'none';
+                document.getElementById('closeButton').style.display = 'none';
+                currentKey = null;
+                scrollToTop()
+            }
 
-	    fullContentDiv.style.display = 'none';
-	    saveButton.style.display = 'none';
-	    closeButton.style.display = 'none';
-	    currentKey = null; // 現在のkeyをリセット
-	    scrollToTop() // Topに戻る
-	}
+            // 修正内容を保存する関数
+            function saveChanges() {
+                const fullContentDiv = document.getElementById('fullContent');
+                // HTML要素の内容をそのまま取得し、URLとして保存されないようにテキストのみを格納
+                const newContent = fullContentDiv.innerText;
 
-	// 修正内容を保存する関数
-	function saveChanges() {
-	    const fullContentDiv = document.getElementById('fullContent');
-	    const newContent = fullContentDiv.innerText; // 修正後の内容を取得（プレーンテキスト）
+                if (currentKey) {
+                    localStorage.setItem(currentKey, newContent);
+                    alert('内容を保存しました！');
+                    searchMemos();
+                } else {
+                    alert('保存する内容が見つかりません。');
+                }
+            }
 
-	    if (currentKey) {
-	        localStorage.setItem(currentKey, newContent); // ローカルストレージに保存
-	        alert('内容を保存しました！');
-	        searchMemos(); // 検索結果を更新
-	    } else {
-	        alert('保存する内容が見つかりません。');
-	    }
-	}
+            // メモの検索と表示を行う関数
+            function searchMemos() {
+                const keyword = document.getElementById('keywordInput').value;
+                const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword');
+                const searchResults = keys.filter(key => {
+                    const content = localStorage.getItem(key);
+                    return content && content.includes(keyword); // contentがnullでないことを確認
+                });
 
-	// メモの検索と表示を行う関数
-	function searchMemos() {
-	    const keyword = document.getElementById('keywordInput').value;
-	    const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword');
-	    const searchResults = keys.filter(key => {
-	        const content = localStorage.getItem(key);
-	        return content.includes(keyword); // キーワードが含まれているかチェック
-	    });
+                searchResults.sort((a, b) => a.localeCompare(b));
 
-	    searchResults.sort((a, b) => a.localeCompare(b));
+                const searchResultsList = document.getElementById('searchResults');
+                searchResultsList.innerHTML = '';
 
-	    const searchResultsList = document.getElementById('searchResults');
-	    searchResultsList.innerHTML = '';
+                if (searchResults.length === 0 && keyword.length > 0) {
+                     searchResultsList.innerHTML = '<p style="text-align: center; color: #888;">一致する結果はありませんでした。</p>';
+                     return;
+                }
 
-	    const table = document.createElement('table');
-	    const headerRow = document.createElement('tr');
-	    const keywordHeader = document.createElement('th');
-	    keywordHeader.classList.add('keyword-column');
-	    keywordHeader.textContent = 'key';
-	    const contentHeader = document.createElement('th');
-	    contentHeader.classList.add('content-column');
-	    contentHeader.textContent = '内容';
-	    const actionsHeader = document.createElement('th');
-	    actionsHeader.classList.add('actions-column');
-	    actionsHeader.textContent = '操作';
-	    headerRow.appendChild(keywordHeader);
-	    headerRow.appendChild(contentHeader);
-	    headerRow.appendChild(actionsHeader);
-	    table.appendChild(headerRow);
 
-	    searchResults.forEach(key => {
-	        const row = document.createElement('tr');
-	        const keywordCell = document.createElement('td');
-	        keywordCell.classList.add('keyword-column');
-	        const contentCell = document.createElement('td');
-	        contentCell.classList.add('content-column');
-	        const actionsCell = document.createElement('td');
-	        actionsCell.classList.add('actions-column');
-	        const content = localStorage.getItem(key);
+                const table = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                const headers = ['key', '内容', '操作'];
+                const classNames = ['keyword-column', 'content-column', 'actions-column'];
+                
+                headers.forEach((text, index) => {
+                    const th = document.createElement('th');
+                    th.classList.add(classNames[index]);
+                    th.textContent = text;
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
 
-	        keywordCell.textContent = key.slice(0, 10);
-	        contentCell.textContent = content.slice(0, 30) + '...';
+                searchResults.forEach(key => {
+                    const row = document.createElement('tr');
+                    const content = localStorage.getItem(key) || '';
+                    
+                    const keywordCell = document.createElement('td');
+                    keywordCell.classList.add('keyword-column');
+                    keywordCell.textContent = key.slice(0, 10);
+                    
+                    const contentCell = document.createElement('td');
+                    contentCell.classList.add('content-column');
+                    contentCell.textContent = content.slice(0, 30) + (content.length > 30 ? '...' : '');
 
-	        const viewButton = document.createElement('button');
-	        viewButton.textContent = '表示';
-	        viewButton.classList.add('btn-show-text'); // クラスを追加
-	        viewButton.onclick = () => displayFullContent(content, key);
+                    const actionsCell = document.createElement('td');
+                    actionsCell.classList.add('actions-column');
+                    
+                    const viewButton = document.createElement('button');
+                    viewButton.textContent = '表示';
+                    viewButton.classList.add('btn-show-text'); 
+                    viewButton.onclick = () => displayFullContent(content, key);
 
-	        actionsCell.appendChild(viewButton);
-	        row.appendChild(keywordCell);
-	        row.appendChild(contentCell);
-	        row.appendChild(actionsCell);
-	        table.appendChild(row);
-	    });
+                    actionsCell.appendChild(viewButton);
+                    row.appendChild(keywordCell);
+                    row.appendChild(contentCell);
+                    row.appendChild(actionsCell);
+                    table.appendChild(row);
+                });
 
-	    searchResultsList.appendChild(table);
-	}
+                searchResultsList.appendChild(table);
+            }
 
-	// DOM読み込み後の初期化
-	document.addEventListener('DOMContentLoaded', function () {
-	    const voiceButton = document.getElementById('voiceButton');
-	    const keywordInput = document.getElementById('keywordInput');
+            // DOM読み込み後の初期化
+            document.addEventListener('DOMContentLoaded', function () {
+                const voiceButton = document.getElementById('voiceButton');
+                const keywordInput = document.getElementById('keywordInput');
 
-	    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-	        voiceButton.style.display = "none";
-	        showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
-	    } else {
-	        voiceButton.onclick = startVoiceInput;
-	        toggleVoiceButton(false);
-	    }
+                // モーダルのキャンセルボタンに処理を割り当てる
+                document.getElementById('closeModalButton').onclick = closeAlternativesModal;
+                
+                // 初期の音声入力ボタンの状態を設定
+                if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) && !(typeof Android !== 'undefined' && Android.startVoiceRecognition)) {
+                    voiceButton.style.display = "none";
+                    showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
+                } else {
+                    toggleVoiceButton(false);
+                }
 
-	    // 手動入力が始まったら「❌ クリア」ボタンに切り替え
-	    keywordInput.addEventListener('input', function () {
-	        if (this.value.trim() !== '') {
-	            voiceButton.style.display = "inline-block";
-	            toggleVoiceButton(true);
-	        }
-	    });
-	    
-	    // ページ読み込み時に初期化
-	    searchMemos();
-	});
+                // 手動入力が始まったら「❌ クリア」ボタンに切り替え
+                keywordInput.addEventListener('input', function () {
+                    if (this.value.trim() !== '') {
+                        voiceButton.style.display = "inline-block";
+                        toggleVoiceButton(true);
+                    } else {
+                        toggleVoiceButton(false);
+                    }
+                });
+                
+                // ページ読み込み時に初期化検索を実行
+                searchMemos();
+            });
 
-	// Topに戻る
-	function scrollToTop() {
-	    window.scrollTo({
-	        top: 0,
-	        behavior: 'smooth'
-	    });
-	}
+            // Topに戻る
+            function scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
 
-	  </script>
-	  
- 	  
-   	</div>
-
-<div id="alternativesModal" class="modal">
-    <div class="modal-content">
-        <h2>認識候補を選択してください</h2>
-        <div id="alternativeButtons">
-            </div>
-        <button id="closeModalButton">キャンセル</button>
+        </script>
+        
     </div>
-</div>
 
-   	
-	<footer style="text-align: center;">
-	<br>
-	  © 20251022 ettomio
-	</footer>
-     	
-	<!-- HTML末尾にこれを追加 5/5 -->
-	<div style="height: 80px;"></div>
-   	       
+    <div id="alternativesModal" class="modal">
+        <div class="modal-content">
+            <h2>認識候補を選択してください</h2>
+            <div id="alternativeButtons">
+                </div>
+            <button id="closeModalButton">キャンセル</button>
+        </div>
+    </div>
+
+    <footer style="text-align: center;">
+        <br>
+        © 20251023 ettomio 
+    </footer>
+    
+    <div style="height: 80px;"></div>
+        
 </body>
+
 </html>
