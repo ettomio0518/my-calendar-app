@@ -508,7 +508,7 @@
 		}
 
 
-		/* 新しいカスタム確認ダイアログのスタイル 10/21*/
+		/* 新しいカスタム確認ダイアログのスタイル 10/21 10/23 */
 		.custom-confirm {
 		    position: fixed;
 		    top: 50%; /* 中央寄せ */
@@ -546,6 +546,55 @@
 		    color: white;
 		}
 
+
+		/* モーダルの中身 */
+		.modal-content {
+		    background-color: #fefefe;
+		    margin: 15% auto; /* 画面中央に配置 */
+		    padding: 20px;
+		    border: 1px solid #888;
+		    width: 80%;
+		    max-width: 400px;
+		    border-radius: 8px;
+		    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+		    text-align: center;
+		}
+
+		/* 候補ボタンのコンテナ */
+		#alternativeButtons {
+		    margin: 15px 0;
+		}
+
+		/* 候補ボタンのスタイル */
+		#alternativeButtons button {
+		    display: block; /* 縦に並べる */
+		    width: 100%;
+		    padding: 10px;
+		    margin-bottom: 8px;
+		    border: 1px solid #ccc;
+		    background-color: #e9e9e9;
+		    cursor: pointer;
+		    font-size: 16px;
+		    border-radius: 4px;
+		    transition: background-color 0.2s;
+		}
+
+		#alternativeButtons button:hover {
+		    background-color: #d1d1d1;
+		}
+
+		/* キャンセルボタンのスタイル */
+		#closeModalButton {
+		    background-color: #f8887e;
+		    color: white;
+		    padding: 10px 20px;
+		    border: none;
+		    border-radius: 4px;
+		    cursor: pointer;
+		    font-size: 16px;
+		    margin-top: 10px;
+		}
+	
     </style>
     
 	<script>
@@ -1181,194 +1230,275 @@
 	        <div id="output"></div>
 	    </div>
 
+	<div id="alternativesModal" style="display:none; position:fixed; 			z-index:10001; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
+	
+    <div class="modal-content">
+        <h3>認識候補を選択してください</h3>
+        <div id="alternativeButtons">
+            </div>
+        <button id="closeModalButton">キャンセル</button>
+    </div>	
+</div>
 
 	<script>
-	    // --- ここから予定管理のスクリプト ---
+	// --- ここから予定管理のスクリプト ---
 
-	    // --- 初期設定 ---
-	    const voiceInputButton = document.getElementById("voiceInputButton");
-	    const scheduleInput = document.getElementById("scheduleInput");
+	    // --- 新規追加: グローバル変数と候補選択関数 ---
+	    // グローバル変数は極力減らし、ローカル変数で処理するように修正
+	    let currentEditingKey = null;
+	    let limitEnabled = true;
 
-	    // 音声認識が使えるかチェック（DOMContentLoadedの中）10/8
-	    document.addEventListener("DOMContentLoaded", function () {
-	        const voiceInputButton = document.getElementById("voiceInputButton");
-	        const voiceInputButton2 = document.getElementById("voiceInputButton2");
+		// 予定内容の候補が選択されたときの処理 (新規)
+		function selectAlternative(transcript) {
+			const scheduleInput = document.getElementById("scheduleInput");
+			// 既存の入力内容に続けて追記する
+			scheduleInput.value += transcript;
+			
+			// モーダルを閉じる
+			document.getElementById('alternativesModal').style.display = 'none'; 
+			scheduleInput.focus();
+		}
+	    // --- 候補選択関数ここまで ---
 
+
+	    document.addEventListener("DOMContentLoaded", function () {
+	        const voiceInputButton = document.getElementById("voiceInputButton");
+	        const voiceInputButton2 = document.getElementById("voiceInputButton2");
+	        const scheduleInput = document.getElementById("scheduleInput");
+			const scheduleDateInput = document.getElementById('scheduleDate');
+	        
+			// ★修正点: モーダルキャンセルボタンの処理を追加
+			const closeModalButton = document.getElementById('closeModalButton');
+			if (closeModalButton) {
+				closeModalButton.onclick = () => {
+					document.getElementById('alternativesModal').style.display = 'none';
+				};
+			}
+
+			// 音声認識が使えるかチェック
 			if (!('webkitSpeechRecognition' in window)) {
-			    voiceInputButton.style.display = "none";
-			    voiceInputButton2.style.display = "none";
-			    showCustomAlert4('この端末では音声入力が使えません。iPhoneでWeb版をご利用の場合は、Safari 14.1以降で直接開いてください。');
-	        }
-	    });
+				if (voiceInputButton) voiceInputButton.style.display = "none";
+				if (voiceInputButton2) voiceInputButton2.style.display = "none";
+				showCustomAlert4('この端末では音声入力が使えません。iPhoneでWeb版をご利用の場合は、Safari 14.1以降で直接開いてください。');
+			}
+			
+			// ★削除済み: 以前ここにあった recognition のグローバルな初期化ブロックは削除しました。
 
-	    // 日付音声入力の処理 10/8 10/11
+			// 日付選択ツールで日付を選択したときの処理
+			if (scheduleDateInput) {
+				scheduleDateInput.addEventListener('change', function () {
+					const selectedDate = this.value;
+					if (selectedDate) {
+						const [year, month, day] = selectedDate.split('-');
+						scheduleInput.value = `${month}/${day} `;
+						scheduleInput.focus();
+
+						if (voiceInputButton) {
+							voiceInputButton.style.display = "inline-block";
+							voiceInputButton.classList.remove("recording", "blinking");
+						}
+					}
+				});
+			}
+	    });
+
+	    // 日付音声入力の処理 (変更なし)
 		function startVoiceInput2() {
-		    const voiceInputButton2 = document.getElementById("voiceInputButton2");
-		    voiceInputButton2.classList.add("blinking");
-		    voiceInputButton2.classList.add("recording2"); // ← ここを修正！10/11
+		    const voiceInputButton2 = document.getElementById("voiceInputButton2");
+		    voiceInputButton2.classList.add("blinking");
+		    voiceInputButton2.classList.add("recording2"); 
 
-		    const recognition = new webkitSpeechRecognition();
-		    recognition.lang = 'ja-JP';
+		    const recognition = new webkitSpeechRecognition();
+		    recognition.lang = 'ja-JP';
+		    recognition.interimResults = false;
+		    recognition.maxAlternatives = 1;
+
+		    recognition.onresult = (event) => {
+		        const transcript = event.results[0][0].transcript;
+		        console.log("認識された日付:", transcript);
+
+		        const parsedDate = parseJapaneseDate(transcript);
+		        if (parsedDate) {
+		            document.getElementById("scheduleDate").value = parsedDate;
+
+		            const dateObj = new Date(parsedDate);
+		            const mmdd = `${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')}`;
+		            document.getElementById("scheduleInput").value = mmdd + " ";
+
+		            document.getElementById("voiceInputButton2").style.display = "none";
+		            document.getElementById("voiceInputButton").style.display = "inline-block";
+		            startVoiceInput(); // 予定入力に移行
+		        } else {
+		            alert("日付の認識に失敗しました。もう一度お試しください。");
+		        }
+		    };
+
+		    recognition.onerror = (event) => {
+		        alert('音声認識エラー: ' + event.error);
+	            showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。Web版をiPhoneでご利用の方はSafari 14.1以降で開いてください。詳しくは「紹介ページ」をご覧ください。');	        
+		        voiceInputButton2.style.display = "none";
+		    };
+
+		    recognition.onend = () => {
+		        voiceInputButton2.classList.remove("blinking");
+		        voiceInputButton2.classList.remove("recording2"); 
+		    };
+
+		    recognition.start();
+		}
+
+
+	    // 日付テキストを yyyy-mm-dd に変換する関数 (変更なし)
+	    function parseJapaneseDate(text) {
+	        const currentYear = new Date().getFullYear();
+	        let year = currentYear;
+
+	        const yearMatch = text.match(/(\d{4})年/);
+	        if (yearMatch) {
+	            year = parseInt(yearMatch[1], 10);
+	        }
+
+	        const monthMatch = text.match(/(\d{1,2})月/);
+	        const dayMatch = text.match(/(\d{1,2})日/);
+
+	        if (monthMatch && dayMatch) {
+	            const month = String(monthMatch[1]).padStart(2, '0');
+	            const day = String(dayMatch[1]).padStart(2, '0');
+	            return `${year}-${month}-${day}`;
+	        }
+
+	        return null;
+	    }
+
+
+		// Androidから結果を受け取るためのグローバル関数
+		// ★この関数がAndroidのKotlinコードから呼び出されます★
+		function receiveNativeAlternatives(alternatives) {
+		    // Androidから渡される alternatives は、認識候補の文字列配列です。
+		    
+		    const voiceInputButton = document.getElementById("voiceInputButton");
+		    if (voiceInputButton) {
+		        // 録音中アニメーションを解除
+		        voiceInputButton.classList.remove("blinking");
+		        voiceInputButton.classList.remove("recording");
+		    }
+
+		    const alternativesContainer = document.getElementById('alternativeButtons');
+		    alternativesContainer.innerHTML = '';
+		    
+		    if (alternatives.length === 0) {
+		        showCustomAlert('音声認識ができませんでした。'); // 既存のカスタムアラートを使用
+		        return;
+		    }
+
+		    alternatives.forEach(transcript => {
+		        const button = document.createElement('button');
+		        button.textContent = transcript;
+		        // 新しく定義した selectAlternative を使用
+		        button.onclick = () => selectAlternative(transcript);
+		        alternativesContainer.appendChild(button);
+		    });
+		    
+		    document.getElementById('alternativesModal').style.display = 'block'; // モーダルを表示
+		}
+
+
+		// 音声入力開始処理 (予定内容) - ★ここを候補選択式に修正★
+		function startVoiceInput() {
+		    const voiceInputButton = document.getElementById("voiceInputButton");
+		    if (!voiceInputButton) return;
+
+		    voiceInputButton.classList.add("blinking");
+		    voiceInputButton.classList.add("recording");
+		    
+		    // ==========================================================
+		    // ★ 修正/追加箇所: Android 環境チェック ★
+		    // ==========================================================
+		    if (typeof Android !== 'undefined' && Android.startVoiceRecognition) {
+		        // Android (WebView) 環境の場合、Kotlin関数を呼び出す
+		        Android.startVoiceRecognition();
+		        return; // Web Speech API の処理はスキップ
+		    }
+		    // ==========================================================
+
+		    // Android 以外の環境 (PC Chrome、Web版など) の処理
+		    if (!('webkitSpeechRecognition' in window)) {
+		        showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。');
+		        voiceInputButton.style.display = "none";
+		        return;
+		    }
+
+		    // ローカルで毎回 recognition を定義し直すことで、リセットを確実にする
+		    const recognition = new webkitSpeechRecognition(); 
+
+		    recognition.lang = "ja-JP";
 		    recognition.interimResults = false;
-		    recognition.maxAlternatives = 1;
+		    recognition.maxAlternatives = 3; // 複数の候補を取得
 
 		    recognition.onresult = (event) => {
-		        const transcript = event.results[0][0].transcript;
-		        console.log("認識された日付:", transcript);
-
-		        const parsedDate = parseJapaneseDate(transcript);
-		        if (parsedDate) {
-		            document.getElementById("scheduleDate").value = parsedDate;
-
-		            const dateObj = new Date(parsedDate);
-		            const mmdd = `${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')}`;
-		            document.getElementById("scheduleInput").value = mmdd + " ";
-
-		            document.getElementById("voiceInputButton2").style.display = "none";
-		            document.getElementById("voiceInputButton").style.display = "inline-block";
-		            startVoiceInput();
-		        } else {
-		            alert("日付の認識に失敗しました。もう一度お試しください。");
-		        }
+		        // Web Speech API の結果をそのまま receiveNativeAlternatives に渡すのと同じ処理を実行
+		        const alternatives = Array.from(event.results[0]).map(r => r.transcript);
+		        receiveNativeAlternatives(alternatives); // ★結果処理を共通化★
+		        
+		        // onresult が成功した場合は onend も呼ばれるため、ここではアニメーション解除は不要
 		    };
 
-		    recognition.onerror = (event) => {
+		    recognition.onerror = function (event) {
 		        alert('音声認識エラー: ' + event.error);
-	            showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。Web版をiPhoneでご利用の方はSafari 14.1以降で開いてください。詳しくは「紹介ページ」をご覧ください。');	        
-		        voiceInputButton2.style.display = "none";
+		        showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。Web版をiPhoneでご利用の方はSafari 14.1以降で開いてください。詳しくは「紹介ページ」をご覧ください。');
+		        voiceInputButton.style.display = "none";
 		    };
 
 		    recognition.onend = () => {
-		        voiceInputButton2.classList.remove("blinking");
-		        voiceInputButton2.classList.remove("recording2"); // ← ここも修正！
+		        voiceInputButton.classList.remove("blinking");
+		        voiceInputButton.classList.remove("recording");
 		    };
-
+		    
 		    recognition.start();
 		}
 
 
-	    // 日付テキストを yyyy-mm-dd に変換する関数
-	    function parseJapaneseDate(text) {
-	        const currentYear = new Date().getFullYear();
-	        let year = currentYear;
+	    // --- 通知・音声関数 --- (変更なし)
+	    function showCustomAlert(message) {
+	        const alertContainer = document.createElement('div');
+	        alertContainer.className = 'custom-alert';
+	        alertContainer.textContent = message;
+	        document.body.appendChild(alertContainer);
+	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
+	    }
+	    function showCustomAlert2(message) {
+	        const alertContainer = document.createElement('div');
+	        alertContainer.className = 'custom-alert2';
+	        alertContainer.textContent = message;
+	        document.body.appendChild(alertContainer);
+	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 2000);
+	    }
+	    function showCustomAlert3(message) {
+	        const alertContainer = document.createElement('div');
+	        alertContainer.className = 'custom-alert3';
+	        alertContainer.textContent = message;
+	        document.body.appendChild(alertContainer);
+	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 3000);
+	    }
 
-	        const yearMatch = text.match(/(\d{4})年/);
-	        if (yearMatch) {
-	            year = parseInt(yearMatch[1], 10);
-	        }
-
-	        const monthMatch = text.match(/(\d{1,2})月/);
-	        const dayMatch = text.match(/(\d{1,2})日/);
-
-	        if (monthMatch && dayMatch) {
-	            const month = String(monthMatch[1]).padStart(2, '0');
-	            const day = String(dayMatch[1]).padStart(2, '0');
-	            return `${year}-${month}-${day}`;
-	        }
-
-	        return null;
-	    }
-
-
-	    let recognition;
-	    let currentEditingKey = null;
-	    let limitEnabled = true;
-
-	    document.addEventListener("DOMContentLoaded", function () {
-	        const voiceInputButton = document.getElementById("voiceInputButton");
-	        const scheduleInput = document.getElementById("scheduleInput");
-
-	        // 音声認識オブジェクトの設定
-	        if ('webkitSpeechRecognition' in window) {
-	            recognition = new webkitSpeechRecognition();
-	        } else if ('SpeechRecognition' in window) {
-	            recognition = new SpeechRecognition();
-	        }
-
-	        recognition.lang = "ja-JP";
-	        recognition.interimResults = false;
-
-	        recognition.onresult = (event) => {
-	            const transcript = event.results[0][0].transcript;
-	            scheduleInput.value += transcript;
-	        };
-
-	        recognition.onerror = function (event) {
-	            alert('音声認識エラー: ' + event.error);
-	            showCustomAlert4('この端末では音声入力が使えません。手動入力をご利用ください。Web版をiPhoneでご利用の方はSafari 14.1以降で開いてください。詳しくは「紹介ページ」をご覧ください。');
-	            voiceInputButton.style.display = "none";
-	        };
-
-	        recognition.onend = () => {
-	            voiceInputButton.classList.remove("blinking");
-	            voiceInputButton.classList.remove("recording");
-	        };
-
-	        // 日付選択ツールで日付を選択したときの処理
-	        document.getElementById('scheduleDate').addEventListener('change', function () {
-	            const selectedDate = this.value;
-	            if (selectedDate) {
-	                const [year, month, day] = selectedDate.split('-');
-	                scheduleInput.value = `${month}/${day} `;
-	                scheduleInput.focus();
-
-	                voiceInputButton.style.display = "inline-block";
-	                voiceInputButton.classList.remove("recording");
-	                voiceInputButton.classList.remove("blinking");
-	            }
-	        });
-	    });
-
-	    // 音声入力開始処理
-	    function startVoiceInput() {
-	        const voiceInputButton = document.getElementById("voiceInputButton");
-	        voiceInputButton.classList.add("blinking");
-	        voiceInputButton.classList.add("recording");
-	        recognition.start();
-	    }
-
-
-	    // --- 通知・音声関数 ---
-	    function showCustomAlert(message) {
-	        const alertContainer = document.createElement('div');
-	        alertContainer.className = 'custom-alert';
-	        alertContainer.textContent = message;
-	        document.body.appendChild(alertContainer);
-	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
-	    }
-	    function showCustomAlert2(message) {
-	        const alertContainer = document.createElement('div');
-	        alertContainer.className = 'custom-alert2';
-	        alertContainer.textContent = message;
-	        document.body.appendChild(alertContainer);
-	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 2000);
-	    }
-	    function showCustomAlert3(message) {
-	        const alertContainer = document.createElement('div');
-	        alertContainer.className = 'custom-alert3';
-	        alertContainer.textContent = message;
-	        document.body.appendChild(alertContainer);
-	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 3000);
-	    }
-
-	    // --- 8/12追加 ---
-	    function showCustomAlert4(message) {
-	        const alertContainer = document.createElement('div');
-	        alertContainer.className = 'custom-alert4';
-	        alertContainer.textContent = message;
-	        document.body.appendChild(alertContainer);
-	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
-	    }    
-	    function speakText(text) {
-	        if ('speechSynthesis' in window) {
-	            const utterance = new SpeechSynthesisUtterance(text);
-	            utterance.lang = 'ja-JP';
-	            window.speechSynthesis.speak(utterance);
-	        } else { showCustomAlert("ご使用のブラウザは音声合成をサポートしていません。"); }
-	    }
-	    function nativeSpeak(text) {
-	        if (typeof Android !== 'undefined' && Android.speak) { Android.speak(text); } else { speakText(text); }
-	    }
+	    // --- 8/12追加 ---
+	    function showCustomAlert4(message) {
+	        const alertContainer = document.createElement('div');
+	        alertContainer.className = 'custom-alert4';
+	        alertContainer.textContent = message;
+	        document.body.appendChild(alertContainer);
+	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
+	    }    
+	    function speakText(text) {
+	        if ('speechSynthesis' in window) {
+	            const utterance = new SpeechSynthesisUtterance(text);
+	            utterance.lang = 'ja-JP';
+	            window.speechSynthesis.speak(utterance);
+	        } else { showCustomAlert("ご使用のブラウザは音声合成をサポートしていません。"); }
+	    }
+	    function nativeSpeak(text) {
+	        if (typeof Android !== 'undefined' && Android.speak) { Android.speak(text); } else { speakText(text); }
+	    }
 
 
 		// ==========================================================
@@ -1376,489 +1506,472 @@
 		// ==========================================================
 
 		function showCustomConfirm(message) {
-		    return new Promise(resolve => {
-		        const confirmDiv = document.createElement('div');
-		        confirmDiv.className = 'custom-confirm';
-		        confirmDiv.innerHTML = `
-		            <p>${message}</p>
-		            <div class="custom-confirm-buttons">
-		                <button class="btn-yes">はい</button>
-		                <button class="btn-no">いいえ</button>
-		            </div>
-		        `;
-		        document.body.appendChild(confirmDiv);
+		    return new Promise(resolve => {
+		        const confirmDiv = document.createElement('div');
+		        confirmDiv.className = 'custom-confirm';
+		        confirmDiv.innerHTML = `
+		            <p>${message}</p>
+		            <div class="custom-confirm-buttons">
+		                <button class="btn-yes">はい</button>
+		                <button class="btn-no">いいえ</button>
+		            </div>
+		        `;
+		        document.body.appendChild(confirmDiv);
 
-		        // 「はい」ボタンのリスナー
-		        confirmDiv.querySelector('.btn-yes').onclick = () => {
-		            document.body.removeChild(confirmDiv);
-		            resolve(true); // true（はい）を返す
-		        };
+		        // 「はい」ボタンのリスナー
+		        confirmDiv.querySelector('.btn-yes').onclick = () => {
+		            document.body.removeChild(confirmDiv);
+		            resolve(true); // true（はい）を返す
+		        };
 
-		        // 「いいえ」ボタンのリスナー
-		        confirmDiv.querySelector('.btn-no').onclick = () => {
-		            document.body.removeChild(confirmDiv);
-		            resolve(false); // false（いいえ）を返す
-		        };
-		    });
+		        // 「いいえ」ボタンのリスナー
+		        confirmDiv.querySelector('.btn-no').onclick = () => {
+		            document.body.removeChild(confirmDiv);
+		            resolve(false); // false（いいえ）を返す
+		        };
+		    });
 		}
 
 
-	    // --- 状態保存・読み込み (localStorage) ---
-	    function saveState(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
-	    function loadState(key) {
-	        const value = localStorage.getItem(key);
-	        return value ? JSON.parse(value) : null;
-	    }
-	    const storedLimitEnabled = loadState("limitEnabled");
-	    if (storedLimitEnabled !== null) { limitEnabled = storedLimitEnabled; }
+	    // --- 状態保存・読み込み (localStorage) --- (変更なし)
+	    function saveState(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+	    function loadState(key) {
+	        const value = localStorage.getItem(key);
+	        return value ? JSON.parse(value) : null;
+	    }
+	    const storedLimitEnabled = loadState("limitEnabled");
+	    if (storedLimitEnabled !== null) { limitEnabled = storedLimitEnabled; }
 
-	    function toggleLimit(enable) {
-	        limitEnabled = enable;
-	        saveState("limitEnabled", limitEnabled);
-	        showCustomAlert(enable ? "予定入力の件数制限を有効にしました。" : "予定入力の件数制限を解除しました。");
-	    }
+	    function toggleLimit(enable) {
+	        limitEnabled = enable;
+	        saveState("limitEnabled", limitEnabled);
+	        showCustomAlert(enable ? "予定入力の件数制限を有効にしました。" : "予定入力の件数制限を解除しました。");
+	    }
 
 
-		// スケジュール保存関数 10/8書き換え (非同期対応済み 10/21)
-				async function saveSchedule() { // ★修正点: async を追加
-				    const voiceInputButton = document.getElementById("voiceInputButton");
-				    const voiceInputButton2 = document.getElementById("voiceInputButton2");
-				    const dateInput = document.getElementById('scheduleDate');
-				    const scheduleInput = document.getElementById('scheduleInput');
+		// スケジュール保存関数 (変更なし)
+		async function saveSchedule() { 
+		    const voiceInputButton = document.getElementById("voiceInputButton");
+		    const voiceInputButton2 = document.getElementById("voiceInputButton2");
+		    const dateInput = document.getElementById('scheduleDate');
+		    const scheduleInput = document.getElementById('scheduleInput');
 
-				    voiceInputButton.style.display = "none";
+		    voiceInputButton.style.display = "none";
 
-				    const selectedDateValue = dateInput.value;
-				    const rawScheduleText = scheduleInput.value;
-				    const trimmedScheduleText = rawScheduleText.trim();
+		    const selectedDateValue = dateInput.value;
+		    const rawScheduleText = scheduleInput.value;
+		    const trimmedScheduleText = rawScheduleText.trim();
 
-				    const scheduleKeys = Object.keys(localStorage).filter(key => key.startsWith("ScheduledText"));
-				    if (limitEnabled && scheduleKeys.length >= 10 && !currentEditingKey) {
-				        showCustomAlert("予定入力の件数は10件までです。");
-				        nativeSpeak("入力件数は10件までです。生活を豊かにする機能充実の正規版への移行をお勧めします。");
-				        return;
-				    }
+		    const scheduleKeys = Object.keys(localStorage).filter(key => key.startsWith("ScheduledText"));
+		    if (limitEnabled && scheduleKeys.length >= 10 && !currentEditingKey) {
+		        showCustomAlert("予定入力の件数は10件までです。");
+		        nativeSpeak("入力件数は10件までです。生活を豊かにする機能充実の正規版への移行をお勧めします。");
+		        return;
+		    }
 
-				    if (selectedDateValue && trimmedScheduleText) {
-				        const [year, month, day] = selectedDateValue.split('-');
-				        const dateForlocalStorageKey = `${year}${month.padStart(2, '0')}${day.padStart(2, '0')}`;
+		    if (selectedDateValue && trimmedScheduleText) {
+		        const [year, month, day] = selectedDateValue.split('-');
+		        const dateForlocalStorageKey = `${year}${month.padStart(2, '0')}${day.padStart(2, '0')}`;
 
-				        let scheduleToStore = trimmedScheduleText;
-				        const autoInsertedPrefix = `${month.padStart(2, '0')}/${day.padStart(2, '0')} `;
-				        if (rawScheduleText.startsWith(autoInsertedPrefix) && trimmedScheduleText === autoInsertedPrefix.trim()) {
-				            showCustomAlert('予定欄に予定案件を入力してください。');
-				            return;
-				        }
+		        let scheduleToStore = trimmedScheduleText;
+		        const autoInsertedPrefix = `${month.padStart(2, '0')}/${day.padStart(2, '0')} `;
+		        if (rawScheduleText.startsWith(autoInsertedPrefix) && trimmedScheduleText === autoInsertedPrefix.trim()) {
+		            showCustomAlert('予定欄に予定案件を入力してください。');
+		            return;
+		        }
 
-				        if (!rawScheduleText.match(/^\d{1,2}\/\d{1,2}\s/)) {
-				            scheduleToStore = `${month.padStart(2, '0')}/${day.padStart(2, '0')} ${trimmedScheduleText}`;
-				        } else {
-				            scheduleToStore = rawScheduleText;
-				        }
+		        if (!rawScheduleText.match(/^\d{1,2}\/\d{1,2}\s/)) {
+		            scheduleToStore = `${month.padStart(2, '0')}/${day.padStart(2, '0')} ${trimmedScheduleText}`;
+		        } else {
+		            scheduleToStore = rawScheduleText;
+		        }
 
-				        if (currentEditingKey) {
-				            localStorage.setItem(currentEditingKey, scheduleToStore);
-				            showCustomAlert('修正して保存しました。');
-				            currentEditingKey = null;
-				        } else {
-				            const randomSuffix = Math.floor(100 + Math.random() * 900).toString();
-				            const key = `ScheduledText${dateForlocalStorageKey}_${randomSuffix}`;
-				            localStorage.setItem(key, scheduleToStore);
-				        }
+		        if (currentEditingKey) {
+		            localStorage.setItem(currentEditingKey, scheduleToStore);
+		            showCustomAlert('修正して保存しました。');
+		            currentEditingKey = null;
+		        } else {
+		            const randomSuffix = Math.floor(100 + Math.random() * 900).toString();
+		            const key = `ScheduledText${dateForlocalStorageKey}_${randomSuffix}`;
+		            localStorage.setItem(key, scheduleToStore);
+		        }
 
-				        // ✅ 保存後のカスタム確認ダイアログに置き換え
-				        const confirmMessage = "保存しました。続いて他の予定入力のために『日付音声入力』ボタンを表示しますか？";
-				        const continueInput = await showCustomConfirm(confirmMessage); // ★修正点: await と showCustomConfirm を使用
+		        // 保存後のカスタム確認ダイアログ
+		        const confirmMessage = "保存しました。続いて他の予定入力のために『日付音声入力』ボタンを表示しますか？";
+		        const continueInput = await showCustomConfirm(confirmMessage); 
 
-				        if (continueInput) {
-				            voiceInputButton2.style.display = "inline-block";
-				        }
+		        if (continueInput) {
+		            voiceInputButton2.style.display = "inline-block";
+		        }
 
-				        // 入力欄をクリア
-				        dateInput.value = '';
-				        scheduleInput.value = '';
+		        // 入力欄をクリア
+		        dateInput.value = '';
+		        scheduleInput.value = '';
 
-				        if (document.getElementById('output').innerHTML !== '') {
-				            displayCheck();
-				        }
-				        applyScheduleColorsToCalendar();
-				    } else {
-				        if (!selectedDateValue) {
-				            showCustomAlert('日付選択欄から日付を選択してください。');
-				        } else {
-				            showCustomAlert('予定欄に予定案件を入力してください。');
-				        }
-				    }
-				}
+		        if (document.getElementById('output').innerHTML !== '') {
+		            displayCheck();
+		        }
+		        applyScheduleColorsToCalendar();
+		    } else {
+		        if (!selectedDateValue) {
+		            showCustomAlert('日付選択欄から日付を選択してください。');
+		        } else {
+		            showCustomAlert('予定欄に予定案件を入力してください。');
+		        }
+		    }
+		}
 
-		
-        // --- 予定修正関数 (年対応版) ---
-        function editSchedule(key) {
-            const schedule = localStorage.getItem(key);
-            if (schedule) {
-                document.getElementById('scheduleInput').value = schedule;
-                // キーから日付を抽出し、日付入力フィールドにセット
-                const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-                if (dateMatch) {
-                    document.getElementById('scheduleDate').value = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
-                }
-                currentEditingKey = key; // 編集中のキーを設定
-                window.scrollTo({ top: 0, behavior: 'smooth' }); // ページ上部へスクロール
-            }
-        }
+        // --- 予定修正関数 (変更なし) ---
+        function editSchedule(key) {
+            const schedule = localStorage.getItem(key);
+            if (schedule) {
+                document.getElementById('scheduleInput').value = schedule;
+                // キーから日付を抽出し、日付入力フィールドにセット
+                const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
+                if (dateMatch) {
+                    document.getElementById('scheduleDate').value = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+                }
+                currentEditingKey = key; // 編集中のキーを設定
+                window.scrollTo({ top: 0, behavior: 'smooth' }); // ページ上部へスクロール
+            }
+        }
 
-        // --- リスト表示関連 ---
-        function closeList() {
-            const outputElement = document.getElementById('output');
-            const toggleButton = document.getElementById('toggleButton');
-            outputElement.innerHTML = '';
-            document.getElementById('closeListButton').style.display = 'none';
-            toggleButton.textContent = '予定の確認';
-            toggleButton.onclick = () => toggleButtonFunction('check');
-            toggleButton.className = 'check-button';
-            currentEditingKey = null; // 編集モードを終了
-            // closeList()はリストを閉じるだけなので、カレンダーの色更新は不要（削除時に更新済みのため）
-        }
+        // --- リスト表示関連 --- (変更なし)
+        function closeList() {
+            const outputElement = document.getElementById('output');
+            const toggleButton = document.getElementById('toggleButton');
+            outputElement.innerHTML = '';
+            document.getElementById('closeListButton').style.display = 'none';
+            toggleButton.textContent = '予定の確認';
+            toggleButton.onclick = () => toggleButtonFunction('check');
+            toggleButton.className = 'check-button';
+            currentEditingKey = null; // 編集モードを終了
+        }
 
-        function toggleButtonFunction(mode) {
-            const button = document.getElementById('toggleButton');
-            if (mode === 'check') {
-                displayCheck(); // 予定リストを表示
-                button.textContent = '予定の音声出力';
-                button.onclick = () => toggleButtonFunction('output');
-                button.className = 'output-button';
-            } else if (mode === 'output') {
-                displaySchedules(); // 予定を音声出力
-                button.textContent = '予定の確認';
-                button.onclick = () => toggleButtonFunction('check');
-                button.className = 'check-button';
-            }
-        }
+        function toggleButtonFunction(mode) {
+            const button = document.getElementById('toggleButton');
+            if (mode === 'check') {
+                displayCheck(); // 予定リストを表示
+                button.textContent = '予定の音声出力';
+                button.onclick = () => toggleButtonFunction('output');
+                button.className = 'output-button';
+            } else if (mode === 'output') {
+                displaySchedules(); // 予定を音声出力
+                button.textContent = '予定の確認';
+                button.onclick = () => toggleButtonFunction('check');
+                button.className = 'check-button';
+            }
+        }
 
-		// --- 「予定の確認」表示関数 (年対応版) ---
+		// --- 「予定の確認」表示関数 (変更なし) ---
 		function displayCheck() {
-		    const outputElement = document.getElementById('output');
-		    outputElement.innerHTML = ''; // リストをクリア
-		    document.getElementById('closeListButton').style.display = 'block';
+		    const outputElement = document.getElementById('output');
+		    outputElement.innerHTML = ''; // リストをクリア
+		    document.getElementById('closeListButton').style.display = 'block';
 
-		    // 修正箇所：アプリを開いた「当日」の日付を基準にする
-		    const today = new Date(); // アプリ実行時の今日の日付を取得
-		    today.setHours(0, 0, 0, 0); // 時刻情報をリセットし、正確に日付のみで比較できるようにする
+		    const today = new Date(); 
+		    today.setHours(0, 0, 0, 0); 
 
-		    // 比較用に YYYYMMDD 形式の整数を生成
-		    const todayYMD = parseInt(
-		        `${today.getFullYear()}` +
-		        `${String(today.getMonth() + 1).padStart(2, '0')}` +
-		        `${String(today.getDate()).padStart(2, '0')}`
-		    );
+		    const todayYMD = parseInt(
+		        `${today.getFullYear()}` +
+		        `${String(today.getMonth() + 1).padStart(2, '0')}` +
+		        `${String(today.getDate()).padStart(2, '0')}`
+		    );
 
 
-		    const keys = Object.keys(localStorage)
-		        .filter(key => key.startsWith('ScheduledText'))
-		        .filter(key => {
-		            // キーから日付部分を抽出 (YYYYMMDD)
-		            const dateMatch = key.match(/ScheduledText(\d{8})_/);
-		            if (dateMatch) {
-		                const scheduleDateYMD = parseInt(dateMatch[1]);
-		                // 今日以降の予定のみ表示
-		                return scheduleDateYMD >= todayYMD;
-		            }
-		            return false; // 日付情報がないキーは除外
-		        })
-		        .sort((a, b) => {
-		            // キーに含まれる日付部分でソート (YYYYMMDD)
-		            const dateA = a.match(/ScheduledText(\d{8})_/)?.[1] || '';
-		            const dateB = b.match(/ScheduledText(\d{8})_/)?.[1] || '';
-		            return dateA.localeCompare(dateB);
-		        });
+		    const keys = Object.keys(localStorage)
+		        .filter(key => key.startsWith('ScheduledText'))
+		        .filter(key => {
+		            const dateMatch = key.match(/ScheduledText(\d{8})_/);
+		            if (dateMatch) {
+		                const scheduleDateYMD = parseInt(dateMatch[1]);
+		                return scheduleDateYMD >= todayYMD;
+		            }
+		            return false; 
+		        })
+		        .sort((a, b) => {
+		            const dateA = a.match(/ScheduledText(\d{8})_/)?.[1] || '';
+		            const dateB = b.match(/ScheduledText(\d{8})_/)?.[1] || '';
+		            return dateA.localeCompare(dateB);
+		        });
 
-		    if (keys.length === 0) {
-		        outputElement.textContent = "現在、表示できる予定はありません。";
-		        return;
-		    }
+		    if (keys.length === 0) {
+		        outputElement.textContent = "現在、表示できる予定はありません。";
+		        return;
+		    }
 
-		    keys.forEach(key => {
-		        const scheduleText = localStorage.getItem(key);
-		        // キーから年月日を抽出
-		        const dateMatchForKey = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-		        // 予定テキストから月日を抽出（もしあれば）
-		        const scheduleContentMatch = scheduleText.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
+		    keys.forEach(key => {
+		        const scheduleText = localStorage.getItem(key);
+		        const dateMatchForKey = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
+		        const scheduleContentMatch = scheduleText.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
 
-		        let displayDate = "";
-		        let scheduleContent = scheduleText;
+		        let displayDate = "";
+		        let scheduleContent = scheduleText;
 
-		        if (dateMatchForKey) {
-		            // キーから日付を生成 (MM/DD)
-		            displayDate = `${dateMatchForKey[2]}/${dateMatchForKey[3]}`;
-		        }
+		        if (dateMatchForKey) {
+		            displayDate = `${dateMatchForKey[2]}/${dateMatchForKey[3]}`;
+		        }
 
-		        if (scheduleContentMatch) {
-		            // 予定テキストに月日が含まれる場合は、それ以降のテキストを予定内容とする
-		            scheduleContent = scheduleContentMatch[2].trim();
-		        } else if (displayDate) {
-		            // 予定テキストに月日が含まれず、キーから日付が取れる場合は、日付と予定テキスト全体を表示
-		            scheduleContent = scheduleText.trim();
-		        }
+		        if (scheduleContentMatch) {
+		            scheduleContent = scheduleContentMatch[2].trim();
+		        } else if (displayDate) {
+		            scheduleContent = scheduleText.trim();
+		        }
 
-		        const row = document.createElement('div');
-		        row.className = 'output-row';
+		        const row = document.createElement('div');
+		        row.className = 'output-row';
 
-		        const scheduleDiv = document.createElement('div');
-		        scheduleDiv.textContent = `${displayDate} ${scheduleContent}`;
-		        row.appendChild(scheduleDiv);
+		        const scheduleDiv = document.createElement('div');
+		        scheduleDiv.textContent = `${displayDate} ${scheduleContent}`;
+		        row.appendChild(scheduleDiv);
 
-		        const editButton = document.createElement('button');
-		        editButton.textContent = '確認修正';
-		        editButton.onclick = () => editSchedule(key);
-		        row.appendChild(editButton);
+		        const editButton = document.createElement('button');
+		        editButton.textContent = '確認修正';
+		        editButton.onclick = () => editSchedule(key);
+		        row.appendChild(editButton);
 
-		        const deleteButton = document.createElement('button');
-		        deleteButton.textContent = '消去';
-		        deleteButton.onclick = () => {
-		            localStorage.removeItem(key);
-		            displayCheck(); // リストを再表示
-		            applyScheduleColorsToCalendar(); // 削除後にカレンダーの色を更新
-		        };
-		        row.appendChild(deleteButton);
-		        outputElement.appendChild(row);
-		    });
+		        const deleteButton = document.createElement('button');
+		        deleteButton.textContent = '消去';
+		        deleteButton.onclick = () => {
+		            localStorage.removeItem(key);
+		            displayCheck(); // リストを再表示
+		            applyScheduleColorsToCalendar(); // 削除後にカレンダーの色を更新
+		        };
+		        row.appendChild(deleteButton);
+		        outputElement.appendChild(row);
+		    });
 		}
 
-        // --- 「予定の音声出力」表示関数 (年対応版) ---
-        function displaySchedules() {
-            const keys = Object.keys(localStorage)
-                .filter(key => key.startsWith('ScheduledText'))
-                .sort((a, b) => {
-                    const dateA = a.match(/ScheduledText(\d{8})_/)?.[1] || '';
-                    const dateB = b.match(/ScheduledText(\d{8})_/)?.[1] || '';
-                    return dateA.localeCompare(dateB);
-                });
+        // --- 「予定の音声出力」表示関数 (変更なし) ---
+        function displaySchedules() {
+            const keys = Object.keys(localStorage)
+                .filter(key => key.startsWith('ScheduledText'))
+                .sort((a, b) => {
+                    const dateA = a.match(/ScheduledText(\d{8})_/)?.[1] || '';
+                    const dateB = b.match(/ScheduledText(\d{8})_/)?.[1] || '';
+                    return dateA.localeCompare(dateB);
+                });
 
-            if (keys.length === 0) {
-                showCustomAlert("登録されている予定はありません。");
-                nativeSpeak("登録されている予定はありません。");
-                return;
-            }
+            if (keys.length === 0) {
+                showCustomAlert("登録されている予定はありません。");
+                nativeSpeak("登録されている予定はありません。");
+                return;
+            }
 
-            let fullScheduleText = "登録されている予定は、";
-            keys.forEach(key => {
-                const scheduleText = localStorage.getItem(key);
-                const dateMatchForKey = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-                const scheduleContentMatch = scheduleText.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
+            let fullScheduleText = "登録されている予定は、";
+            keys.forEach(key => {
+                const scheduleText = localStorage.getItem(key);
+                const dateMatchForKey = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
+                const scheduleContentMatch = scheduleText.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
 
-                let displayDate = "";
-                let scheduleContent = scheduleText;
+                let displayDate = "";
+                let scheduleContent = scheduleText;
 
-                if (dateMatchForKey) {
-                    displayDate = `${parseInt(dateMatchForKey[2])}月${parseInt(dateMatchForKey[3])}日`;
-                }
-                if (scheduleContentMatch) {
-                    scheduleContent = scheduleContentMatch[2].trim();
-                } else {
-                    scheduleContent = scheduleText.trim();
-                }
-                fullScheduleText += `${displayDate} の予定、${scheduleContent}。`;
-            });
-            showCustomAlert(fullScheduleText); // デバッグ用
-            nativeSpeak(fullScheduleText);
-        }
+                if (dateMatchForKey) {
+                    displayDate = `${parseInt(dateMatchForKey[2])}月${parseInt(dateMatchForKey[3])}日`;
+                }
+                if (scheduleContentMatch) {
+                    scheduleContent = scheduleContentMatch[2].trim();
+                } else {
+                    scheduleContent = scheduleText.trim();
+                }
+                fullScheduleText += `${displayDate} の予定、${scheduleContent}。`;
+            });
+            showCustomAlert(fullScheduleText); // デバッグ用
+            nativeSpeak(fullScheduleText);
+        }
 
-        // --- 新しい関数: ローカルストレージに基づいて日付に色を適用 --- 6/4
-        function applyScheduleColorsToCalendar() {
-            // まず全ての日付セルの「has-schedule」クラスをリセット
-            document.querySelectorAll('#calendar-body td').forEach(cell => {
-                cell.classList.remove('has-schedule');
-                // その他のインラインスタイルもクリアしたい場合は以下を追記
-                // cell.style.backgroundColor = '';
-            });
+        // --- 新しい関数: ローカルストレージに基づいて日付に色を適用 --- (変更なし)
+        function applyScheduleColorsToCalendar() {
+            document.querySelectorAll('#calendar-body td').forEach(cell => {
+                cell.classList.remove('has-schedule');
+            });
 
-            const keys = Object.keys(localStorage).filter(key => key.startsWith('ScheduledText'));
-            const scheduledDates = new Set(); // 予定がある日付を格納するSet
+            const keys = Object.keys(localStorage).filter(key => key.startsWith('ScheduledText'));
+            const scheduledDates = new Set(); 
 
-            keys.forEach(key => {
-                const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-                if (dateMatch) {
-                    const date = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`; // "YYYY-MM-DD"形式
-                    scheduledDates.add(date);
-                }
-            });
+            keys.forEach(key => {
+                const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
+                if (dateMatch) {
+                    const date = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`; 
+                    scheduledDates.add(date);
+                }
+            });
 
-            scheduledDates.forEach(date => {
-                const dayCell = document.getElementById(`day-${date}`);
-                if (dayCell) {
-                    // CSSクラスを追加することで、スタイルシートで一元管理
-                    dayCell.classList.add('has-schedule');
-                }
-            });
-        }
+            scheduledDates.forEach(date => {
+                const dayCell = document.getElementById(`day-${date}`);
+                if (dayCell) {
+                    dayCell.classList.add('has-schedule');
+                }
+            });
+        }
 
-		// --- 祝日・日付クリック関数 (年対応版) 8/21書き換え---        
+		// --- 祝日・日付クリック関数 (変更なし) ---        
 		function displayScheduleForDate(year, month, day) {
-				    const datePrefixForKey = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
-				    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
-				    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
-		    
-		    let hasSchedule = keys.length > 0;
-		    let hasHoliday = !!holiday;
-		    let speechText = '';
-		    let alertMessage = '';
-		    let alertType;
+				    const datePrefixForKey = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
+				    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
+				    const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`));
+		    
+		    let hasSchedule = keys.length > 0;
+		    let hasHoliday = !!holiday;
+		    let speechText = '';
+		    let alertMessage = '';
+		    let alertType;
 
-		    // 1. 予定のメッセージを生成
-		    if (hasSchedule) {
-		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
-		        
-		        const today = new Date();
-		        today.setHours(0, 0, 0, 0);
-		        const clickedDate = new Date(year, month, day);
-		        clickedDate.setHours(0, 0, 0, 0);
+		    // 1. 予定のメッセージを生成
+		    if (hasSchedule) {
+		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
+		        
+		        const today = new Date();
+		        today.setHours(0, 0, 0, 0);
+		        const clickedDate = new Date(year, month, day);
+		        clickedDate.setHours(0, 0, 0, 0);
 
-		        if (clickedDate < today) {
-		            // 過去の日付の場合
-		            speechText += `${month + 1}月${day}日は${schedules.join('。 ')}です。`;
-		            alertMessage += `過去の予定：${schedules.join('、 ')}`;
-		        } else {
-		            // 今日または未来の日付の場合
-		            speechText += `${month + 1}月${day}日の予定は${schedules.join('。 ')}です。`;
-		            alertMessage += `予定：${schedules.join('、 ')}`;
-		        }
-		        alertType = 'custom-alert';
-		    }
+		        if (clickedDate < today) {
+		            // 過去の日付の場合
+		            speechText += `${month + 1}月${day}日は${schedules.join('。 ')}です。`;
+		            alertMessage += `過去の予定：${schedules.join('、 ')}`;
+		        } else {
+		            // 今日または未来の日付の場合
+		            speechText += `${month + 1}月${day}日の予定は${schedules.join('。 ')}です。`;
+		            alertMessage += `予定：${schedules.join('、 ')}`;
+		        }
+		        alertType = 'custom-alert';
+		    }
 
-		    // 2. 祝日のメッセージを生成
-		    if (hasHoliday) {
-		        const holidayName = holiday[1];
-		        
-		        if (hasSchedule) {
-		            // 予定も祝日もある場合
-		            speechText += ` なお、${month + 1}月${day}日は${holidayName}です。`;
-		            alertMessage += `\n祝日：${holidayName}`;
-		        } else {
-		            // 祝日のみの場合
-		            speechText += `${month + 1}月${day}日は${holidayName}です。`;
-		            alertMessage += `祝日：${holidayName}`;
-		            alertType = 'custom-alert3';
-		        }
-		    }
-		    
-		    // 3. 予定も祝日もない場合の処理
-		    if (!hasSchedule && !hasHoliday) {
-		        speechText = `${month + 1}月${day}日は何も登録されていません。`;
-		        alertMessage = `${month + 1}月${day}日は何も登録されていません。`;
-		        alertType = 'custom-alert2';
-		    }
+		    // 2. 祝日のメッセージを生成
+		    if (hasHoliday) {
+		        const holidayName = holiday[1];
+		        
+		        if (hasSchedule) {
+		            // 予定も祝日もある場合
+		            speechText += ` なお、${month + 1}月${day}日は${holidayName}です。`;
+		            alertMessage += `\n祝日：${holidayName}`;
+		        } else {
+		            // 祝日のみの場合
+		            speechText += `${month + 1}月${day}日は${holidayName}です。`;
+		            alertMessage += `祝日：${holidayName}`;
+		            alertType = 'custom-alert3';
+		        }
+		    }
+		    
+		    // 3. 予定も祝日もない場合の処理
+		    if (!hasSchedule && !hasHoliday) {
+		        speechText = `${month + 1}月${day}日は何も登録されていません。`;
+		        alertMessage = `${month + 1}月${day}日は何も登録されていません。`;
+		        alertType = 'custom-alert2';
+		    }
 
-		    // 最終的なアラートと音声出力
-		    if (alertType === 'custom-alert') {
-		        showCustomAlert(alertMessage);
-		    } else if (alertType === 'custom-alert3') {
-		        showCustomAlert3(alertMessage);
-		    } else {
-		        showCustomAlert2(alertMessage);
-		    }
-		    
-		    nativeSpeak(speechText);
+		    // 最終的なアラートと音声出力
+		    if (alertType === 'custom-alert') {
+		        showCustomAlert(alertMessage);
+		    } else if (alertType === 'custom-alert3') {
+		        showCustomAlert3(alertMessage);
+		    } else {
+		        showCustomAlert2(alertMessage);
+		    }
+		    
+		    nativeSpeak(speechText);
 		}
 		
 		
-		// --- image64.pngクリック時の処理 8/21,8/23追加---
+		// --- image64.pngクリック時の処理 (変更なし) ---
 		document.addEventListener('DOMContentLoaded', () => {
-		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
+		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
 
-		    if (!logoImage) return;
+		    if (!logoImage) return;
 
-		    // ダイアログ表示処理
-		    const showDialog = () => {
-		        document.getElementById("customDialog").style.display = "flex";
-		    };
+		    // ダイアログ表示処理
+		    const showDialog = () => {
+		        document.getElementById("customDialog").style.display = "flex";
+		    };
 
-		    // ダイアログ非表示処理
-		    const hideDialog = () => {
-		        document.getElementById("customDialog").style.display = "none";
-		    };
+		    // ダイアログ非表示処理
+		    const hideDialog = () => {
+		        document.getElementById("customDialog").style.display = "none";
+		    };
 
-		    // 各ボタンの処理設定
-		    document.getElementById("btnSchedule").onclick = () => {
-		        speakTodaySchedule();
-		        hideDialog();
-		    };
+		    // 各ボタンの処理設定
+		    document.getElementById("btnSchedule").onclick = () => {
+		        speakTodaySchedule();
+		        hideDialog();
+		    };
 
-		    // 10/8追加
+		    // 10/8追加
 			document.getElementById("btnSearch7").onclick = () => {
-			    document.getElementById("voiceInputButton2").style.display = "inline-block"; // ← これ！
-			    startVoiceInput2();
-			    hideDialog();
+			    document.getElementById("voiceInputButton2").style.display = "inline-block"; 
+			    startVoiceInput2();
+			    hideDialog();
 			};
 
-		    document.getElementById("btnSearch").onclick = () => {
-		        window.location.href = "高機能検索.html";
-		    };
+		    document.getElementById("btnSearch").onclick = () => {
+		        window.location.href = "高機能検索.html";
+		    };
 
-		    document.getElementById("btnSearch2").onclick = () => {
-		        window.location.href = "メモ.html";
-		    };
+		    document.getElementById("btnSearch2").onclick = () => {
+		        window.location.href = "メモ.html";
+		    };
 
-		    document.getElementById("btnSearch3").onclick = () => {
-		        window.location.href = "日記.html";
-		    };
+		    document.getElementById("btnSearch3").onclick = () => {
+		        window.location.href = "日記.html";
+		    };
 
-		    document.getElementById("btnSearch4").onclick = () => {
-		        window.location.href = "お買い物計算.html";
-		    };
+		    document.getElementById("btnSearch4").onclick = () => {
+		        window.location.href = "お買い物計算.html";
+		    };
 
 			document.getElementById("btnSearch5").onclick = () => {
-			    openQRReader(); // ← WebViewでもChromeでも対応
+			    openQRReader(); 
 			};
 
 			document.getElementById("btnSearch6").onclick = () => {
-			    openTodayCalendar(); // ← WebViewでもChromeでも対応
+			    openTodayCalendar(); 
 			};
-					    
-		    document.getElementById("btnClose").onclick = hideDialog;
+					    
+		    document.getElementById("btnClose").onclick = hideDialog;
 
-		    // 画像クリック時の処理
-		    logoImage.addEventListener('click', () => {
-		        logoImage.classList.add('spin-around');
+		    // 画像クリック時の処理
+		    logoImage.addEventListener('click', () => {
+		        logoImage.classList.add('spin-around');
 
-		        setTimeout(() => logoImage.classList.remove('spin-around'), 800);
-		        setTimeout(showDialog, 1000);
-		    });
+		        setTimeout(() => logoImage.classList.remove('spin-around'), 800);
+		        setTimeout(showDialog, 1000);
+		    });
 		});
 
 
 		function speakTodaySchedule() {
-		    const today = new Date();
-		    const year = today.getFullYear();
-		    const month = today.getMonth() + 1;
-		    const day = today.getDate();
+		    const today = new Date();
+		    const year = today.getFullYear();
+		    const month = today.getMonth() + 1;
+		    const day = today.getDate();
 
-		    const datePrefixForKey = `ScheduledText${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
-		    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
+		    const datePrefixForKey = `ScheduledText${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
+		    const keys = Object.keys(localStorage).filter(key => key.startsWith(datePrefixForKey));
 
-		    if (keys.length > 0) {
-		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
-		        const fullScheduleText = `今日、${month}月${day}日の予定は${schedules.join('。 ')}です。`;
-		        showCustomAlert(fullScheduleText);
-		        nativeSpeak(fullScheduleText);
-		    } else {
-		        const noScheduleText = `今日、${month}月${day}日、登録されている予定はありません。`;
-		        showCustomAlert2(noScheduleText);
-		        nativeSpeak(noScheduleText);
-		    }
+		    if (keys.length > 0) {
+		        const schedules = keys.map(key => localStorage.getItem(key).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
+		        const fullScheduleText = `今日、${month}月${day}日の予定は${schedules.join('。 ')}です。`;
+		        showCustomAlert(fullScheduleText);
+		        nativeSpeak(fullScheduleText);
+		    } else {
+		        const noScheduleText = `今日、${month}月${day}日、登録されている予定はありません。`;
+		        showCustomAlert2(noScheduleText);
+		        nativeSpeak(noScheduleText);
+		    }
 		}
 
-		// --- 初期化処理 --- 6/4
+		// --- 初期化処理 --- (変更なし)
 		document.addEventListener('DOMContentLoaded', () => {
-		    showTodayInfo(); // 今日の情報を表示する関数
-		    updateCalendar(); // カレンダーを描画する関数
-		    applyScheduleColorsToCalendar();  // 6/15 ★ここを追加★：予定のある日付に色を付ける関数
-		    updateTime(); // 現在時刻を更新する関数
-		    setInterval(updateTime, 1000); // 1秒ごとに時刻を更新
+		    showTodayInfo(); 
+		    updateCalendar(); 
+		    applyScheduleColorsToCalendar();  
+		    updateTime(); 
+		    setInterval(updateTime, 1000); 
 		});
 
-        // --- 予定管理のスクリプトここまで ---
-    </script>
-
+        // --- 予定管理のスクリプトここまで ---
+	</script>
 
 	<div class="container2">
 	<div class="link-buttons1">
@@ -2224,9 +2337,9 @@
     });
   </script>
 
-
+    
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 12.1 (2025-10-21)</p>
+	 © 2025 ettomio. All rights reserved. | Version 12.2 (2025-10-24)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
