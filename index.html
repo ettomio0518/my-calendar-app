@@ -641,6 +641,7 @@
 		    <button id="btnSearch4">お買い物電卓に進む</button>
 		    <button id="btnSearch5">QRコードリーダーに進む</button>
 		    <button id="btnSearch6">簡易版Googleカレンダー</button>
+		    <button id="btnSearch8">データの保存と復元ツール</button>		    
 		    <button id="btnClose">閉じる</button>		    
 		  </div>
 		</div>
@@ -1877,66 +1878,79 @@
 		
 		// --- image64.pngクリック時の処理 (変更なし) ---
 		document.addEventListener('DOMContentLoaded', () => {
-		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
+		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
 
-		    if (!logoImage) return;
+		    if (!logoImage) return;
 
-		    // ダイアログ表示処理
-		    const showDialog = () => {
-		        document.getElementById("customDialog").style.display = "flex";
-		    };
+		    // ダイアログ表示処理 (customDialog)
+		    const showDialog = () => {
+		        document.getElementById("customDialog").style.display = "flex";
+		    };
 
-		    // ダイアログ非表示処理
-		    const hideDialog = () => {
-		        document.getElementById("customDialog").style.display = "none";
-		    };
+		    // ダイアログ非表示処理 (customDialog)
+		    const hideDialog = () => {
+		        document.getElementById("customDialog").style.display = "none";
+		    };
 
-		    // 各ボタンの処理設定
-		    document.getElementById("btnSchedule").onclick = () => {
-		        speakTodaySchedule();
-		        hideDialog();
-		    };
+		    // KeyNダイアログ表示処理 (dialogOverlay)
+		    const showKeyNDialog = () => {
+		        document.getElementById("dialogOverlay").style.display = "flex";
+		    };
 
-		    // 10/8追加
+		    // 各ボタンの処理設定
+		    document.getElementById("btnSchedule").onclick = () => {
+		        speakTodaySchedule();
+		        hideDialog();
+		    };
+
+		    // 10/8追加
 			document.getElementById("btnSearch7").onclick = () => {
-			    document.getElementById("voiceInputButton2").style.display = "inline-block"; 
-			    startVoiceInput2();
-			    hideDialog();
+			    document.getElementById("voiceInputButton2").style.display = "inline-block"; 
+			    startVoiceInput2();
+			    hideDialog();
 			};
 
-		    document.getElementById("btnSearch").onclick = () => {
-		        window.location.href = "高機能検索.html";
-		    };
+		    document.getElementById("btnSearch").onclick = () => {
+		        window.location.href = "高機能検索.html";
+		    };
 
-		    document.getElementById("btnSearch2").onclick = () => {
-		        window.location.href = "メモ.html";
-		    };
+		    document.getElementById("btnSearch2").onclick = () => {
+		        window.location.href = "メモ.html";
+		    };
 
-		    document.getElementById("btnSearch3").onclick = () => {
-		        window.location.href = "日記.html";
-		    };
+		    document.getElementById("btnSearch3").onclick = () => {
+		        window.location.href = "日記.html";
+		    };
 
-		    document.getElementById("btnSearch4").onclick = () => {
-		        window.location.href = "お買い物計算.html";
-		    };
+		    document.getElementById("btnSearch4").onclick = () => {
+		        window.location.href = "お買い物計算.html";
+		    };
 
 			document.getElementById("btnSearch5").onclick = () => {
-			    openQRReader(); 
+			    openQRReader(); 
 			};
 
 			document.getElementById("btnSearch6").onclick = () => {
-			    openTodayCalendar(); 
+			    openTodayCalendar(); 
 			};
-					    
-		    document.getElementById("btnClose").onclick = hideDialog;
 
-		    // 画像クリック時の処理
-		    logoImage.addEventListener('click', () => {
-		        logoImage.classList.add('spin-around');
+			// 🔥 ここに処理を追加・修正します
+			document.getElementById("btnSearch8").onclick = () => {
+			    // 1. 最初のダイアログを閉じる
+			    hideDialog();
+			    // 2. データの保存と復元ツールのダイアログを表示する
+			    showKeyNDialog(); 
+			};
+								    
+		    document.getElementById("btnClose").onclick = hideDialog;
 
-		        setTimeout(() => logoImage.classList.remove('spin-around'), 800);
-		        setTimeout(showDialog, 1000);
-		    });
+		    // 画像クリック時の処理
+		    logoImage.addEventListener('click', () => {
+		        logoImage.classList.add('spin-around');
+
+		        setTimeout(() => logoImage.classList.remove('spin-around'), 800);
+		        setTimeout(showDialog, 1000);
+		    });
 		});
 
 
@@ -2339,7 +2353,7 @@
 
     
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 12.2 (2025-10-24)</p>
+	 © 2025 ettomio. All rights reserved. | Version 12.3 (2025-10-31)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
@@ -2347,6 +2361,4 @@
 
 </body>
 </html>
-
-
 
