@@ -491,7 +491,7 @@
 		  font-size: 16px;
 		  border: none;
 		  border-radius: 6px;
-		  background-color: #0078D4;
+		  background-color: #0078d4;
 		  color: white;
 		  cursor: pointer;
 		  transition: background-color 0.2s;
@@ -501,12 +501,21 @@
 		  background-color: #005A9E;
 		}
 
-		/* モーダルのフェードイン演出 */
-		@keyframes fadeIn {
-		  from { opacity: 0; transform: scale(0.95); }
-		  to { opacity: 1; transform: scale(1); }
-		}
 
+/* モーダルのフェードイン演出 */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 🔥 ここに追記します */
+/* ジャンプリスト（カスタムダイアログ）内の特定ボタンの色設定 */
+#btnSearch7,
+#btnSearch,
+#btnSearch2,
+#btnSearch5 {
+  color: yellow; /* 文字色を黄色に変更 */
+}
 
 		/* 新しいカスタム確認ダイアログのスタイル 10/21 10/23 */
 		.custom-confirm {
@@ -607,16 +616,28 @@
 	}
 	</script>
 
-    <script> // 9/23追加
-    function openTodayCalendar() {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, '0');
-      const dd = String(today.getDate()).padStart(2, '0');
-      const dateStr = `${yyyy}-${mm}-${dd}`;
-      const url = `https://calendar.google.com/calendar/u/0/r/day/${dateStr}`;
-      window.open("https://calendar.google.com/calendar/u/0/r", "_blank");
-    }
+
+    <script> // 9/23追加 10/31修正
+	/**
+	 * Googleカレンダーを開く前に確認ダイアログを表示する
+	 */
+	function openTodayCalendar() {
+	    // confirm()関数は「OK」が押されたら true、「キャンセル」が押されたら false を返します。
+	    const isGoogleCalendarUser = confirm("Googleカレンダーをお使いですか?");
+
+	    if (isGoogleCalendarUser) {
+	        // 「OK」（Yes）が押された場合
+	        
+	        // 🔥 修正点: r/day を r/week に変更します
+	        window.open('https://calendar.google.com/calendar/r/week', '_blank'); 
+	        
+	    } else {
+	        // 「キャンセル」（No）が押された場合
+	        // 何もしません
+	        console.log("Googleカレンダーは開きませんでした。");
+	    }
+	}
+
     </script>
   	
 </head>	
@@ -1876,7 +1897,7 @@
 		}
 		
 		
-		// --- image64.pngクリック時の処理 (変更なし) ---
+		// --- image64.pngクリック時の処理 (10/31 btnSearch8を追加) ---
 		document.addEventListener('DOMContentLoaded', () => {
 		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
 
