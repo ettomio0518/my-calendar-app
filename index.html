@@ -510,7 +510,7 @@
 
 		/* 🔥 ここに追記します */
 		/* ジャンプリスト（カスタムダイアログ）内の特定ボタンの色設定 */
-		#btnSearch7,
+		/* #btnSearch7, */
 		#btnSearch,
 		#btnSearch2,
 		#btnSearch5,		
@@ -518,6 +518,16 @@
 		  color: yellow; /* 文字色を黄色に変更 */
 		}
 
+		/* 🔥 ここに追記します */
+		/* ジャンプリスト（カスタムダイアログ）内の特定ボタンの色設定 */
+		#btnSearch7
+		/* #btnSearch,
+		#btnSearch2,
+		#btnSearch5,		
+		#btnSearch6 */{
+		  color:#aeffff; /* 文字色を空色に変更 */
+		}
+		
 		/* 新しいカスタム確認ダイアログのスタイル 10/21 10/23 */
 		.custom-confirm {
 		    position: fixed;
@@ -654,7 +664,7 @@
 
 		<div id="customDialog" style="display:none;" class="dialog-overlay">
 		  <div class="dialog-box">
-		    <p>どちらに進みますか？</p>
+		    <h3>どちらに進みますか？</h3>
 		    <button id="btnSchedule">今日の予定を音声出力</button>
 		    <button id="btnSearch7">予定を音声入力</button>
 		    <button id="btnSearch">高機能検索に進む</button>
@@ -2375,7 +2385,7 @@
 
     
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 12.3 (2025-10-31)</p>
+	 © 2025 ettomio. All rights reserved. | Version 12.4 (2025-11-01)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 80px;"></div>
