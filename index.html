@@ -313,28 +313,27 @@
 		    animation: blink 1s infinite; 
 		}
 
-	    .top-button { 
-	        position: fixed;
-	        bottom: 20px;
-	        left: 50%;
-	        transform: translateX(-50%);
-	        background: #007bff;
-	        color: white;
-	        border: none;
-	        border-radius: 20px;
-	        padding: 10px 20px;
-	        font-size: 16px;
-	        cursor: pointer;
-	        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-	        z-index: 9999;
-	        display: none;
-	    }
-	    .top-button:hover { background: #0056b3; }
-		.word-label { margin-bottom: 5px; font-size: 14px; }
-		.word-input { margin-top: 0; width: 35%; }
-	    .input-row { margin-bottom: 10px; }
-	    #scheduleDate { width: 130px; }
-
+		/* 11/5 Top/Bottomボタン */
+		.bottom-button, .top-button {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #007bff;
+		    color: white;
+		    border: none;
+		    border-radius: 20px;
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		    display: none;
+		}
+		.bottom-button:hover, .top-button:hover {
+		    background: #0056b3;
+		}
+		
         /* 予定がある日の背景色 6/4 */
         .has-schedule {
             background-color: #fff59b !important; /* 予定がある日 */
@@ -2430,37 +2429,91 @@
   </script>
 
 
-  <!-- スクロールで表示されるTopボタン -->
-  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
-
-  <!-- JavaScript -->
+    <!-- スクロールで表示されるTopボタン 11/5 -->
+    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+	<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+    <!--  <div style="height: 30px;"></div> -->
+    
   <script>
-    // Topに戻る
+
+    // ==========================================================
+    // ★ スクロールボタン制御 (Top/Bottom) 11/5
+    // ==========================================================
+
     function scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // スクロールしてボタン表示制御
-    window.addEventListener("scroll", function () {
-      const topBtn = document.getElementById("topBtn");
-      if (window.scrollY > 300) {
-        topBtn.style.display = "block";
-      } else {
-        topBtn.style.display = "none";
-      }
+    function scrollToBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function hideScrollButtons() {
+        document.getElementById("topBtn").style.display = "none";
+        document.getElementById("bottomBtn").style.display = "none";
+    }
+
+    function showScrollButtonsIfPageLong() {
+        const topBtn = document.getElementById("topBtn");
+        const bottomBtn = document.getElementById("bottomBtn");
+        
+        // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
+        const scrollThreshold = 300;
+        // document.body.scrollHeight (ページ全体の高さ) が window.innerHeight (画面の表示領域) + 閾値 よりも大きいか
+        const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
+
+        if (!isScrollable) {
+            hideScrollButtons();
+            return;
+        }
+
+        // ページが長い場合のスクロール位置による制御
+        const scrollY = window.scrollY;
+        const docHeight = document.body.scrollHeight;
+        const viewHeight = window.innerHeight;
+        const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
+        
+        if (scrollY > scrollThreshold) {
+            // ある程度スクロールした -> Topボタンを表示
+            topBtn.style.display = "block";
+            bottomBtn.style.display = "none";
+        } else if (bottomMargin > scrollThreshold) {
+            // ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
+            topBtn.style.display = "none";
+            bottomBtn.style.display = "block";
+        } else {
+            // ページの上端または下端近くにいる
+            topBtn.style.display = "none";
+            bottomBtn.style.display = "none";
+        }
+    }
+
+    // スクロール時のボタン表示制御
+    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+    
+    // 初期ロード時にもボタン表示をチェック
+    window.addEventListener("load", showScrollButtonsIfPageLong);
+    
+    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+    // ==========================================================
+    // ★ 初期化
+    // ==========================================================
+    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+    document.addEventListener('DOMContentLoaded', () => {
+        showScrollButtonsIfPageLong();
     });
+    
   </script>
 
     
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 12.6 (2025-11-04)</p>
+	 © 2025 ettomio. All rights reserved. | Version 12.7 (2025-11-05)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
-	<div style="height: 80px;"></div>
-
+	<div style="height: 50px;"></div>
 
 </body>
 </html>
