@@ -6,7 +6,7 @@
     <title>高機能検索</title>
     <link rel="stylesheet" href="styles.css">
     
-	<style>   
+	<style>    
 	/* 基本のスタイル */
 	body {
 	    font-family: Arial, sans-serif;
@@ -26,19 +26,19 @@
 	}
 
 	header {
-	  background:  #6c6cff;
-	  color: white;
-	  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
-	  text-align: center;
-	  position: relative;
+	    background:  #6c6cff;
+	    color: white;
+	    padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+	    text-align: center;
+	    position: relative;
 	}
 	h1 {
-	  font-size: 20px;
-	  margin: 0;
-	}    	            
+	    font-size: 20px;
+	    margin: 0;
+	}    	 	 	 	 	 	 
 
 	h2 {
-	  font-size: 15px;
+	    font-size: 15px;
 	}    	
 	
 	/* 入力ボックス */
@@ -93,7 +93,7 @@
 
 	th.actions-column, td.actions-column {
 	    width: 20%;
-	    text-align: center;	   
+	    text-align: center;	 	
 	}
 
 	td.actions-column button {
@@ -140,7 +140,7 @@
         background-color: #b9ffff;
         color: black;
         border: 1px solid #0000ff;
-        border-radius: 5px;            
+        border-radius: 5px;          
         cursor: pointer;
         min-width: 60px;   /* 最小幅を設定 */
         display: inline-block; /* 横並びにする */
@@ -186,7 +186,7 @@
       border-radius: 20px;
       padding: 6px 12px;
       font-size: 14px;
-	  border: 1px solid black; /* 枠線を表示 */	      
+	  border: 1px solid black; /* 枠線を表示 */	 	 
       cursor: pointer;
     }
     .top-right-button:hover {
@@ -202,13 +202,13 @@
 	}
 
 	@keyframes blink {
-	  0% { opacity: 1; }
-	  50% { opacity: 0.3; }
-	  100% { opacity: 1; }
+	    0% { opacity: 1; }
+	    50% { opacity: 0.3; }
+	    100% { opacity: 1; }
 	}
 
 	.blinking {
-	  animation: blink 1s infinite;
+	    animation: blink 1s infinite;
 	}
 
 	#voiceButton.recording {
@@ -292,7 +292,7 @@
 	    margin-top: 10px;
 	}
 
-	/* 11/4 */
+	/* 11/4 Top/Bottomボタン */
 	.bottom-button, .top-button {
 	    position: fixed;
 	    bottom: 20px;
@@ -337,7 +337,7 @@
         <button id="saveButton" style="display: none;" onclick="saveChanges()">修正して保存</button>
         <button id="closeButton" class="closeButton" style="display: none;" onclick="closeFullContent()">詳細を閉じる</button>
 
-	    <!--  11/4 Top/Bottomボタン -->	
+
 	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
 		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
 	    <div style="height: 30px;"></div>
@@ -431,7 +431,7 @@
             
             // Web Speech APIの初期化と実行ロジック (ブラウザ環境でのみ使用)
             function startWebSpeechAPI() {
-                 if (!recognition) {
+                if (!recognition) {
                     if ('webkitSpeechRecognition' in window) {
                         recognition = new webkitSpeechRecognition();
                     } else if ('SpeechRecognition' in window) {
@@ -670,76 +670,75 @@
             });
 
 
-		// ==========================================================
-	    // ★ スクロールボタン制御 (Top/Bottom) 11/4
-	    // ==========================================================
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
 
-	    function scrollToTop() {
-	      window.scrollTo({ top: 0, behavior: 'smooth' });
-	    }
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
 
-	    function scrollToBottom() {
-	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-	    }
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
 
-	    function hideScrollButtons() {
-	        document.getElementById("topBtn").style.display = "none";
-	        document.getElementById("bottomBtn").style.display = "none";
-	    }
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
 
-	    function showScrollButtonsIfPageLong() {
-	        const topBtn = document.getElementById("topBtn");
-	        const bottomBtn = document.getElementById("bottomBtn");
-	        
-	        // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
-	        const scrollThreshold = 300;
-	        // document.body.scrollHeight (ページ全体の高さ) が window.innerHeight (画面の表示領域) + 閾値 よりも大きいか
-	        const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
+	    function showScrollButtonsIfPageLong() {
+	        const topBtn = document.getElementById("topBtn");
+	        const bottomBtn = document.getElementById("bottomBtn");
+	        
+	        // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
+	        const scrollThreshold = 300;
+	        // document.body.scrollHeight (ページ全体の高さ) が window.innerHeight (画面の表示領域) + 閾値 よりも大きいか
+	        const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
 
-	        if (!isScrollable) {
-	            hideScrollButtons();
-	            return;
-	        }
+	        if (!isScrollable) {
+	            hideScrollButtons();
+	            return;
+	        }
 
-	        // ページが長い場合のスクロール位置による制御
-	        const scrollY = window.scrollY;
-	        const docHeight = document.body.scrollHeight;
-	        const viewHeight = window.innerHeight;
-	        const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
-	        
-	        if (scrollY > scrollThreshold) {
-	            // ある程度スクロールした -> Topボタンを表示
-	            topBtn.style.display = "block";
-	            bottomBtn.style.display = "none";
-	        } else if (bottomMargin > scrollThreshold) {
-	            // ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
-	            topBtn.style.display = "none";
-	            bottomBtn.style.display = "block";
-	        } else {
-	            // ページの上端または下端近くにいる
-	            topBtn.style.display = "none";
-	            bottomBtn.style.display = "none";
-	        }
-	    }
+	        // ページが長い場合のスクロール位置による制御
+	        const scrollY = window.scrollY;
+	        const docHeight = document.body.scrollHeight;
+	        const viewHeight = window.innerHeight;
+	        const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
+	        
+	        if (scrollY > scrollThreshold) {
+	            // ある程度スクロールした -> Topボタンを表示
+	            topBtn.style.display = "block";
+	            bottomBtn.style.display = "none";
+	        } else if (bottomMargin > scrollThreshold) {
+	            // ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
+	            topBtn.style.display = "none";
+	            bottomBtn.style.display = "block";
+	        } else {
+	            // ページの上端または下端近くにいる
+	            topBtn.style.display = "none";
+	            bottomBtn.style.display = "none";
+	        }
+	    }
 
-	    // スクロール時のボタン表示制御
-	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
-	    
-	    // 初期ロード時にもボタン表示をチェック
-	    window.addEventListener("load", showScrollButtonsIfPageLong);
-	    
-	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
-	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
 
 
-	    // ==========================================================
-	    // ★ 初期化
-	    // ==========================================================
-	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
-	    document.addEventListener('DOMContentLoaded', () => {
-	        showScrollButtonsIfPageLong();
-	    });
-	
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
         </script>
         
     </div>
