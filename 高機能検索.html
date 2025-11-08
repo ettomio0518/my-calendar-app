@@ -578,6 +578,9 @@
 
             // メモの検索と表示を行う関数
             function searchMemos() {
+            	// ★★★ この行を先頭に追加します 11/8 ★★★
+    			closeFullContent();
+    			
                 const keyword = document.getElementById('keywordInput').value;
                 const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword');
                 const searchResults = keys.filter(key => {
@@ -760,7 +763,7 @@
 
     <footer style="text-align: center;">
         <br>
-        © 20251106 ettomio 
+        © 20251108 ettomio 
     </footer>
     
     <div style="height: 80px;"></div>
