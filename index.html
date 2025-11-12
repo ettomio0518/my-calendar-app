@@ -749,6 +749,19 @@
 		  </div>
 		</div>
 
+
+		<!-- モーダルダイアログ 11/12 簡易版でも表示できるようにここに移動 -->
+		<div id="dialogOverlay" class="dialog-overlay" style="display: none;">
+		  <div class="dialog-box">
+		    <h3>どちらのツールを使用しますか？</h3>
+		    <button id="androidBtn">Androidアプリ版ツール</button>
+		    <button id="webBtn">Web版ツール</button>
+		    <button id="keyListBtn">Keyリスト</button> <!-- ← 追加 -->
+		    <button id="closeBtn">閉じる</button>
+		  </div>
+		</div>
+
+
     <div class="calendar-header">
         <button onclick="changeMonth(-1)">◁</button>
         <div class="year-month">
@@ -2128,17 +2141,17 @@
 		<button id="keyNButton">データの保存と復元ツール</button>
 		<br><br>
 
-		<!-- モーダルダイアログ -->
+		<!-- モーダルダイアログ 11/12 正規版内にあるため移動
 		<div id="dialogOverlay" class="dialog-overlay" style="display: none;">
 		  <div class="dialog-box">
 		    <h3>どちらのツールを使用しますか？</h3>
 		    <button id="androidBtn">Androidアプリ版ツール</button>
 		    <button id="webBtn">Web版ツール</button>
-		    <button id="keyListBtn">Keyリスト</button> <!-- ← 追加 -->
+		    <button id="keyListBtn">Keyリスト</button>
 		    <button id="closeBtn">閉じる</button>
 		  </div>
 		</div>
-            	        
+          -->   	        
 
         <button onclick="location.href='電卓.html'">電卓</button>
         <button onclick="location.href='年齢計算.html'">年齢計算</button>
@@ -2516,7 +2529,7 @@
 
     
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 12.9 (2025-11-08)</p>
+	 © 2025 ettomio. All rights reserved. | Version 13.0 (2025-11-12)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
