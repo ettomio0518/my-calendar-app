@@ -60,10 +60,40 @@
     #button2:hover, #button3:hover, #button4:hover {
       background-color: #e5e5e5;
     }
+	/* 11/4 Top/Bottomボタン */
+	.bottom-button, .top-button {
+	    position: fixed;
+	    bottom: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	    z-index: 9999;
+	    display: none;
+	}
+	.bottom-button:hover, .top-button:hover {
+	    background: #0056b3;
+	}
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+      }
+      .btn {
+        width: 60%;
+        text-align: center;
+      }
+    }    
   </style>
 </head>
 <body>
-  <h1>データの保存と復元ツール</h1>
+  <h1>Androidアプリ版<br>データの保存と復元ツール</h1>
   <button class="right" onclick="location.href='index.html'">戻る</button>
 
   <h3>初めに:</h3>
@@ -165,7 +195,92 @@
     }
   </script>
 
-  <br />
-  <p>----- 250929 ettomio</p>
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+	    // ★ スクロールボタン制御 (Top/Bottom) 11/6
+	function showScrollButtonsIfPageLong() {
+	    const topBtn = document.getElementById("topBtn");
+	    const bottomBtn = document.getElementById("bottomBtn");
+	    
+	    // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
+	    const scrollThreshold = 300;
+	    const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
+
+	    if (!isScrollable) {
+	        hideScrollButtons();
+	        return;
+	    }
+
+	    // ページが長い場合のスクロール位置による制御
+	    const scrollY = window.scrollY;
+	    const docHeight = document.body.scrollHeight;
+	    const viewHeight = window.innerHeight;
+	    const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
+	    
+	    // スクロール位置の判定
+	    if (scrollY > scrollThreshold) {
+	        // [ケース1] ある程度スクロールした -> Topボタンを表示 (Bottomボタンは非表示)
+	        topBtn.style.display = "block";
+	        bottomBtn.style.display = "none";
+	    } else if (scrollY === 0 && bottomMargin > scrollThreshold) {
+	        // [ケース2 - 修正箇所] ページ最上部（scrollY=0）にいる場合 -> Bottomボタンを非表示
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "none"; 
+	    } else if (bottomMargin > scrollThreshold) {
+	        // [ケース3] ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
+	        // ただし、このelse ifに到達するのは scrollY > 0 の時のみ (ケース2で弾かれるため)
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "block";
+	    } else {
+	        // [ケース4] ページの下端近くにいる
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "none";
+	    }
+	}
+	
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
+  
+  <footer>
+    © 20251125 ettomio
+  </footer>
+  <div style="height: 80px;"></div>  
 </body>
 </html>
