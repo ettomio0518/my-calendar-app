@@ -18,7 +18,11 @@
     }
     p { color: #ffff00; /* 黄色 */}
 
-    .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+	.grid {
+	  display: grid;
+	  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	  gap: 16px;
+	}
 
     .card {
       display: flex;
@@ -40,7 +44,7 @@
     .time { font-weight: 700; font-size: 1.3rem; margin-bottom: 8px; }
     .diff { font-weight: 600; color: #f39c12; font-size: 0.9rem; margin-top: 4px; }
     canvas { background: #fafafa; border: 1px solid #ccc; border-radius: 50%; margin-left: 16px; z-index: 1; }
-    footer { margin-top: 24px; color: #ccc; font-size: 0.9rem; }
+    footer { margin-top: 24px; color: #ceffff; /*淡い青 */ font-size: 0.9rem; }
 
     /* 昼夜で背景と文字色を切り替え */
     .day {
@@ -51,7 +55,6 @@
       background: linear-gradient(to bottom, #0b1e33, #1c2f4a);
       color: #fff; /* 夜は白文字 */
     }
-    footer { color: #ceffff; /*淡い青 */}    
     
     /* 戻るボタン（右上） */
     .top-right-button {
@@ -359,7 +362,7 @@
   </script>
   
   <footer>
-    © 20251127 ettomio
+    © 20251128 ettomio
   </footer>
   <div style="height: 80px;"></div>
   
