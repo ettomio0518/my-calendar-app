@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>世界の現在時刻</title>
+  <style>
+    :root {
+      --solar-angle: 0deg;
+    }
+    body {
+      margin: 24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      /* 昼夜境界を模したグラデーション背景 */
+      background: linear-gradient(var(--solar-angle),
+        #0b1e33 0%,      /* 夜 */
+        #0b1e33 40%,
+        #1c2f4a 45%,     /* 夜明けの紺 */
+        #fef3c7 50%,     /* 明け方の薄金 */
+        #87cefa 60%,     /* 昼の水色 */
+        #87cefa 100%
+      );
+      transition: background 1s linear;
+      color: #fff;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* 星の粒ノイズ */
+    body::after {
+      content: "";
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background-image: radial-gradient(white 1px, transparent 1px);
+      background-size: 3px 3px;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+      color: #002828; /* タイトルは深い緑 */
+    }
+    p { color: #361b1b; /* 茶色 */}
+
+	.grid {
+	  display: grid;
+	  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	  gap: 16px;
+	}
+
+    .card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      transition: background 0.5s, color 0.5s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info { flex: 1; text-align: left; z-index: 1; }
+    .city { font-weight: 600; font-size: 1.1rem; margin-bottom: 6px; }
+    .date { margin-bottom: 6px; }
+    .utc { margin-bottom: 6px; font-size: 0.9rem; }
+    .time { font-weight: 700; font-size: 1.3rem; margin-bottom: 8px; }
+    .diff { font-weight: 600; color: #f39c12; font-size: 0.9rem; margin-top: 4px; }
+    canvas { background: #fafafa; border: 1px solid #ccc; border-radius: 50%; margin-left: 16px; z-index: 1; }
+    footer { margin-top: 24px; color: #ceffff; /*淡い青 */ font-size: 0.9rem; }
+
+    /* 昼夜で背景と文字色を切り替え */
+    .day {
+      background: linear-gradient(to bottom, #fef3c7, #41b4f8);
+      color: #000; /* 昼は黒文字 */
+    }
+    .night {
+      background: linear-gradient(to bottom, #0b1e33, #570057);
+      color: #fff; /* 夜は白文字 */
+    }
+    
+    /* 戻るボタン（右上） */
+    .top-right-button {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .top-right-button:hover {
+        background-color: #0056b3;
+    }
+	/* 11/4 Top/Bottomボタン */
+	.bottom-button, .top-button {
+	    position: fixed;
+	    bottom: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	    z-index: 9999;
+	    display: none;
+	}
+	.bottom-button:hover, .top-button:hover {
+	    background: #0056b3;
+	}
+  </style>
+</head>
+<body>
+  <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+  <h1>世界の現在時刻</h1>
+  <p>東京を先頭に、他の都市はUTCオフセット順で並べています。</p>
+
+  <div id="clockGrid" class="grid"></div>
+
+  <footer>
+    各カードの背景は都市ごとの昼夜グラデーションです。夏時間（DST）は自動反映されます。
+  </footer>
+
+  <script>
+    const tokyo = { name: "東京", tz: "Asia/Tokyo" };
+    const others = [
+      { name: "ホノルル", tz: "Pacific/Honolulu" },
+      { name: "バンクーバー", tz: "America/Vancouver" },
+      { name: "ロサンゼルス", tz: "America/Los_Angeles" },
+      { name: "デンバー", tz: "America/Denver" },
+      { name: "ダラス", tz: "America/Chicago" },
+      { name: "シカゴ", tz: "America/Chicago" },
+      { name: "ニューヨーク", tz: "America/New_York" },
+      { name: "マイアミ", tz: "America/New_York" },
+      { name: "オタワ", tz: "America/Toronto" },
+      { name: "リオデジャネイロ", tz: "America/Sao_Paulo" },
+      { name: "ブエノスアイレス", tz: "America/Argentina/Buenos_Aires" },
+      { name: "ロンドン", tz: "Europe/London" },
+      { name: "マドリード", tz: "Europe/Madrid" },
+      { name: "パリ", tz: "Europe/Paris" },
+      { name: "ベルリン", tz: "Europe/Berlin" },
+      { name: "ローマ", tz: "Europe/Rome" },
+      { name: "ストックホルム", tz: "Europe/Stockholm" },
+      { name: "アテネ", tz: "Europe/Athens" },
+      { name: "キーウ", tz: "Europe/Kyiv" },
+      { name: "カイロ", tz: "Africa/Cairo" },
+      { name: "ヨハネスブルグ", tz: "Africa/Johannesburg" },
+      { name: "アンカラ", tz: "Europe/Istanbul" },
+      { name: "モスクワ", tz: "Europe/Moscow" },
+      { name: "ドバイ", tz: "Asia/Dubai" },
+      { name: "ニューデリー", tz: "Asia/Kolkata" },
+      { name: "ジャカルタ", tz: "Asia/Jakarta" },
+      { name: "バンコク", tz: "Asia/Bangkok" },
+      { name: "シンガポール", tz: "Asia/Singapore" },
+      { name: "香港", tz: "Asia/Hong_Kong" },
+      { name: "北京", tz: "Asia/Shanghai" },
+      { name: "ソウル", tz: "Asia/Seoul" },
+      { name: "グアム", tz: "Pacific/Guam" },
+      { name: "シドニー", tz: "Australia/Sydney" }
+    ];
+    const cities = [tokyo, ...others];
+
+    const grid = document.getElementById("clockGrid");
+    const cards = cities.map(city => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const info = document.createElement("div");
+      info.className = "info";
+
+      const cityEl = document.createElement("div");
+      cityEl.className = "city";
+      cityEl.textContent = city.name;
+
+      const dateEl = document.createElement("div");
+      dateEl.className = "date";
+
+      const utcEl = document.createElement("div");
+      utcEl.className = "utc";
+
+      const timeEl = document.createElement("div");
+      timeEl.className = "time";
+
+      const diffEl = document.createElement("div");
+      diffEl.className = "diff";
+
+      info.append(cityEl, dateEl, utcEl, timeEl, diffEl);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 120;
+      canvas.height = 120;
+
+      card.append(info, canvas);
+      grid.appendChild(card);
+
+      return { city, card, dateEl, utcEl, timeEl, diffEl, canvas };
+    });
+
+    function updateClocks() {
+      const now = new Date();
+      const tokyoDate = new Date(now.toLocaleString("en-US", { timeZone: tokyo.tz }));
+
+      cards.forEach(({ city, card, dateEl, utcEl, timeEl, diffEl, canvas }) => {
+        const dateStr = new Intl.DateTimeFormat("ja-JP", {
+          timeZone: city.tz, year: "numeric", month: "2-digit", day: "2-digit", weekday: "short"
+        }).format(now);
+
+        const timeStr = new Intl.DateTimeFormat("ja-JP", {
+          timeZone: city.tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+        }).format(now);
+
+        const formatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: city.tz, hour: "2-digit", minute: "2-digit", timeZoneName: "short"
+        });
+        const tzName = formatter.formatToParts(now).find(p => p.type === "timeZoneName").value;
+
+        dateEl.textContent = dateStr;
+        timeEl.textContent = timeStr;
+        utcEl.textContent = tzName;
+
+        const cityDate = new Date(now.toLocaleString("en-US", { timeZone: city.tz }));
+        const diffHours = (cityDate - tokyoDate) / (1000 * 60 * 60);
+
+        let diffText;
+        if (city.name === "東京") {
+          diffText = "基準 (UTC+9)";
+        } else if (diffHours < 0) {
+          diffText = `東京より ${Math.abs(diffHours).toFixed(2).replace(/\.00$/, '')}時間 遅れている`;
+        } else if (diffHours > 0) {
+          diffText = `東京より ${diffHours.toFixed(2).replace(/\.00$/, '')}時間 進んでいる`;
+        } else {
+          diffText = "東京と時差なし";
+        }
+        diffEl.textContent = diffText;
+
+        // 昼夜判定（カードにクラスを付ける）
+        const hour = cityDate.getHours();
+        if (hour >= 6 && hour < 18) {
+          card.classList.add("day");
+          card.classList.remove("night");
+        } else {
+          card.classList.add("night");
+          card.classList.remove("day");
+        }
+
+        // アナログ時計描画
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const radius = canvas.width / 2;
+        ctx.translate(radius, radius);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius - 2, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        const hours = cityDate.getHours();
+        const minutes = cityDate.getMinutes();
+        const seconds = cityDate.getSeconds();
+
+        // 時針
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(
+          Math.cos((hours % 12 + minutes / 60) * 30 * Math.PI / 180 - Math.PI / 2) * (radius * 0.5),
+          Math.sin((hours % 12 + minutes / 60) * 30 * Math.PI / 180 - Math.PI / 2) * (radius * 0.5)
+        );
+        ctx.stroke();
+
+        // 分針
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(
+          Math.cos((minutes + seconds / 60) * 6 * Math.PI / 180 - Math.PI / 2) * (radius * 0.7),
+          Math.sin((minutes + seconds / 60) * 6 * Math.PI / 180 - Math.PI / 2) * (radius * 0.7)
+        );
+        ctx.stroke();
+
+        // 秒針
+        ctx.strokeStyle = "red";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(
+          Math.cos(seconds * 6 * Math.PI / 180 - Math.PI / 2) * (radius * 0.8),
+          Math.sin(seconds * 6 * Math.PI / 180 - Math.PI / 2) * (radius * 0.8)
+        );
+        ctx.stroke();
+        ctx.strokeStyle = "black";
+
+        // 座標を元に戻す
+        ctx.translate(-radius, -radius);
+      });
+    }
+
+    updateClocks();
+    setInterval(updateClocks, 1000);
+  </script>
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+	    // ★ スクロールボタン制御 (Top/Bottom) 11/6
+	function showScrollButtonsIfPageLong() {
+	    const topBtn = document.getElementById("topBtn");
+	    const bottomBtn = document.getElementById("bottomBtn");
+	    
+	    // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
+	    const scrollThreshold = 300;
+	    const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
+
+	    if (!isScrollable) {
+	        hideScrollButtons();
+	        return;
+	    }
+
+	    // ページが長い場合のスクロール位置による制御
+	    const scrollY = window.scrollY;
+	    const docHeight = document.body.scrollHeight;
+	    const viewHeight = window.innerHeight;
+	    const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
+	    
+	    // スクロール位置の判定
+	    if (scrollY > scrollThreshold) {
+	        // [ケース1] ある程度スクロールした -> Topボタンを表示 (Bottomボタンは非表示)
+	        topBtn.style.display = "block";
+	        bottomBtn.style.display = "none";
+	    } else if (scrollY === 0 && bottomMargin > scrollThreshold) {
+	        // [ケース2 - 修正箇所] ページ最上部（scrollY=0）にいる場合 -> Bottomボタンを非表示
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "none"; 
+	    } else if (bottomMargin > scrollThreshold) {
+	        // [ケース3] ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
+	        // ただし、このelse ifに到達するのは scrollY > 0 の時のみ (ケース2で弾かれるため)
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "block";
+	    } else {
+	        // [ケース4] ページの下端近くにいる
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "none";
+	    }
+	}
+	
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
+  
+  <footer>
+    © 20251128 ettomio
+  </footer>
+  <div style="height: 80px;"></div>
+  
+  </body>
+</html>
