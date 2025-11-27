@@ -5,9 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>世界の現在時刻</title>
   <style>
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; margin: 24px; }
-    h1 { margin-bottom: 8px; font-size: 1.5rem; }
+    body {
+      margin: 24px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      background:  #000066; /* 紺色 */
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+      color: #ebebeb; /* タイトルは常に明るい色で見やすく */
+    }
+    p { color: #ffff00; /* 黄色 */}
+
     .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+
     .card {
       display: flex;
       justify-content: space-between;
@@ -15,19 +27,31 @@
       border: 1px solid #ddd;
       border-radius: 10px;
       padding: 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
       transition: background 0.5s, color 0.5s;
+      position: relative;
+      overflow: hidden;
     }
-    .info { flex: 1; text-align: left; }
+
+    .info { flex: 1; text-align: left; z-index: 1; }
     .city { font-weight: 600; font-size: 1.1rem; margin-bottom: 6px; }
     .date { margin-bottom: 6px; }
     .utc { margin-bottom: 6px; font-size: 0.9rem; }
     .time { font-weight: 700; font-size: 1.3rem; margin-bottom: 8px; }
-    .diff { font-weight: 600; color: #e67e22; font-size: 0.9rem; margin-top: 4px; }
-    canvas { background: #fafafa; border: 1px solid #ccc; border-radius: 50%; margin-left: 16px; }
-    footer { margin-top: 24px; color: #666; font-size: 0.9rem; }
-    .day { background: #fffbe6; color: #000; }
-    .night { background: #2c3e50; color: #f0f0f0; }
+    .diff { font-weight: 600; color: #f39c12; font-size: 0.9rem; margin-top: 4px; }
+    canvas { background: #fafafa; border: 1px solid #ccc; border-radius: 50%; margin-left: 16px; z-index: 1; }
+    footer { margin-top: 24px; color: #ccc; font-size: 0.9rem; }
+
+    /* 昼夜で背景と文字色を切り替え */
+    .day {
+      background: linear-gradient(to bottom, #fef3c7, #87cefa);
+      color: #000; /* 昼は黒文字 */
+    }
+    .night {
+      background: linear-gradient(to bottom, #0b1e33, #1c2f4a);
+      color: #fff; /* 夜は白文字 */
+    }
+    footer { color: #ceffff; /*淡い青 */}    
     
     /* 戻るボタン（右上） */
     .top-right-button {
@@ -64,7 +88,7 @@
 	}
 	.bottom-button:hover, .top-button:hover {
 	    background: #0056b3;
-	}        
+	}
   </style>
 </head>
 <body>
@@ -75,22 +99,39 @@
   <div id="clockGrid" class="grid"></div>
 
   <footer>
-    昼夜判定により背景色を切り替えています。夏時間（DST）は各タイムゾーン設定により自動反映されます。
+    各カードの背景は都市ごとの昼夜グラデーションです。夏時間（DST）は自動反映されます。
   </footer>
 
   <script>
     const tokyo = { name: "東京", tz: "Asia/Tokyo" };
     const others = [
       { name: "ホノルル", tz: "Pacific/Honolulu" },
+      { name: "バンクーバー", tz: "America/Vancouver" },
       { name: "ロサンゼルス", tz: "America/Los_Angeles" },
+      { name: "デンバー", tz: "America/Denver" },
+      { name: "ダラス", tz: "America/Chicago" },
+      { name: "シカゴ", tz: "America/Chicago" },
       { name: "ニューヨーク", tz: "America/New_York" },
+      { name: "マイアミ", tz: "America/New_York" },
+      { name: "オタワ", tz: "America/Toronto" },
       { name: "リオデジャネイロ", tz: "America/Sao_Paulo" },
+      { name: "ブエノスアイレス", tz: "America/Argentina/Buenos_Aires" },
       { name: "ロンドン", tz: "Europe/London" },
+      { name: "マドリード", tz: "Europe/Madrid" },
       { name: "パリ", tz: "Europe/Paris" },
       { name: "ベルリン", tz: "Europe/Berlin" },
+      { name: "ローマ", tz: "Europe/Rome" },
+      { name: "ストックホルム", tz: "Europe/Stockholm" },
+      { name: "アテネ", tz: "Europe/Athens" },
+      { name: "キーウ", tz: "Europe/Kyiv" },
+      { name: "カイロ", tz: "Africa/Cairo" },
       { name: "ヨハネスブルグ", tz: "Africa/Johannesburg" },
+      { name: "アンカラ", tz: "Europe/Istanbul" },
+      { name: "モスクワ", tz: "Europe/Moscow" },
       { name: "ドバイ", tz: "Asia/Dubai" },
       { name: "ニューデリー", tz: "Asia/Kolkata" },
+      { name: "ジャカルタ", tz: "Asia/Jakarta" },
+      { name: "バンコク", tz: "Asia/Bangkok" },
       { name: "シンガポール", tz: "Asia/Singapore" },
       { name: "香港", tz: "Asia/Hong_Kong" },
       { name: "北京", tz: "Asia/Shanghai" },
@@ -138,7 +179,6 @@
 
     function updateClocks() {
       const now = new Date();
-
       const tokyoDate = new Date(now.toLocaleString("en-US", { timeZone: tokyo.tz }));
 
       cards.forEach(({ city, card, dateEl, utcEl, timeEl, diffEl, canvas }) => {
@@ -159,7 +199,6 @@
         timeEl.textContent = timeStr;
         utcEl.textContent = tzName;
 
-        // ★ 東京との時差を計算
         const cityDate = new Date(now.toLocaleString("en-US", { timeZone: city.tz }));
         const diffHours = (cityDate - tokyoDate) / (1000 * 60 * 60);
 
@@ -175,12 +214,14 @@
         }
         diffEl.textContent = diffText;
 
-        // 昼夜判定
+        // 昼夜判定（カードにクラスを付ける）
         const hour = cityDate.getHours();
         if (hour >= 6 && hour < 18) {
-          card.classList.add("day"); card.classList.remove("night");
+          card.classList.add("day");
+          card.classList.remove("night");
         } else {
-          card.classList.add("night"); card.classList.remove("day");
+          card.classList.add("night");
+          card.classList.remove("day");
         }
 
         // アナログ時計描画
@@ -318,7 +359,7 @@
   </script>
   
   <footer>
-    © 20251126 ettomio
+    © 20251127 ettomio
   </footer>
   <div style="height: 80px;"></div>
   
