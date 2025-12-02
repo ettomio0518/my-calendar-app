@@ -300,47 +300,44 @@
 	        document.getElementById("bottomBtn").style.display = "none";
 	    }
 
-	    // ★ スクロールボタン制御 (Top/Bottom) 11/6
-	function showScrollButtonsIfPageLong() {
-	    const topBtn = document.getElementById("topBtn");
-	    const bottomBtn = document.getElementById("bottomBtn");
-	    
-	    // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
-	    const scrollThreshold = 300;
-	    const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
 
-	    if (!isScrollable) {
-	        hideScrollButtons();
-	        return;
-	    }
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
 
-	    // ページが長い場合のスクロール位置による制御
-	    const scrollY = window.scrollY;
-	    const docHeight = document.body.scrollHeight;
-	    const viewHeight = window.innerHeight;
-	    const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
-	    
-	    // スクロール位置の判定
-	    if (scrollY > scrollThreshold) {
-	        // [ケース1] ある程度スクロールした -> Topボタンを表示 (Bottomボタンは非表示)
-	        topBtn.style.display = "block";
-	        bottomBtn.style.display = "none";
-	    } else if (scrollY === 0 && bottomMargin > scrollThreshold) {
-	        // [ケース2 - 修正箇所] ページ最上部（scrollY=0）にいる場合 -> Bottomボタンを非表示
-	        topBtn.style.display = "none";
-	        bottomBtn.style.display = "none"; 
-	    } else if (bottomMargin > scrollThreshold) {
-	        // [ケース3] ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
-	        // ただし、このelse ifに到達するのは scrollY > 0 の時のみ (ケース2で弾かれるため)
-	        topBtn.style.display = "none";
-	        bottomBtn.style.display = "block";
-	    } else {
-	        // [ケース4] ページの下端近くにいる
-	        topBtn.style.display = "none";
-	        bottomBtn.style.display = "none";
-	    }
-	}
-	
+		    // --- Bottomボタンの表示制御 ---
+		    // ページ下端から100px手前までBottomボタンを表示
+		    // (docHeight - viewHeight - scrollY) は、残りのスクロール量
+		    if (docHeight - viewHeight - scrollY > scrollThreshold) {
+		        bottomBtn.style.display = "block";
+		    } else {
+		        bottomBtn.style.display = "none";
+		    }
+		}
+
 	    // スクロール時のボタン表示制御
 	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
 	    
@@ -362,7 +359,7 @@
   </script>
   
   <footer>
-    © 20251128 ettomio
+    © 20251202 ettomio
   </footer>
   <div style="height: 80px;"></div>
   
