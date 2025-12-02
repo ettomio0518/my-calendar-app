@@ -2117,12 +2117,14 @@
         <button onclick="location.href='日記.html'">簡易日記</button>
 
 	    <h3>天気予報</h3>
+	    <button class="calendar-button" onclick="location.href='weather.html'">現在地の天気予報</button>
+	    <br>
 	    <p class="word-label">天気サイトのアドレスを入力して下さい。</p>
 	    <label for="weatherUrl">URL:</label>
 <input type="url" id="weatherUrl" placeholder="例: https://www.weather.com" class="word-input">
 
 	    <button onclick="navigate()">移動</button>
-	    <br>
+	    
 	    <button id="updateBtn" onclick="enableEditing()">入力と修正</button>
 	    <button id="saveBtn" onclick="saveNewUrl()" style="display:none;">保存</button>
 
@@ -2528,9 +2530,8 @@
     
   </script>
 
-    
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 13.5 (2025-11-28)</p>
+	 © 2025 ettomio. All rights reserved. | Version 13.6 (2025-12-02)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
