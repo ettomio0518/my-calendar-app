@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>現在地の7日間天気予報</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 24px;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+      background: #7ebebe;
+      color: #232323;
+    }
+    
+    /* 星の粒ノイズ */
+    body::after {
+      content: "";
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background-image: radial-gradient(white 1px, transparent 1px);
+      background-size: 3px 3px;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    
+    h1 { margin-bottom: 10px; font-size: 1.3rem; color: #3a2a1a; }
+    #weather-cards {
+      display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;
+    }
+    .card {
+      width: 280px; border-radius: 12px; padding: 10px; background: #fff;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.35);
+    }
+    .header {
+      display: flex; align-items: center; margin-bottom: 6px;
+    }
+    .date { font-size: 1rem; font-weight: bold; }
+    .icon { font-size: 2.2rem; margin-left: auto; margin-right: 12px; }
+    .grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 0.85rem;
+    }
+    .grid p { margin: 2px 0; line-height: 1.2; }
+    .sun-row {
+      grid-column: 1 / -1; text-align: center; margin-top: 4px; font-weight: bold;
+    }
+    .sunny   { background: linear-gradient(to bottom, #fff9c4, #ffd54f); }
+    .cloudy  { background: linear-gradient(to bottom, #f0f0f0, #bdbdbd); }
+    .rainy   { background: linear-gradient(to bottom, #4a90e2, #1c2f4a); color: #fff; }
+    .snowy   { background: linear-gradient(to bottom, #f0f8ff, #e6e6fa); }
+    .thunder { background: linear-gradient(to bottom, #6a5acd, #4b0082); color: #fff; }
+    .unknown { background: linear-gradient(to bottom, #e0e0e0, #9e9e9e); color: #333; }
+    @media (max-width: 640px) { .card { width: 92vw; } }
+    
+    /* 戻るボタン（右上） */
+    .top-right-button {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .top-right-button:hover {
+        background-color: #0056b3;
+    }
+	/* 11/4 Top/Bottomボタン */
+	.bottom-button, .top-button {
+	    position: fixed;
+	    bottom: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	    z-index: 9999;
+	    display: none;
+	}
+	.bottom-button:hover, .top-button:hover {
+	    background: #0056b3;
+	}    
+  </style>
+</head>
+<body>
+  <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+
+  <h1 id="title">現在地の7日間天気予報</h1>
+  <div id="weather-cards"></div>
+
+  <script>
+    const iconOf = code => {
+      const map = {0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",61:"🌧️",71:"❄️",80:"🌧️",95:"⛈️",99:"⛈️"};
+      return map[code] || "🌫️";
+    };
+    const labelOf = code => {
+      const map = {0:"快晴",1:"晴れ",2:"晴れがち",3:"曇り",45:"霧",48:"霧",51:"にわか雨",61:"雨",71:"雪",80:"雨",95:"雷雨",99:"激しい雷雨"};
+      return map[code] || "不明";
+    };
+    const classOf = code => {
+      if ([0,1].includes(code)) return "sunny";
+      if ([2,3,45,48].includes(code)) return "cloudy";
+      if ([51,61,80].includes(code)) return "rainy";
+      if ([71].includes(code)) return "snowy";
+      if ([95,99].includes(code)) return "thunder";
+      return "unknown";
+    };
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+      const geoData = await geoRes.json();
+      const placeName = geoData.address.city || geoData.address.town || geoData.address.village || "現在地";
+      document.getElementById("title").textContent = `${placeName}の7日間天気予報`;
+
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,sunrise,sunset&hourly=weathercode,relativehumidity_2m,precipitation_probability&timezone=Asia%2FTokyo`);
+      const data = await res.json();
+      const days = data.daily;
+      const hourly = data.hourly;
+      const container = document.getElementById("weather-cards");
+
+      for (let i = 0; i < days.time.length; i++) {
+        const date = new Date(days.time[i]);
+        const code = days.weathercode[i];
+        const icon = iconOf(code);
+        const bg = classOf(code);
+        const max = days.temperature_2m_max[i];
+        const min = days.temperature_2m_min[i];
+        const wind = days.windspeed_10m_max[i];
+        const sunrise = new Date(days.sunrise[i]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+        const sunset = new Date(days.sunset[i]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+
+        // 午前・午後の代表天気
+        const dayKey = days.time[i];
+        const indices = hourly.time.map((t, idx) => ({t, idx})).filter(o => o.t.startsWith(dayKey));
+        const morning = indices.filter(o => new Date(o.t).getHours() < 12);
+        const afternoon = indices.filter(o => new Date(o.t).getHours() >= 12);
+
+        const mode = arr => {
+          if (!arr.length) return null;
+          const freq = {};
+          arr.forEach(c => freq[c] = (freq[c]||0)+1);
+          return +Object.keys(freq).reduce((a,b)=>freq[a]>freq[b]?a:b);
+        };
+        const morningCode = mode(morning.map(o=>hourly.weathercode[o.idx]));
+        const afternoonCode = mode(afternoon.map(o=>hourly.weathercode[o.idx]));
+        const morningLabel = morningCode!==null ? labelOf(morningCode) : "予報準備中";
+        const afternoonLabel = afternoonCode!==null ? labelOf(afternoonCode) : "予報準備中";
+
+        // 湿度（午前・午後平均）
+        const morningHum = morning.length ? Math.round(morning.map(o=>hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
+        const afternoonHum = afternoon.length ? Math.round(afternoon.map(o=>hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
+
+        // 降水確率（午前・午後平均）
+        const morningRain = morning.length ? Math.round(morning.map(o=>hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
+        const afternoonRain = afternoon.length ? Math.round(afternoon.map(o=>hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
+
+        const card = document.createElement("div");
+        card.className = `card ${bg}`;
+        card.innerHTML = `
+          <div class="header">
+            <span class="date">${date.toLocaleDateString("ja-JP",{weekday:"short",month:"numeric",day:"numeric"})}</span>
+            <span class="icon">${icon}</span>
+          </div>
+          <div class="grid">
+            <p>午前: ${morningLabel}</p>
+            <p>午後: ${afternoonLabel}</p>
+            <p>最高: ${max}℃</p>
+            <p>最低: ${min}℃</p>
+            <p>湿度(午前): ${morningHum !== "予報準備中" ? morningHum+"%" : morningHum}</p>
+            <p>湿度(午後): ${afternoonHum !== "予報準備中" ? afternoonHum+"%" : afternoonHum}</p>
+            <p>降水確率(午前): ${morningRain !== "予報準備中" ? morningRain+"%" : morningRain}</p>
+            <p>降水確率(午後): ${afternoonRain !== "予報準備中" ? afternoonRain+"%" : afternoonRain}</p>
+            <p>風速: ${wind}m/s</p>
+            <p class="sun-row">日の出: ${sunrise} ／ 日没: ${sunset}</p>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    }, (err) => {
+      // 位置情報が取得できなかった場合の処理
+      document.getElementById("title").textContent = "位置情報が取得できませんでした";
+      const container = document.getElementById("weather-cards");
+      const card = document.createElement("div");
+      card.className = "card unknown";
+      card.innerHTML = `
+        <div class="header">
+          <span class="date">エラー</span>
+          <span class="icon">⚠️</span>
+        </div>
+        <div class="grid">
+          <p>位置情報が利用できません。</p>
+          <p>${err.message}</p>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  </script>
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+		    // --- Bottomボタンの表示制御 ---
+		    // ページ下端から100px手前までBottomボタンを表示
+		    // (docHeight - viewHeight - scrollY) は、残りのスクロール量
+		    if (docHeight - viewHeight - scrollY > scrollThreshold) {
+		        bottomBtn.style.display = "block";
+		    } else {
+		        bottomBtn.style.display = "none";
+		    }
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
+  
+  <footer>
+    <br><br>
+    © 20251202 ettomio
+  </footer>
+  <div style="height: 50px;"></div>
+  
+  </body>
+</html>
+
