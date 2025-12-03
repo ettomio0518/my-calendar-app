@@ -187,23 +187,25 @@
         container.appendChild(card);
       }
     }, (err) => {
-      // 位置情報が取得できなかった場合の処理
-      document.getElementById("title").textContent = "位置情報が取得できませんでした";
-      const container = document.getElementById("weather-cards");
-      const card = document.createElement("div");
-      card.className = "card unknown";
-      card.innerHTML = `
-        <div class="header">
-          <span class="date">エラー</span>
-          <span class="icon">⚠️</span>
-        </div>
-        <div class="grid">
-          <p>位置情報が利用できません。</p>
-          <p>${err.message}</p>
-        </div>
-      `;
-      container.appendChild(card);
+	// 位置情報が取得できなかった場合の処理
+	document.getElementById("title").textContent = "位置情報が取得できませんでした";
+	const container = document.getElementById("weather-cards");
+	const card = document.createElement("div");
+	card.className = "card unknown";
+	card.innerHTML = `
+	  <div class="header">
+	    <span class="date">エラー</span>
+	    <span class="icon">⚠️</span>
+	  </div>
+	  <div class="grid">
+	    <p>位置情報が利用できません。</p>
+	    <p>${err.message}</p>
+	    <p>※初回起動時に許可ダイアログが表示されない場合は、スマホを再起動してアプリを開くか、設定から位置情報を許可してください。</p>
+	  </div>
+	`;
+	container.appendChild(card);
     });
+    
   </script>
 	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
 		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
@@ -287,7 +289,7 @@
   
   <footer>
     <br><br>
-    © 20251202 ettomio
+    © 20251203 ettomio
   </footer>
   <div style="height: 50px;"></div>
   
