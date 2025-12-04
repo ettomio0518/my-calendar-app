@@ -686,6 +686,12 @@
 		    }
 		}
 
+		/* 全部のリンクに効かせるのではなく、特定のクラスだけ 12/4 */
+		.header-link {
+		  text-decoration: none;
+		  color: inherit;
+		}
+
     </style>
     
 	<script>
@@ -727,10 +733,10 @@
 <body>
 
 	<header>
-	    <div class="logo-title">
-	        <img src="image64.png" alt="サンプル画像">
-	        <h4>舞い ♪ カレンダー</h4>
-	    </div>
+	  <div class="logo-title">
+	    <img src="image64.png" alt="サンプル画像">
+	    <h4><a href="weather.html" class="header-link">舞い ♪ カレンダー</a></h4>
+	  </div>
 	</header>
 
 		<div id="customDialog" style="display:none;" class="dialog-overlay">
@@ -2531,7 +2537,7 @@
   </script>
 
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 13.7 (2025-12-03)</p>
+	 © 2025 ettomio. All rights reserved. | Version 13.8 (2025-12-04)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
