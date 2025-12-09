@@ -136,7 +136,6 @@
             cursor: pointer;
         }
 
-
 		/* 「予定の確認」ボタンのスタイルを設定 */
 		.check-button {
 		    background-color:#bfffbf;
@@ -179,6 +178,14 @@
 		    background-color: #ffe8ff; /* 背景色も変更可能 */
 		}
 
+		/* 「今日のカード」ボタンだけスタイルを変更 */
+		.todaycard-button {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding: 3px 30px; /* ボタン全体の大きさを調整 */
+		    color: blue;
+		    background-color: #ffecd9; /* 背景色も変更可能 */
+		}
+		
 		/* 「カレンダー」ボタンだけ異なるスタイルを設定 */
 		.calendar-button {
 		    background-color: #ffffc4;/* 背景色も変更可能 */
@@ -2124,6 +2131,7 @@
 	<div class="link-buttons1">
 	    <button class="calendar-button" onclick="location.href='カレンダー.html'">カレンダー</button>
 	    <button class="clock-button" onclick="location.href='時計.html'">時計</button>
+	    <button  class="todaycard-button" onclick="location.href='today-card.html'">今日のカード</button>
 	</div>
 	<br>
 	
