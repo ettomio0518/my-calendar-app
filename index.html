@@ -692,6 +692,12 @@
 		  color: inherit;
 		}
 
+		.current-date {
+		  cursor: pointer;       /* マウスを乗せたらクリックできる雰囲気 12/7 */
+		  text-decoration: none; /* 下線を消す */
+		  color: #d60000; /* 元の赤に戻す（好みの赤に変更可） */
+		}
+
     </style>
     
 	<script>
@@ -755,7 +761,6 @@
 		  </div>
 		</div>
 
-
 		<!-- モーダルダイアログ 11/12 簡易版でも表示できるようにここに移動 -->
 		<div id="dialogOverlay" class="dialog-overlay" style="display: none;">
 		  <div class="dialog-box">
@@ -783,6 +788,13 @@
         </div>
         <button onclick="changeMonth(1)">▷</button>
     </div>
+
+	<script>
+	// 12/7 追加　今日の日付をクリックで遷移
+	document.getElementById("current-date").addEventListener("click", function() {
+	  window.location.href = "today-card.html";
+	});
+	</script>
 
     <div class="navigation-buttons">
         <button onclick="changeYear(-1)">1年前</button>
@@ -2537,7 +2549,7 @@
   </script>
 
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 13.8 (2025-12-04)</p>
+	 © 2025 ettomio. All rights reserved. | Version 14.0 (2025-12-09)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
