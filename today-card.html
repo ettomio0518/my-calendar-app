@@ -145,39 +145,72 @@
     @media (min-width: 960px) {
       .page { max-width: 560px; width: 560px; }
     }
+    
+	/* 11/4 Top/Bottomボタン */
+	.bottom-button, .top-button {
+	    position: fixed;
+	    bottom: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background: #a74fff;
+	    color: white;
+	    border: none;
+	    border-radius: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	    z-index: 9999;
+	    display: none;
+	}
+	.bottom-button:hover, .top-button:hover {
+	    background: #0056b3;
+	}    
+	    
   </style>
 </head>
 <body>
-  <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	<button class="top-right-button" onclick="location.href='index.html'">戻る</button>
 
-  <div class="page">
-      <h2>今日のカード</h2>  
-		<div class="card" id="today-card">
-		  <p id="seireki"></p>
-		  <p id="current-time"></p>
-		  <p id="weekday"></p>
-		  <p id="wareki"></p>
-		  <p id="holiday"></p>
-		  <p id="rokuyo"></p>
-		  <p id="zodiac"></p>
-		  <p id="wafuu"></p>
+	<div class="page">
+	  <h2>今日のカード</h2>  
+	  <div class="card" id="today-card">
+	    <p id="seireki"></p>
+	    <p id="current-time"></p>
+	    <p id="weekday"></p>
+	    <p id="wareki"></p>
+	    <p id="holiday"></p>
+	    <p id="rokuyo"></p>
+	    <p id="zodiac"></p>
+	    <p id="wafuu"></p>
 
-		  <!-- ★ ここに横並びボタンを追加 -->
-		  <div id="calendar-buttons" style="margin:8px 0; display:flex; gap:10px;">
-		    <button onclick="openExternal('https://www.pasokoncalendar.com/display/')">
-		      今日のカレンダー
-		    </button>
-		    <button onclick="openExternal('https://eco.mtk.nao.ac.jp/koyomi/cande/calendar.html')">
-		      今月のこよみ
-		    </button>
-		  </div>
+	    <!-- ★ 横並びボタン -->
+	    <div id="calendar-buttons" style="margin:8px 0; display:flex; gap:10px;">
+	      <button onclick="openExternal('https://www.pasokoncalendar.com/display/')">今日のカレンダー</button>
+	      <button onclick="openExternal('https://eco.mtk.nao.ac.jp/koyomi/cande/calendar.html')">今月のこよみ</button>
+	    </div>
 
-		  <p id="schedule"></p>
-		</div>
+	    <p id="schedule"></p>
 
-    <h3 id="title">現在地の天気</h3>
-    <div id="weather-container"></div>
-  </div>
+	    <!-- 時間割展開ボタン -->
+	    <div id="calendar-buttons-timeline" style="margin:8px 0;">
+	      <button id="timeline-toggle" onclick="toggleTimeline()">📅 今日の時間割を見る</button>
+	    </div>
+
+	    <!-- 時間軸 -->
+	    <div id="timeline" style="display:none; margin-top:10px;">
+	      <h4>今日の時間割</h4>
+	      <div style="display:flex;">
+	        <div id="time-labels" style="width:50px; font-size:12px; color:#666;"></div>
+	        <div id="timeline-container" style="position:relative; height:600px; border-left:2px solid #333; flex-grow:1; margin-left:10px;"></div>
+	      </div>
+	      <p id="timeline-note"></p>
+	    </div>
+	  </div> <!-- today-card を閉じる -->
+
+	  <h3 id="title">現在地の天気</h3>
+	  <div id="weather-container"></div>
+	</div> <!-- page を閉じる -->
 
   <script>
   
@@ -2500,10 +2533,10 @@ const rokuyoData = [
   setInterval(updateCard, 1000);
 
 
-function openExternal(url) {
-  // WebView内でも、スマホなら外部ブラウザで開ける
-  window.open(url, "_blank");
-}
+	function openExternal(url) {
+	  // WebView内でも、スマホなら外部ブラウザで開ける
+	  window.open(url, "_blank");
+	}
 
 
     // 天気アイコン・ラベル・背景クラス
@@ -2604,10 +2637,210 @@ function openExternal(url) {
       document.getElementById("title").textContent = "位置情報が取得できませんでした";
     });
   </script>
+
+
+	<script>
+	function toggleTimeline() {
+	  const tl = document.getElementById("timeline");
+	  const btn = document.getElementById("timeline-toggle");
+
+	  if (tl.style.display === "none" || tl.style.display === "") {
+	    tl.style.display = "block";
+	    renderTimeLabels();
+	    renderTimeline();
+	    btn.textContent = "📅 時間割を閉じる";
+	  } else {
+	    tl.style.display = "none";
+	    btn.textContent = "📅 今日の時間割を見る";
+	  }
+	}
+
+	function buildSchedulesFromLocalStorage(includeNextDay=false) {
+	  const today = new Date();
+	  const year = today.getFullYear();
+	  const month = today.getMonth() + 1;
+	  const day = today.getDate();
+
+	  const prefix = `ScheduledText${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
+	  const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
+
+	  const schedules = [];
+
+	  keys.forEach(key => {
+	    const raw = localStorage.getItem(key) ?? "";
+	    const text = raw.replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim();
+
+	    // 時間帯を抽出（分あり・なし・記号違い対応）
+	    const match = text.match(/(\d{1,2})時(?:\d{1,2}分)?\s*(?:-|から|〜|～)\s*(\d{1,2})時(?:\d{1,2}分)?/);
+
+	    if (match) {
+	      let start = parseInt(match[1], 10);
+	      let end = parseInt(match[2], 10);
+
+	      // 翌日扱い（25時=翌日1時、26時=翌日2時）
+	      if (includeNextDay) {
+	        if (end > 24) {
+	          end = end - 24; // 翌日の時間に変換
+	          // ただし「翌日分」として特別に今日の時間割に含める
+	        }
+	      } else {
+	        if (end > 24) end = 24; // 通常は今日の24時までで打ち切り
+	      }
+
+	      schedules.push({ text, start, end });
+	    } else {
+	      schedules.push({ text, start: null, end: null });
+	    }
+	  });
+
+	  return schedules;
+	}
+
+
+	function renderTimeline() {
+	  const container = document.getElementById("timeline-container");
+	  container.innerHTML = "";
+
+	  const schedules = buildSchedulesFromLocalStorage();
+	  const colors = ["#4a90e2", "#f5a623", "#00bfbf"];
+	  let colorIndex = 0;
+	  let hasTime = false;
+	  const placedBlocks = [];
+
+	  schedules.forEach(sch => {
+	    if (sch.start !== null && sch.end !== null) {
+	      hasTime = true;
+
+	      // 重なり判定：既存ブロックと時間帯がかぶっているか
+	      let overlapLevel = 0;
+	      for (let b of placedBlocks) {
+	        if (!(sch.end <= b.start || sch.start >= b.end)) {
+	          overlapLevel++;
+	        }
+	      }
+
+	      const block = document.createElement("div");
+	      block.style.position = "absolute";
+	      block.style.left = (20 + overlapLevel * 180) + "px"; // 右にずらす
+	      block.style.width = "160px"; // 横に伸ばす
+	      block.style.background = colors[colorIndex % colors.length];
+	      block.style.color = "#fff";
+	      block.style.padding = "2px";
+	      block.style.fontSize = "12px";
+	      block.style.borderRadius = "4px";
+
+	      const scale = 600 / 24;
+	      block.style.top = (sch.start * scale) + "px";
+	      block.style.height = ((sch.end - sch.start) * scale) + "px";
+
+	      block.textContent = sch.text;
+	      container.appendChild(block);
+	      placedBlocks.push({ start: sch.start, end: sch.end });
+	      colorIndex++;
+	    }
+	  });
+
+	  const note = document.getElementById("timeline-note");
+	  note.textContent = hasTime ? "" : "特になし";
+	}
+
+	function renderTimeLabels() {
+	  const labels = document.getElementById("time-labels");
+	  labels.innerHTML = "";
+	  for (let h = 0; h <= 24; h++) {
+	    const label = document.createElement("div");
+	    label.style.height = "25px";
+	    label.textContent = `${h}:00`;
+	    labels.appendChild(label);
+	  }
+	}
+	</script>
+
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+		    // --- Bottomボタンの表示制御 ---
+		    // ページ下端から100px手前までBottomボタンを表示
+		    // (docHeight - viewHeight - scrollY) は、残りのスクロール量
+		    if (docHeight - viewHeight - scrollY > scrollThreshold) {
+		        bottomBtn.style.display = "block";
+		    } else {
+		        bottomBtn.style.display = "none";
+		    }
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
   
   <footer>
-    © 20251209 ettomio
+    © 20251211 ettomio
   </footer>
-    
+
+  <div style="height: 50px;"></div>
+      
 </body>
 </html>
