@@ -145,7 +145,8 @@
     @media (min-width: 960px) {
       .page { max-width: 560px; width: 560px; }
     }
-    
+
+
 	/* 11/4 Top/Bottomボタン */
 	.bottom-button, .top-button {
 	    position: fixed;
@@ -2640,6 +2641,7 @@ const rokuyoData = [
 
 
 	<script>
+
 	function toggleTimeline() {
 	  const tl = document.getElementById("timeline");
 	  const btn = document.getElementById("timeline-toggle");
@@ -2655,37 +2657,38 @@ const rokuyoData = [
 	  }
 	}
 
-	function buildSchedulesFromLocalStorage(includeNextDay=false) {
-	  const today = new Date();
-	  const year = today.getFullYear();
-	  const month = today.getMonth() + 1;
-	  const day = today.getDate();
 
-	  const prefix = `ScheduledText${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
+	/* -------------------------------------------------
+	   LocalStorage から予定を取得し start/end を小数の時刻で返す
+	---------------------------------------------------*/
+	function buildSchedulesFromLocalStorage(includeNextDay = false) {
+	  const today = new Date();
+	  const prefix =
+	    `ScheduledText${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}_`;
+
 	  const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
 
 	  const schedules = [];
+
+	  const sep = '(?:[-\u2212\u2013\u2014〜～\\uFF5E]|から)';
+	  const timePart = '(\\d{1,2})(?:[:：](\\d{1,2})|時(?:\\s*(\\d{1,2})分)?)?';
+	  const fullRe = new RegExp(timePart + '\\s*' + sep + '\\s*' + timePart);
 
 	  keys.forEach(key => {
 	    const raw = localStorage.getItem(key) ?? "";
 	    const text = raw.replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim();
 
-	    // 時間帯を抽出（分あり・なし・記号違い対応）
-	    const match = text.match(/(\d{1,2})時(?:\d{1,2}分)?\s*(?:-|から|〜|～)\s*(\d{1,2})時(?:\d{1,2}分)?/);
+	    const m = text.match(fullRe);
+	    if (m) {
+	      const sHour = parseInt(m[1]);
+	      const sMin = m[2] ? parseInt(m[2]) : (m[3] ? parseInt(m[3]) : 0);
+	      const eHour = parseInt(m[4]);
+	      const eMin = m[5] ? parseInt(m[5]) : (m[6] ? parseInt(m[6]) : 0);
 
-	    if (match) {
-	      let start = parseInt(match[1], 10);
-	      let end = parseInt(match[2], 10);
+	      const start = sHour + sMin / 60;
+	      let end = eHour + eMin / 60;
 
-	      // 翌日扱い（25時=翌日1時、26時=翌日2時）
-	      if (includeNextDay) {
-	        if (end > 24) {
-	          end = end - 24; // 翌日の時間に変換
-	          // ただし「翌日分」として特別に今日の時間割に含める
-	        }
-	      } else {
-	        if (end > 24) end = 24; // 通常は今日の24時までで打ち切り
-	      }
+	      if (!includeNextDay && end < start) end += 24;
 
 	      schedules.push({ text, start, end });
 	    } else {
@@ -2697,53 +2700,100 @@ const rokuyoData = [
 	}
 
 
+	/* -------------------------------------------------
+	   タイムライン描画
+	---------------------------------------------------*/
 	function renderTimeline() {
 	  const container = document.getElementById("timeline-container");
 	  container.innerHTML = "";
 
 	  const schedules = buildSchedulesFromLocalStorage();
-	  const colors = ["#4a90e2", "#f5a623", "#00bfbf"];
+	  const colors = ["#4a90e2", "#f5a623", "#00bfbf", "#7b61ff", "#e64a19"];
+
 	  let colorIndex = 0;
 	  let hasTime = false;
 	  const placedBlocks = [];
 
+	  const isMobile = window.innerWidth <= 600;
+	  const scale = 600 / 24; // 24時間を 600px で表示（0〜24時）
+
 	  schedules.forEach(sch => {
 	    if (sch.start !== null && sch.end !== null) {
+
+	      // 24時以降は描画しない
+	      if (sch.start >= 24) return;
+
+	      let end = sch.end;
+	      if (end > 24) end = 24;
+
 	      hasTime = true;
 
-	      // 重なり判定：既存ブロックと時間帯がかぶっているか
+	      // ======== ▼ 重なり判定（overlapLevel） ========
 	      let overlapLevel = 0;
 	      for (let b of placedBlocks) {
-	        if (!(sch.end <= b.start || sch.start >= b.end)) {
+	        if (!(end <= b.start || sch.start >= b.end)) {
 	          overlapLevel++;
 	        }
 	      }
 
+	      // ======== ▼ ブロック生成 ========
 	      const block = document.createElement("div");
 	      block.style.position = "absolute";
-	      block.style.left = (20 + overlapLevel * 180) + "px"; // 右にずらす
-	      block.style.width = "160px"; // 横に伸ばす
+
+	      // ▼ スマホとPCで幅とオフセットを変える
+	      const containerWidth = container.clientWidth || window.innerWidth;
+	      const baseLeft = 20;
+	      const paddingRight = 10;
+
+	      const blockWidth = isMobile
+	        ? Math.min(140, containerWidth - 40)
+	        : 160;
+
+	      const offset = isMobile ? 80 : 180;
+
+	      let desiredLeft = baseLeft + overlapLevel * offset;
+
+	      // ======== ▼ はみ出し補正 ========
+	      const maxLeftAllowed = containerWidth - blockWidth - paddingRight;
+
+	      if (desiredLeft > maxLeftAllowed) {
+	        // はみ出す分を overlapLevel に応じて少し左に詰める（全部隠れないように）
+	        desiredLeft = Math.max(baseLeft, maxLeftAllowed - overlapLevel * 10);
+	      }
+
+	      block.style.left = desiredLeft + "px";
+	      block.style.width = blockWidth + "px";
+
 	      block.style.background = colors[colorIndex % colors.length];
 	      block.style.color = "#fff";
 	      block.style.padding = "2px";
 	      block.style.fontSize = "12px";
 	      block.style.borderRadius = "4px";
+	      block.style.boxSizing = "border-box";
 
-	      const scale = 600 / 24;
+	      // ======== ▼ 上下位置 ========
 	      block.style.top = (sch.start * scale) + "px";
-	      block.style.height = ((sch.end - sch.start) * scale) + "px";
+	      block.style.height = ((end - sch.start) * scale) + "px";
 
 	      block.textContent = sch.text;
+	      block.title = sch.text;
+
 	      container.appendChild(block);
-	      placedBlocks.push({ start: sch.start, end: sch.end });
+
+	      placedBlocks.push({ start: sch.start, end });
 	      colorIndex++;
 	    }
 	  });
 
+	  // ======== ▼ メモ（予定なし） ========
 	  const note = document.getElementById("timeline-note");
 	  note.textContent = hasTime ? "" : "特になし";
 	}
 
+
+	/* -------------------------------------------------
+	   時刻ラベル表示
+	---------------------------------------------------*/
 	function renderTimeLabels() {
 	  const labels = document.getElementById("time-labels");
 	  labels.innerHTML = "";
@@ -2756,53 +2806,55 @@ const rokuyoData = [
 	}
 
 
-	// ChatGPT 12/12 予定の表示を時間で並べ替え
+	/* -------------------------------------------------
+	   今日の予定表示（並び替え）
+	---------------------------------------------------*/
 	function showTodaySchedule() {
 	  const today = new Date();
-	  const year = today.getFullYear();
-	  const month = today.getMonth() + 1;
-	  const day = today.getDate();
+	  const prefix =
+	    `ScheduledText${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}_`;
 
-	  const prefix = `ScheduledText${year}${String(month).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
 	  const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
 
 	  let items = [];
 
+	  const sep = '(?:-|−|–|—|〜|～|から)';
+	  const time = '(\\d{1,2})(?:[:：](\\d{1,2})|時(?:\\s*(\\d{1,2})分)?)?';
+	  const re = new RegExp(time + '\\s*' + sep + '\\s*' + time);
+
 	  keys.forEach(key => {
 	    const raw = localStorage.getItem(key) ?? "";
 	    const text = raw.replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim();
+	    const m = text.match(re);
 
-	    // 時間抽出：例「13時〜17時」「9時から11時」「18時-21時」
-	    const match = text.match(/(\d{1,2})時.*?(?:-|から|〜|～)\s*(\d{1,2})時/);
+	    if (m) {
+	      const sh = parseInt(m[1], 10);
+	      const sm = m[2] ? parseInt(m[2], 10)
+	             : (m[3] ? parseInt(m[3], 10) : 0);
+	      const start = sh + sm / 60;
 
-	    if (match) {
-	      const start = parseInt(match[1], 10);
 	      items.push({ text, start });
 	    } else {
-	      // 時間のない予定
 	      items.push({ text, start: null });
 	    }
 	  });
 
-	  // ▼ 並び替え： start === null が先 → start の昇順
 	  items.sort((a, b) => {
 	    if (a.start === null && b.start === null) return 0;
-	    if (a.start === null) return -1;
-	    if (b.start === null) return 1;
+	    if (a.start === null) return 1;
+	    if (b.start === null) return -1;
 	    return a.start - b.start;
 	  });
 
-	  const output = items.length > 0
-	    ? items.map(i => i.text).join("<br>")
-	    : "-";
+	  const output = items.length ? items.map(i => i.text).join("<br>") : "-";
 
 	  const el = document.getElementById("schedule");
-	  if (el) {
-	    el.innerHTML = `予定 : <span class="highlight">${output}</span>`;
-	  }
+	  if (el) el.innerHTML = `予定 : <span class="highlight">${output}</span>`;
 	}
 
 	</script>
+
+
 
 	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
 		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
@@ -2885,7 +2937,7 @@ const rokuyoData = [
   </script>
   
   <footer>
-    © 20251212 ettomio
+    © 20251213 ettomio
   </footer>
 
   <div style="height: 50px;"></div>
