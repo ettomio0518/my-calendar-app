@@ -33,6 +33,21 @@
 	h2 { margin-top: 5px; margin-bottom: 10px; font-size: 1.3rem; color: #3a2a1a; }
 	h3 { margin-bottom: 10px; font-size: 1.1rem; color: #3a2a1a; }
 
+    button {
+        margin: 3px;
+        background-color: white;
+	    border: solid; 
+	    border-radius: 5px; 	            
+        }
+
+	.recent-button {
+        margin: 3px;
+        background-color: #ffddff;
+        color: #000000;       
+	    border: solid; 
+	    border-radius: 5px;
+	}
+		        
 	/* 今日のカード */
 	.card {
 	  border: 1px solid #ccc;
@@ -146,7 +161,28 @@
       .page { max-width: 560px; width: 560px; }
     }
 
+	.event-block {
+	  user-select: none;
+	  -webkit-user-select: none;
+	  cursor: pointer;
+	  pointer-events: auto; /* 念のため */
+	}
 
+
+	.custom-alert {
+	    position: fixed;
+	    top: 10px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background-color: #ffcccb;
+	    color: black;
+	    padding: 10px 20px;
+	    border: 1px solid red;
+	    border-radius: 5px;
+	    font-size: 16px;
+	    z-index: 1000;
+	}
+		
 	/* 11/4 Top/Bottomボタン */
 	.bottom-button, .top-button {
 	    position: fixed;
@@ -194,9 +230,14 @@
 	    <p id="schedule"></p>
 
 	    <!-- 時間割展開ボタン -->
-	    <div id="calendar-buttons-timeline" style="margin:8px 0;">
-	      <button id="timeline-toggle" onclick="toggleTimeline()">📅 今日の時間割を見る</button>
-	    </div>
+		<button id="timeline-toggle" onclick="toggleTimeline()">
+		  📅 今日の時間割
+		</button>
+
+		<button class="recent-button" onclick="announceNearestSchedule()">
+		  ⏰ 直近の予定を出力
+		</button>
+
 
 	    <!-- 時間軸 -->
 	    <div id="timeline" style="display:none; margin-top:10px;">
@@ -2653,10 +2694,47 @@ const rokuyoData = [
 	    btn.textContent = "📅 時間割を閉じる";
 	  } else {
 	    tl.style.display = "none";
-	    btn.textContent = "📅 今日の時間割を見る";
+	    btn.textContent = "📅 今日の時間割";
 	  }
 	}
 
+
+	function formatTime(decimal) {
+	  const h = Math.floor(decimal);
+	  const m = Math.round((decimal - h) * 60);
+	  if (m === 0) return `${h}時`;
+	  return `${h}時${m}分`;
+	}
+
+	function showCustomAlert(text) {
+	  const alert = document.createElement("div");
+	  alert.className = "custom-alert";
+	  alert.textContent = text;
+	  document.body.appendChild(alert);
+
+	  setTimeout(() => {
+	    alert.remove();
+	  }, 4000);
+	}
+
+	// 既存の音声再生関数
+	function speakText(text) {
+	   if ('speechSynthesis' in window) {
+	       const utterance = new SpeechSynthesisUtterance(text);
+	       window.speechSynthesis.speak(utterance);
+	   } else {
+	       alert("音声合成がサポートされていません");
+	   }
+	}
+
+	// 新しい音声合成関数
+	function nativeSpeak(text) {
+	   if (typeof Android !== 'undefined' && Android.speak) {
+	       Android.speak(text);
+	   } else {
+	       speakText(text); // Android.speakが使用できない場合はブラウザの音声合成を使用
+	   }
+	}
 
 	/* -------------------------------------------------
 	   LocalStorage から予定を取得し start/end を小数の時刻で返す
@@ -2700,6 +2778,23 @@ const rokuyoData = [
 	}
 
 
+	// ===== 時間帯表記を予定文から取り除く =====
+	// 例:
+	//  "9時から12時 テスト1"   → "テスト1"
+	//  "13:00−17:00 テスト3"   → "テスト3"
+	//  "14時30分～16時 会議"   → "会議"
+	//
+	// 読み上げやアラート表示用に、
+	// 「時間は別途（start/end）で扱い、内容だけを抽出」するための関数
+	function stripTimeRange(text) {
+	  return text.replace(
+	    // 時刻表記（時・分・:）＋ 区切り（-,〜,から 等）＋ 時刻表記
+	    /\d{1,2}(?:[:：]\d{2})?(?:時(?:\d{1,2}分)?)?\s*(?:-|−|–|—|〜|～|から)\s*\d{1,2}(?:[:：]\d{2})?(?:時(?:\d{1,2}分)?)?/,
+	    ""
+	  ).trim();
+	}
+
+
 	/* -------------------------------------------------
 	   タイムライン描画
 	---------------------------------------------------*/
@@ -2715,77 +2810,78 @@ const rokuyoData = [
 	  const placedBlocks = [];
 
 	  const isMobile = window.innerWidth <= 600;
-	  const scale = 600 / 24; // 24時間を 600px で表示（0〜24時）
+	  const scale = 600 / 24; // 24時間 → 600px
 
 	  schedules.forEach(sch => {
-	    if (sch.start !== null && sch.end !== null) {
+	    if (sch.start === null || sch.end === null) return;
+	    if (sch.start >= 24) return;
 
-	      // 24時以降は描画しない
-	      if (sch.start >= 24) return;
+	    let end = sch.end;
+	    if (end > 24) end = 24;
 
-	      let end = sch.end;
-	      if (end > 24) end = 24;
+	    hasTime = true;
 
-	      hasTime = true;
+    // ===== 重なり判定 =====
+    let overlapLevel = 0;
+    for (let b of placedBlocks) {
+      if (!(end <= b.start || sch.start >= b.end)) {
+        overlapLevel++;
+      }
+    }
 
-	      // ======== ▼ 重なり判定（overlapLevel） ========
-	      let overlapLevel = 0;
-	      for (let b of placedBlocks) {
-	        if (!(end <= b.start || sch.start >= b.end)) {
-	          overlapLevel++;
-	        }
-	      }
+    // ===== ブロック生成 =====
+    const block = document.createElement("div");
+    block.className = "event-block";
+    block.style.position = "absolute";
 
-	      // ======== ▼ ブロック生成 ========
-	      const block = document.createElement("div");
-	      block.style.position = "absolute";
+    const containerWidth = container.clientWidth || window.innerWidth;
+    const baseLeft = 20;
+    const paddingRight = 10;
 
-	      // ▼ スマホとPCで幅とオフセットを変える
-	      const containerWidth = container.clientWidth || window.innerWidth;
-	      const baseLeft = 20;
-	      const paddingRight = 10;
+    const blockWidth = isMobile
+      ? Math.min(140, containerWidth - 40)
+      : 160;
 
-	      const blockWidth = isMobile
-	        ? Math.min(140, containerWidth - 40)
-	        : 160;
+    const offset = isMobile ? 80 : 180;
 
-	      const offset = isMobile ? 80 : 180;
+    let left = baseLeft + overlapLevel * offset;
+    const maxLeft = containerWidth - blockWidth - paddingRight;
+    if (left > maxLeft) {
+      left = Math.max(baseLeft, maxLeft - overlapLevel * 10);
+    }
 
-	      let desiredLeft = baseLeft + overlapLevel * offset;
+    block.style.left = left + "px";
+    block.style.width = blockWidth + "px";
 
-	      // ======== ▼ はみ出し補正 ========
-	      const maxLeftAllowed = containerWidth - blockWidth - paddingRight;
+    block.style.background = colors[colorIndex % colors.length];
+    block.style.color = "#fff";
+    block.style.padding = "2px";
+    block.style.fontSize = "12px";
+    block.style.borderRadius = "4px";
+    block.style.boxSizing = "border-box";
+    block.style.cursor = "pointer";
 
-	      if (desiredLeft > maxLeftAllowed) {
-	        // はみ出す分を overlapLevel に応じて少し左に詰める（全部隠れないように）
-	        desiredLeft = Math.max(baseLeft, maxLeftAllowed - overlapLevel * 10);
-	      }
+    block.style.top = (sch.start * scale) + "px";
+    block.style.height = ((end - sch.start) * scale) + "px";
 
-	      block.style.left = desiredLeft + "px";
-	      block.style.width = blockWidth + "px";
+    block.textContent = sch.text;
 
-	      block.style.background = colors[colorIndex % colors.length];
-	      block.style.color = "#fff";
-	      block.style.padding = "2px";
-	      block.style.fontSize = "12px";
-	      block.style.borderRadius = "4px";
-	      block.style.boxSizing = "border-box";
+    // ===== クリック処理 =====
+	block.addEventListener("click", () => {
+	  const cleanText = stripTimeRange(sch.text);
 
-	      // ======== ▼ 上下位置 ========
-	      block.style.top = (sch.start * scale) + "px";
-	      block.style.height = ((end - sch.start) * scale) + "px";
+	  const msg =
+	    `${formatTime(sch.start)}から${formatTime(end)}まで、${cleanText}`;
 
-	      block.textContent = sch.text;
-	      block.title = sch.text;
+	  showCustomAlert(msg);
+	  nativeSpeak(msg);
+	});
 
-	      container.appendChild(block);
-
-	      placedBlocks.push({ start: sch.start, end });
-	      colorIndex++;
-	    }
+	    container.appendChild(block);
+	    placedBlocks.push({ start: sch.start, end });
+	    colorIndex++;
 	  });
 
-	  // ======== ▼ メモ（予定なし） ========
 	  const note = document.getElementById("timeline-note");
 	  note.textContent = hasTime ? "" : "特になし";
 	}
@@ -2850,6 +2946,60 @@ const rokuyoData = [
 
 	  const el = document.getElementById("schedule");
 	  if (el) el.innerHTML = `予定 : <span class="highlight">${output}</span>`;
+	}
+
+
+	function getNowDecimalHour() {
+	  const now = new Date();
+	  return now.getHours() + now.getMinutes() / 60;
+	}
+
+	function getNearestSchedules(schedules) {
+	  const now = getNowDecimalHour();
+
+	  // 終了済みを除外し、開始時刻順にソート
+	  const future = schedules
+	    .filter(s => s.end > now)
+	    .sort((a, b) => a.start - b.start);
+
+	  if (future.length === 0) return [];
+
+	  // 現在進行中の予定
+	  const current = future.find(
+	    s => s.start <= now && now < s.end
+	  );
+
+	  if (current) {
+	    const idx = future.indexOf(current);
+	    return future.slice(idx, idx + 2); // 現在＋次
+	  }
+
+	  // 現在中がなければ次の予定1つ
+	  return [future[0]];
+	}
+
+
+	function announceNearestSchedule() {
+	  const schedules = buildSchedulesFromLocalStorage();
+	  const targets = getNearestSchedules(schedules);
+
+	  if (targets.length === 0) {
+	    showCustomAlert("直近の予定はありません。");
+	    nativeSpeak("直近の予定はありません。");
+	    return;
+	  }
+
+	  const messages = targets.map(s => {
+	    return `${formatTime(s.start)}から${formatTime(s.end)}まで、${stripTimeRange(s.text)}`;
+	  });
+
+	  const message =
+	    messages.length === 2
+	      ? `現在の予定と次の予定です。${messages[0]}。次は、${messages[1]}。`
+	      : `次の予定は、${messages[0]}です。`;
+
+	  showCustomAlert(message);
+	  nativeSpeak(message);
 	}
 
 	</script>
@@ -2937,10 +3087,10 @@ const rokuyoData = [
   </script>
   
   <footer>
-    © 20251213 ettomio
+    © 20251214 ettomio
   </footer>
 
-  <div style="height: 50px;"></div>
+  <div style="height: 60px;"></div>
       
 </body>
 </html>
