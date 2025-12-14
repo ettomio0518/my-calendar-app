@@ -755,7 +755,7 @@
 		<div id="customDialog" style="display:none;" class="dialog-overlay">
 		  <div class="dialog-box">
 		    <h3>どちらに進みますか？</h3>
-		    <button id="btnSchedule">今日の予定を音声出力</button>
+		    <button id="btnSchedule">今日のカード</button>
 		    <button id="btnSearch7">予定を音声入力</button>
 		    <button id="btnSearch">高機能検索に進む</button>
 		    <button id="btnSearch2">メモに進む</button>
@@ -2038,11 +2038,16 @@
 		    };
 
 		    // 各ボタンの処理設定
-		    document.getElementById("btnSchedule").onclick = () => {
-		        speakTodaySchedule();
-		        hideDialog();
-		    };
+		    // document.getElementById("btnSchedule").onclick = () => {
+		    //     speakTodaySchedule();
+		    //    hideDialog();
+		    // };
 
+		    // 各ボタンの処理設定 12/14 変更
+		    document.getElementById("btnSchedule").onclick = () => {
+		        window.location.href = "today-card.html";
+		    };
+		    
 		    // 10/8追加
 			document.getElementById("btnSearch7").onclick = () => {
 			    document.getElementById("voiceInputButton2").style.display = "inline-block"; 
@@ -2557,7 +2562,7 @@
   </script>
 
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 15.2 (2025-12-13)</p>
+	 © 2025 ettomio. All rights reserved. | Version 15.3 (2025-12-14)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
