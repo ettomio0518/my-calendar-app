@@ -2816,69 +2816,75 @@ const rokuyoData = [
 	    if (sch.start === null || sch.end === null) return;
 	    if (sch.start >= 24) return;
 
-	    let end = sch.end;
-	    if (end > 24) end = 24;
+	    // ===== 実際の終了時刻（読み上げ用） =====
+	    const realEnd = sch.end;
+
+	    // ===== 表示用終了時刻（24時で丸める） =====
+	    let displayEnd = sch.end;
+	    if (displayEnd > 24) displayEnd = 24;
 
 	    hasTime = true;
 
-    // ===== 重なり判定 =====
-    let overlapLevel = 0;
-    for (let b of placedBlocks) {
-      if (!(end <= b.start || sch.start >= b.end)) {
-        overlapLevel++;
-      }
-    }
+	    // ===== 重なり判定（表示用で判定） =====
+	    let overlapLevel = 0;
+	    for (let b of placedBlocks) {
+	      if (!(displayEnd <= b.start || sch.start >= b.end)) {
+	        overlapLevel++;
+	      }
+	    }
 
-    // ===== ブロック生成 =====
-    const block = document.createElement("div");
-    block.className = "event-block";
-    block.style.position = "absolute";
+	    // ===== ブロック生成 =====
+	    const block = document.createElement("div");
+	    block.className = "event-block";
+	    block.style.position = "absolute";
 
-    const containerWidth = container.clientWidth || window.innerWidth;
-    const baseLeft = 20;
-    const paddingRight = 10;
+	    const containerWidth = container.clientWidth || window.innerWidth;
+	    const baseLeft = 20;
+	    const paddingRight = 10;
 
-    const blockWidth = isMobile
-      ? Math.min(140, containerWidth - 40)
-      : 160;
+	    const blockWidth = isMobile
+	      ? Math.min(140, containerWidth - 40)
+	      : 160;
 
-    const offset = isMobile ? 80 : 180;
+	    const offset = isMobile ? 80 : 180;
 
-    let left = baseLeft + overlapLevel * offset;
-    const maxLeft = containerWidth - blockWidth - paddingRight;
-    if (left > maxLeft) {
-      left = Math.max(baseLeft, maxLeft - overlapLevel * 10);
-    }
+	    let left = baseLeft + overlapLevel * offset;
+	    const maxLeft = containerWidth - blockWidth - paddingRight;
+	    if (left > maxLeft) {
+	      left = Math.max(baseLeft, maxLeft - overlapLevel * 10);
+	    }
 
-    block.style.left = left + "px";
-    block.style.width = blockWidth + "px";
+	    block.style.left = left + "px";
+	    block.style.width = blockWidth + "px";
 
-    block.style.background = colors[colorIndex % colors.length];
-    block.style.color = "#fff";
-    block.style.padding = "2px";
-    block.style.fontSize = "12px";
-    block.style.borderRadius = "4px";
-    block.style.boxSizing = "border-box";
-    block.style.cursor = "pointer";
+	    block.style.background = colors[colorIndex % colors.length];
+	    block.style.color = "#fff";
+	    block.style.padding = "2px";
+	    block.style.fontSize = "12px";
+	    block.style.borderRadius = "4px";
+	    block.style.boxSizing = "border-box";
+	    block.style.cursor = "pointer";
 
-    block.style.top = (sch.start * scale) + "px";
-    block.style.height = ((end - sch.start) * scale) + "px";
+	    // ===== 上下位置（表示用） =====
+	    block.style.top = (sch.start * scale) + "px";
+	    block.style.height = ((displayEnd - sch.start) * scale) + "px";
 
-    block.textContent = sch.text;
+	    // 表示テキストは元のまま（27時など含む）
+	    block.textContent = sch.text;
 
-    // ===== クリック処理 =====
-	block.addEventListener("click", () => {
-	  const cleanText = stripTimeRange(sch.text);
-
-	  const msg =
-	    `${formatTime(sch.start)}から${formatTime(end)}まで、${cleanText}`;
-
-	  showCustomAlert(msg);
-	  nativeSpeak(msg);
-	});
+	    // ===== クリック処理（正確な時刻で読み上げ） =====
+	    block.addEventListener("click", () => {
+	      const cleanText = stripTimeRange(sch.text);
+	      const msg =
+	        `${formatTime(sch.start)}から${formatTime(realEnd)}まで、${cleanText}`;
+	      showCustomAlert(msg);
+	      nativeSpeak(msg);
+	    });
 
 	    container.appendChild(block);
-	    placedBlocks.push({ start: sch.start, end });
+
+	    // 重なり管理は表示用の終了時刻で
+	    placedBlocks.push({ start: sch.start, end: displayEnd });
 	    colorIndex++;
 	  });
 
@@ -3087,7 +3093,7 @@ const rokuyoData = [
   </script>
   
   <footer>
-    © 20251214 ettomio
+    © 20251215 ettomio
   </footer>
 
   <div style="height: 60px;"></div>
