@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>走り書き</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #ffffcc;
+  }
+  header {
+    background: #8080ff;
+    color: #fff;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+  }
+  header button {
+    position: absolute;
+    right: 16px;
+    padding: 6px 14px;
+    border-radius: 18px;
+    border: 1px solid #333;
+    background: #e0ffff;
+    cursor: pointer;
+  }
+  button {
+      margin: 3px;
+      background-color: white;
+      border: solid; 
+      border-radius: 5px; 	            
+      }  
+    
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #cfe8e8;
+    padding: 20px;
+  }
+  .date-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .date-row input[type="date"] {
+    padding: 4px 6px;
+  }
+  .date-row button {
+    padding: 4px 10px;
+  }
+  textarea {
+    width: 100%;
+    height: 200px;
+    box-sizing: border-box;
+    font-size: 1rem;
+  }
+  .action-row {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  .action-row button {
+    padding: 6px 16px;
+    font-size: 1rem;
+  }
+  .warn {
+    color: red;
+    margin-top: 10px;
+  }
+  footer {
+    text-align: center;
+    padding: 12px;
+  }	  
+</style>
+</head>
+<body>
+<header>
+  <h1>走り書き</h1>
+  <button onclick="location.href='today-card.html'">戻る</button>
+</header>
+
+<main>
+  <div class="date-row">
+    <label>日付:</label>
+    <input type="date" id="dateInput">
+    <button onclick="moveDate(-1)">◁</button>
+    <button onclick="setToday()">今日</button>
+    <button onclick="moveDate(1)">▷</button>
+  </div>
+
+  <textarea id="memo" placeholder="アイデア・買い物メモなど自由に走り書き"></textarea>
+
+    <div class="action-row">
+    <button onclick="saveMemo()">保存</button>
+    <button onclick="deleteMemo()">破棄</button>
+    <button onclick="deleteOldMemos()">7日以上前を破棄</button>
+  </div>
+
+  <p class="warn">雑記ですので逐一データは破棄してください。容量を圧迫してしまいます。</p>
+</main>
+
+<script>
+  const dateInput = document.getElementById('dateInput');
+  const memo = document.getElementById('memo');
+
+  function formatKey(date) {
+    return 'scribbling_' + date.replace(/-/g, '');
+  }
+
+  function loadMemo() {
+    const key = formatKey(dateInput.value);
+    memo.value = localStorage.getItem(key) || '';
+  }
+
+  function saveMemo() {
+    const key = formatKey(dateInput.value);
+    localStorage.setItem(key, memo.value);
+    alert('保存しました');
+  }
+
+  function deleteMemo() {
+    const key = formatKey(dateInput.value);
+    localStorage.removeItem(key);
+    memo.value = '';
+    alert('破棄しました');
+  }
+
+  function deleteOldMemos() {
+    const now = new Date();
+    let count = 0;
+
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (!key.startsWith('scribbling_')) continue;
+
+      const dateStr = key.replace('scribbling_', '');
+      const y = dateStr.substring(0, 4);
+      const m = dateStr.substring(4, 6);
+      const d = dateStr.substring(6, 8);
+      const memoDate = new Date(`${y}-${m}-${d}`);
+
+      const diffDays = (now - memoDate) / (1000 * 60 * 60 * 24);
+      if (diffDays >= 7) {
+        localStorage.removeItem(key);
+        count++;
+      }
+    }
+
+    alert(`${count}件の走り書きを破棄しました`);
+  }
+
+  function setToday() {
+    const today = new Date();
+    dateInput.valueAsDate = today;
+    loadMemo();
+  }
+
+  function moveDate(diff) {
+    const d = dateInput.valueAsDate;
+    d.setDate(d.getDate() + diff);
+    dateInput.valueAsDate = d;
+    loadMemo();
+  }
+
+  dateInput.addEventListener('change', loadMemo);
+
+  // 初期表示：今日
+  setToday();
+</script>
+
+  <footer>
+    © 20251217 ettomio
+  </footer>
+  
+</body>
+</html>
