@@ -159,17 +159,28 @@
   }
 
   function setToday() {
-    const today = new Date();
-    dateInput.valueAsDate = today;
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    dateInput.value = `${y}-${m}-${d}`;
     loadMemo();
   }
 
+
   function moveDate(diff) {
-    const d = dateInput.valueAsDate;
+    const parts = dateInput.value.split('-');
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
     d.setDate(d.getDate() + diff);
-    dateInput.valueAsDate = d;
+
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    dateInput.value = `${y}-${m}-${day}`;
+
     loadMemo();
   }
+
 
   dateInput.addEventListener('change', loadMemo);
 
@@ -178,7 +189,7 @@
 </script>
 
   <footer>
-    © 20251217 ettomio
+    © 20251218 ettomio
   </footer>
   
 </body>
