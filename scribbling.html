@@ -44,14 +44,18 @@
 
   .save-button {
     background: #ffecff;
-    padding: 2px 8px;     /* ← 縦を詰める */
+    min-width: 72px;
+    padding: 8px 14px;
     font-size: 15px;
+    white-space: nowrap;
     line-height: 1.2;
   }
   .button2 {
     background: #fff2e6;
-    padding: 2px 8px;     /* ← 縦を詰める */
+    min-width: 72px;
+    padding: 8px 14px;
     font-size: 15px;
+    white-space: nowrap;
     line-height: 1.2;
   }
             
@@ -105,7 +109,8 @@
     margin-top: 6px;
     font-size: 14px;
   }
-  
+
+
 </style>
 </head>
 <body>
@@ -116,7 +121,7 @@
 
 <main>
   <div class="date-row">
-    <label>日付:</label>
+	<!-- 日付ラベル削除 -->
 
     <button onclick="moveDate(-1)">◁</button>
     <button onclick="setToday()">今日</button>
