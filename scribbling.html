@@ -35,11 +35,26 @@
   
   button {
     margin: 3px;
-    background-color: white;
-    border: 1px solid #444;   /* ← 太さを明示 */
+    background-color: #dcfedd;
+    border: 1px solid #444;
     border-radius: 5px;
+    font-size: 15px;       /* ← 明示 */
+    line-height: 1.2;      /* ← 超重要 */
   }
-    
+
+  .save-button {
+    background: #ffecff;
+    padding: 2px 8px;     /* ← 縦を詰める */
+    font-size: 15px;
+    line-height: 1.2;
+  }
+  .button2 {
+    background: #fff2e6;
+    padding: 2px 8px;     /* ← 縦を詰める */
+    font-size: 15px;
+    line-height: 1.2;
+  }
+            
   main {
     max-width: 720px;
     margin: 0 auto;
@@ -80,7 +95,17 @@
   footer {
     text-align: center;
     padding: 12px;
-  }	  
+  }	 
+
+  .action-row {
+    margin-top: 6px;   /* 今より少し詰める */
+  }
+
+  .notice {
+    margin-top: 6px;
+    font-size: 14px;
+  }
+  
 </style>
 </head>
 <body>
@@ -102,9 +127,9 @@
   <textarea id="memo" placeholder="アイデア・買い物メモなど自由に走り書き"></textarea>
 
     <div class="action-row">
-    <button onclick="saveMemo()">保存</button>
-    <button onclick="deleteMemo()">破棄</button>
-    <button onclick="deleteOldMemos()">7日以上前を破棄</button>
+    <button class="save-button" onclick="saveMemo()">💾 保存</button>
+    <button class="button2" onclick="deleteMemo()">破棄</button>
+    <button class="button2" onclick="deleteOldMemos()">7日以上前を破棄</button>
   </div>
 
   <p class="warn">雑記ですので逐一データは破棄してください。容量を圧迫してしまいます。</p>
@@ -191,7 +216,7 @@
 </script>
 
   <footer>
-    © 20251218 ettomio
+    © 20251219 ettomio
   </footer>
   
 </body>
