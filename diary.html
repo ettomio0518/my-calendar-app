@@ -36,13 +36,15 @@
             font-size: 18px;
             color: blue;
         }
-        .input-row {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            width: 100%;
-        }
+		.input-row {
+		  display: flex;
+		  flex-direction: column;
+		  align-items: flex-start;
+		  gap: 10px;              /* ← これを追加 */
+		  margin-bottom: 10px;
+		  width: 100%;
+		}
+
         .input-row label, .input-row input, .input-row textarea, .input-row button {
             margin: 5px;
         }
@@ -63,11 +65,11 @@
         }
         table {
             width: 100%;
-            border-collapse: collapse;
+			border-collapse: collapse; /* ← 重要 */            
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+			padding: 6px 6px;   /* ← ここを詰める */
             text-align: left;
             word-wrap: break-word;
             white-space: pre-wrap;
@@ -112,7 +114,6 @@
 		  font-size: 14px;
 		  border-radius: 6px;
 		}
-
         
         .save-button {
             padding: 3px 10px;
@@ -207,7 +208,21 @@
 	      text-align: center;
 	      padding: 12px;
 	    }	   
-  	                
+
+		.list-title {
+		  margin: 6px 0 6px;
+		  font-weight: bold;
+		}
+
+		@media (max-width: 600px) {
+		  th, td {
+		    padding: 4px 4px;
+		    font-size: 14.5px;
+			line-height: 1.4;
+		  }
+		}
+
+
     </style>
 </head>
 <body>
@@ -249,8 +264,7 @@
 
     </div>
 
-    <p>日記を表示</p>
-
+	<p class="list-title">日記を表示</p>
 
     <div id="monthSelection">
       <label for="monthInput">月を選択:</label>
@@ -277,39 +291,39 @@
     }
 
 
-function loadDiaryByDate(dateStr) {
-  const key = `diary_${dateStr.replace(/-/g, '')}`;
-  const saved = localStorage.getItem(key);
-  document.getElementById('diaryContent').value = saved ? saved : '';
-}
+	function loadDiaryByDate(dateStr) {
+	  const key = `diary_${dateStr.replace(/-/g, '')}`;
+	  const saved = localStorage.getItem(key);
+	  document.getElementById('diaryContent').value = saved ? saved : '';
+	}
 
 
     // 今日をセット
-function setToday() {
-  const today = getTodayStr();
-  document.getElementById('date').value = today;
-  loadDiaryByDate(today);
-}
+	function setToday() {
+	  const today = getTodayStr();
+	  document.getElementById('date').value = today;
+	  loadDiaryByDate(today);
+	}
 
 
     // 前日・翌日へ移動
-function changeDate(diff) {
-  const dateInput = document.getElementById('date');
-  if (!dateInput.value) {
-    setToday();
-    return;
-  }
-  const d = new Date(dateInput.value);
-  d.setDate(d.getDate() + diff);
+	function changeDate(diff) {
+	  const dateInput = document.getElementById('date');
+	  if (!dateInput.value) {
+	    setToday();
+	    return;
+	  }
+	  const d = new Date(dateInput.value);
+	  d.setDate(d.getDate() + diff);
 
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  const newDate = `${y}-${m}-${day}`;
+	  const y = d.getFullYear();
+	  const m = String(d.getMonth() + 1).padStart(2, '0');
+	  const day = String(d.getDate()).padStart(2, '0');
+	  const newDate = `${y}-${m}-${day}`;
 
-  dateInput.value = newDate;
-  loadDiaryByDate(newDate);
-}
+	  dateInput.value = newDate;
+	  loadDiaryByDate(newDate);
+	}
 
 
     // 初期表示は今日
@@ -329,18 +343,18 @@ function changeDate(diff) {
     }
 
     // 日付変更時 mm/dd を本文へ転送
-document.getElementById('date').addEventListener('change', function () {
-  const selectedDate = this.value;
-  if (!selectedDate) return;
+	document.getElementById('date').addEventListener('change', function () {
+	  const selectedDate = this.value;
+	  if (!selectedDate) return;
 
-  loadDiaryByDate(selectedDate);
+	  loadDiaryByDate(selectedDate);
 
-  const mmdd = selectedDate.slice(5).replace('-', '/');
-  const diaryContent = document.getElementById('diaryContent');
-  if (!diaryContent.value.startsWith(mmdd)) {
-    diaryContent.value = mmdd + ' ' + diaryContent.value;
-  }
-});
+	  const mmdd = selectedDate.slice(5).replace('-', '/');
+	  const diaryContent = document.getElementById('diaryContent');
+	  if (!diaryContent.value.startsWith(mmdd)) {
+	    diaryContent.value = mmdd + ' ' + diaryContent.value;
+	  }
+	});
 
 
     function saveDiary() {
@@ -525,7 +539,7 @@ document.getElementById('date').addEventListener('change', function () {
   
   <footer>
     <br><br>
-    © 20251218 ettomio
+    © 20251219 ettomio
   </footer>
   <div style="height: 50px;"></div>
   
