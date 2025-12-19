@@ -320,7 +320,7 @@
 		    animation: blink 1s infinite; 
 		}
 
-		/* 11/5 Top/Bottomボタン */
+		/* 11/4 Top/Bottomボタン */
 		.bottom-button, .top-button {
 		    position: fixed;
 		    bottom: 20px;
@@ -339,7 +339,7 @@
 		}
 		.bottom-button:hover, .top-button:hover {
 		    background: #0056b3;
-		}
+		}    
 		
         /* 予定がある日の背景色 6/4 */
         .has-schedule {
@@ -758,7 +758,7 @@
 		    <button id="btnSchedule">今日のカード</button>
 		    <button id="btnSearch7">予定を音声入力</button>
 		    <button id="btnSearch">高機能検索に進む</button>
-		    <button id="btnSearch2">メモに進む</button>
+		    <button id="btnSearch2">ノートに進む</button>
 		    <button id="btnSearch3">簡易日記に進む</button>
 		    <button id="btnSearch4">お買い物電卓に進む</button>
 		    <button id="btnSearch5">QRコードリーダーに進む</button>
@@ -2060,7 +2060,7 @@
 		    };
 
 		    document.getElementById("btnSearch2").onclick = () => {
-		        window.location.href = "メモ.html";
+		        window.location.href = "notepad.html";
 		    };
 
 		    document.getElementById("btnSearch3").onclick = () => {
@@ -2143,7 +2143,7 @@
         <button onclick="location.href='お買い物計算.html'">お買い物電卓</button>
 	    <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>        
         <br><br>
-        <button onclick="location.href='メモ.html'">メモ表示</button>
+        <button onclick="location.href='notepad.html'">ノート表示</button>
 
         <button onclick="location.href='diary.html'">簡易日記</button>
 
@@ -2476,93 +2476,90 @@
   </script>
 
 
-    <!-- スクロールで表示されるTopボタン 11/5 -->
-    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
-	<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
-    <!--  <div style="height: 30px;"></div> -->
-    
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
   <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
 
-    // ==========================================================
-    // ★ スクロールボタン制御 (Top/Bottom) 11/5
-    // ==========================================================
-
-    function scrollToTop() {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function scrollToBottom() {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }
-
-    function hideScrollButtons() {
-        document.getElementById("topBtn").style.display = "none";
-        document.getElementById("bottomBtn").style.display = "none";
-    }
-
-    // ★ スクロールボタン制御 (Top/Bottom) 11/6書き換え
-	function showScrollButtonsIfPageLong() {
-	    const topBtn = document.getElementById("topBtn");
-	    const bottomBtn = document.getElementById("bottomBtn");
-	    
-	    // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
-	    const scrollThreshold = 300;
-	    const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
-
-	    if (!isScrollable) {
-	        hideScrollButtons();
-	        return;
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
 	    }
 
-	    // ページが長い場合のスクロール位置による制御
-	    const scrollY = window.scrollY;
-	    const docHeight = document.body.scrollHeight;
-	    const viewHeight = window.innerHeight;
-	    const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
-	    
-	    // スクロール位置の判定
-	    if (scrollY > scrollThreshold) {
-	        // [ケース1] ある程度スクロールした -> Topボタンを表示 (Bottomボタンは非表示)
-	        topBtn.style.display = "block";
-	        bottomBtn.style.display = "none";
-	    } else if (scrollY === 0 && bottomMargin > scrollThreshold) {
-	        // [ケース2 - 修正箇所] ページ最上部（scrollY=0）にいる場合 -> Bottomボタンを非表示
-	        topBtn.style.display = "none";
-	        bottomBtn.style.display = "none"; 
-	    } else if (bottomMargin > scrollThreshold) {
-	        // [ケース3] ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
-	        // ただし、このelse ifに到達するのは scrollY > 0 の時のみ (ケース2で弾かれるため)
-	        topBtn.style.display = "none";
-	        bottomBtn.style.display = "block";
-	    } else {
-	        // [ケース4] ページの下端近くにいる
-	        topBtn.style.display = "none";
-	        bottomBtn.style.display = "none";
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 	    }
-	}
-	
-    // スクロール時のボタン表示制御
-    window.addEventListener("scroll", showScrollButtonsIfPageLong);
-    
-    // 初期ロード時にもボタン表示をチェック
-    window.addEventListener("load", showScrollButtonsIfPageLong);
-    
-    // 画面サイズ変更時にもチェック (スマホの向き変更など)
-    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+			// --- Bottomボタンの表示制御 ---
+			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
+			if (
+			    scrollY > scrollThreshold &&
+			    docHeight - viewHeight - scrollY > scrollThreshold
+			) {
+			    bottomBtn.style.display = "block";
+			} else {
+			    bottomBtn.style.display = "none";
+			}
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
 
 
-    // ==========================================================
-    // ★ 初期化
-    // ==========================================================
-    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
-    document.addEventListener('DOMContentLoaded', () => {
-        showScrollButtonsIfPageLong();
-    });
-    
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
   </script>
-
+  
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 15.7 (2025-12-19)</p>
+	 © 2025 ettomio. All rights reserved. | Version 15.8 (2025-12-20)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
