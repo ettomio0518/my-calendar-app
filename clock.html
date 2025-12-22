@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デジタル＆アナログ時計</title>
+    <style>
+        /* 全体スタイル */
+        body {
+            font-family: Arial, sans-serif;
+                        color: #ffff00; /* 黄色 */
+            text-align: center;
+            background: linear-gradient(to bottom, #400040,  #000066);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .date {
+            font-size: 1.8em;
+            margin-bottom: 0.1em;
+        }
+        .weekday {
+            font-size: 1.5em;
+            margin-bottom: 0.2em;
+        }        
+        .time {
+            font-size: 2em;
+            margin-bottom: 1em;
+        }
+        
+        button {
+            font-size: 16px;
+            padding: 5px 20px;
+		    padding-top: 3px;	
+		    padding-bottom: 3px;            
+            margin: 10px 5px;
+            border-radius: 8px;
+            border-color: #ffccff;            
+            width: 100%;
+            max-width: 200px;
+            background-color: #bfffff;
+        }       
+
+		/* 「世界の時刻」ボタンだけスタイルを変更 */
+		.worldtime-button {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding-top: 2px;	
+		    padding-bottom: 2px;	
+            max-width: 130px;		    
+		    background-color: #ffffe1; /* 背景色も変更可能 */
+    		margin-bottom: 0px;		    
+		}  
+
+		/* 「Homeに戻る」ボタンだけスタイルを変更 */
+		.bottom-home-button {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding-top: 2px;	
+		    padding-bottom: 2px;
+            max-width: 150px;		    
+		    background-color: #ceffff; /* 背景色も変更可能 */
+    		margin-top: 0px;		    
+		}  
+		
+        /* 横並びを実現 */
+        .inline-elements {
+            display: flex;           /* 横並びにする */
+            justify-content: center; /* 水平方向に中央揃え */
+            align-items: center;     /* 垂直方向に中央揃え */
+            width: 100%;             /* 親要素が全幅を占める */
+        }
+        .weekday {
+            font-size: 18px;
+            white-space: nowrap;     /* 改行防止 */
+            margin-right: 20px;      /* 曜日とボタンの間に余白 */
+        }
+        
+		/* 「時報」ボタンだけスタイルを変更 */        
+		#timeButton {
+		    font-size: 16px;         /* ボタンの文字サイズを変更 */
+		    padding: 5px 20px;      /* ボタンの内側の余白（縦×横） */
+		    width: auto;             /* ボタンの幅を自動調整 */
+		    height: 35px;            /* ボタンの高さを指定 */
+		    cursor: pointer;        /* ボタンにカーソルを合わせたときに手のひらアイコン */
+    		margin-left: 20px;
+		    background-color: #bfffff;    		
+		}
+
+	</style>
+
+        		      
+		
+		<style>
+        /* デジタル時計スタイル */
+        .date, .weekday, .time {
+            margin: 0.2em 0;
+        }
+        .date { font-size: 1.8em; }
+        .weekday { font-size: 1.5em; }
+        .time { font-size: 2em; }
+        
+    	</style>
+        
+		<body>
+		<div class="date" id="current-date"></div>
+		
+	    <div class="inline-elements">
+	        <div class="weekday" id="current-weekday"></div>
+	        <button id="timeButton">時報</button>
+	    </div>
+
+		
+		<div class="time" id="current-time"></div>
+
+		<script>
+	    function updateClock() {
+	        const now = new Date();
+
+	        // yyyy/mm/dd形式の西暦日付
+	        const year = now.getFullYear();
+	        const month = String(now.getMonth() + 1).padStart(2, '0');
+	        const date = String(now.getDate()).padStart(2, '0');
+	        const westernDate = `${year}/${month}/${date}`;
+
+	        // 和暦の計算
+	        const eraData = [
+	            { name: '令和', start: new Date(2019, 4, 1) },
+	            { name: '平成', start: new Date(1989, 0, 8) },
+	            { name: '昭和', start: new Date(1926, 11, 25) },
+	            { name: '大正', start: new Date(1912, 6, 30) },
+	            { name: '明治', start: new Date(1868, 0, 25) }
+	        ];
+	        let era, eraYear;
+	        for (let i = 0; i < eraData.length; i++) {
+	            if (now >= eraData[i].start) {
+	                era = eraData[i].name;
+	                eraYear = now.getFullYear() - eraData[i].start.getFullYear() + 1;
+	                break;
+	            }
+	        }
+	        const japaneseDate = `${era}${eraYear}年`;
+
+	        // 曜日を取得
+	        const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
+	        const weekday = weekdays[now.getDay()];
+
+	        // リアルタイムの時刻
+	        const hours = String(now.getHours()).padStart(2, '0');
+	        const minutes = String(now.getMinutes()).padStart(2, '0');
+	        const seconds = String(now.getSeconds()).padStart(2, '0');
+	        const time = `${hours}:${minutes}:${seconds}`;
+
+	        // 要素に値を設定
+	        document.getElementById('current-date').textContent = `${westernDate} (${japaneseDate})`;
+	        document.getElementById('current-weekday').textContent = weekday;
+	        document.getElementById('current-time').textContent = time;
+	    }
+
+	    // 初回更新
+	    updateClock();
+	    // 1秒ごとに時計を更新
+	    setInterval(updateClock, 1000);
+		</script>
+		        
+		<style>
+		/* 全体のリセット: すべての要素の余白とパディングをリセットし、ボックスのサイズをボーダーボックスに設定 */
+		* {
+		  padding: 0;
+		  margin: 0;
+		  box-sizing: border-box;
+		}
+
+		/* Bodyのスタイル: 全体のパディングを設定 */
+		body {
+		  padding: 1em;
+		}
+
+		/* 画面幅が768px以下の場合のフォントサイズ調整: メディアクエリを使用してフォントサイズを画面幅に応じて調整 */
+		@media screen and (max-width: 768px) {
+		  body {
+		    font-size: clamp(12px, 1vw, 16px); /* フォントサイズを12pxから16pxの範囲で調整 */
+		  }
+		}
+
+		/* アナログ時計の外側のスタイル: 時計の円形枠のスタイルを設定 */
+		.c-clock {
+		  width: calc(460 / 16 * 1em); /* 時計の幅を計算 */
+		  height: calc(460 / 16 * 1em); /* 時計の高さを計算 */
+		  padding: 1.2em;
+		  margin: 0 auto;
+		  background-color: #2f2f00;
+		  background-position: center;
+		  background-size: cover;
+		  background-blend-mode: overlay;
+		  border-radius: 50%; /* 時計を円形にする */
+		  overflow: hidden;
+		}
+
+		/* 時計の内側のスタイル: 時計の内部のスタイルを設定 */
+		.c-clock__inner {
+		  width: 100%;
+		  height: 100%;
+		  padding: 1em;
+		  border-radius: 50%; /* 内部も円形に */
+		  outline: calc(6 / 16 * 1em) double #352422; /* 内部のアウトラインを設定 */
+		  outline-offset: -1.4em;
+		  background-color: #336699;
+		  background-position: center;
+		  background-size: cover;
+		  background-blend-mode: hard-light;
+		  position: relative; /* 相対位置を設定 */
+		}
+
+		/* 時計の中心のスタイル: 中心の黒い丸のスタイルを設定 */
+		.c-clock__inner::after {
+		  content: "";
+		  width: calc(24 / 16 * 1em);
+		  height: calc(24 / 16 * 1em);
+		  border-radius: 50%; /* 中心の黒い丸も円形に */
+		  background: #004040;
+		  position: absolute; /* 絶対位置を設定 */
+		  top: 50%;
+		  left: 50%;
+		  transform: translate(-50%, -50%); /* 中心に配置 */
+		}
+
+		/* 時計の数字部分のスタイル: 数字リスト全体のスタイルを設定 */
+		.c-clock__num {
+		  width: 50%;
+		  height: 50%;
+		  position: relative;
+		  list-style: none; /* リストスタイルをなしに */
+		  padding: 0;
+		  margin: 0;
+		  transform: translate(-50%, -50%); /* 中心に配置 */
+		  top: 50%;
+		  left: 50%;
+		}
+
+		/* 時計の各数字のスタイル: 各数字の位置とデザインを設定 */
+		.c-clock__num li {
+		  position: absolute;
+		  width: 100%;
+		  height: 100%;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  transform-origin: center; /* 回転の中心を設定 */
+		  font-family: Merriweather, serif; /* フォントを設定 */
+		  font-size: 2.7em; /* フォントサイズを設定 */
+		  font-weight: normal;
+		  line-height: 1;
+		}
+
+		/* 各数字の配置と回転: 数字を時計の正しい位置に配置し、回転させて読みやすくする */
+		.c-clock__num li:nth-child(1) { transform: rotate(30deg) translateY(-80%) rotate(-30deg); }
+		.c-clock__num li:nth-child(2) { transform: rotate(60deg) translateY(-80%) rotate(-60deg); }
+		.c-clock__num li:nth-child(3) { transform: rotate(90deg) translateY(-80%) rotate(-90deg); }
+		.c-clock__num li:nth-child(4) { transform: rotate(120deg) translateY(-80%) rotate(-120deg); }
+		.c-clock__num li:nth-child(5) { transform: rotate(150deg) translateY(-80%) rotate(-150deg); }
+		.c-clock__num li:nth-child(6) { transform: rotate(180deg) translateY(-80%) rotate(-180deg); }
+		.c-clock__num li:nth-child(7) { transform: rotate(210deg) translateY(-80%) rotate(-210deg); }
+		.c-clock__num li:nth-child(8) { transform: rotate(240deg) translateY(-80%) rotate(-240deg); }
+		.c-clock__num li:nth-child(9) { transform: rotate(270deg) translateY(-80%) rotate(-270deg); }
+		.c-clock__num li:nth-child(10) { transform: rotate(300deg) translateY(-80%) rotate(-300deg); }
+		.c-clock__num li:nth-child(11) { transform: rotate(330deg) translateY(-80%) rotate(-330deg); }
+		.c-clock__num li:nth-child(12) { transform: rotate(0deg) translateY(-80%); }
+
+		/* 時計のローマ数字部分のスタイル */
+		.c-clock__num2 {
+		  width: 50%;
+		  height: 50%;
+		  position: relative;
+		  list-style: none; /* リストスタイルをなしに */
+		  padding: 0;
+		  margin: 0;
+		  transform: translate(-50%, -50%); /* 中心に配置 */
+		  top: 0%;
+		  left: 50%;
+		}
+
+		/* 時計の各数字のスタイル: 各数字の位置とデザインを設定 */
+		.c-clock__num2 li {
+		  position: absolute;
+		  width: 100%;
+		  height: 100%;
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  transform-origin: center; /* 回転の中心を設定 */
+		  font-family: Merriweather, serif; /* フォントを設定 */
+		  font-size: 1em; /* フォントサイズを設定 */
+		  color: #ff8000;
+		  font-weight: normal;
+		  line-height: 1;
+		}
+
+		/* 各ローマ数字の配置 */
+		.c-clock__num2 li:nth-child(1) { transform: rotate(30deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(2) { transform: rotate(60deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(3) { transform: rotate(90deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(4) { transform: rotate(120deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(5) { transform: rotate(150deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(6) { transform: rotate(180deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(7) { transform: rotate(210deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(8) { transform: rotate(240deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(9) { transform: rotate(270deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(10) { transform: rotate(300deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(11) { transform: rotate(330deg) translateY(-98%); }
+		.c-clock__num2 li:nth-child(12) { transform: rotate(0deg) translateY(-98%); }
+
+
+		/* 時計の中心部分のスタイル: 時計の中心部分のデザインを設定 */
+		.c-clock__core {
+		  position: absolute;
+		  top: 50%;
+		  left: 50%;
+		  transform: translate(-50%, -50%); /* 中心に配置 */
+		}
+
+		/* 長針のスタイル: 時計の長針のデザインを設定 */
+		.c-clock__longHand {
+		  width: max(2px, calc(4 / 16 * 1em));
+		  height: calc(180 / 16 * 1em);
+		  background: #00ffff;
+		  transform-origin: center bottom; /* 回転の基点を中心の下に設定 */
+		  transform: rotate(0deg); /* 初期角度を0度に設定 */
+		  position: absolute;
+		  bottom: 0;
+		  left: 0;
+		}
+
+		/* 短針のスタイル: 時計の短針のデザインを設定 */
+		.c-clock__hourHand {
+		  width: max(2px, calc(4 / 16 * 1em));
+		  height: calc(120 / 16 * 1em);
+		  background: #80ff80;
+		  transform-origin: center bottom; /* 回転の基点を中心の下に設定 */
+		  transform: rotate(0deg); /* 初期角度を0度に設定 */
+		  position: absolute;
+		  bottom: 0;
+		  left: 0;
+		}
+
+		/* 秒針のスタイル: 時計の秒針のデザインを設定 */
+		.c-clock__secondHand {
+		  width: max(1px, calc(2 / 16 * 1em));
+		  height: calc(240 / 16 * 1em);
+		  background: #ff0000;
+		  transform-origin: center bottom; /* 回転の基点を中心の下に設定 */
+		  transform: rotate(0deg); /* 初期角度を0度に設定 */
+		  position: absolute;
+		  bottom: 0;
+		  left: 0;
+		}
+
+		/* 今日の曜日と月 (9時位置内側): 曜日と月のラベルの位置とデザインを設定 */
+		.c-clock__label-day {
+		  position: absolute;
+		  top: 50%;
+		  left: 25%;
+		  transform: translate(-50%, -50%);
+		  text-align: center;
+		  font-family: Arial, sans-serif;
+		  font-size: 1.2em;
+		  font-weight: bold;
+		  color: #ffffff;
+		}
+
+		/* 今日の日付 (3時位置内側): 日付ラベルの位置とデザインを設定 */
+		.c-clock__label-date {
+		  position: absolute;
+		  top: 50%;
+		  right: 25%;
+		  transform: translate(50%, -50%);
+		  font-family: Arial, sans-serif;
+		  font-size: 2em;
+		  font-weight: bold;
+		  color: #ffffff;
+		}
+
+		/* 年 (12時位置内側): 年ラベルの位置とデザインを設定 */
+		.c-clock__label-year {
+		  position: absolute;
+		  top: 20%; /* 時計の中心から上方向に配置 */
+		  left: 50%;
+		  transform: translate(-50%, 0);
+		  font-family: Arial, sans-serif;
+		  font-size: 1.5em;
+		  font-weight: bold;
+		  color: #c0c0c0;
+		}
+		</style>
+
+
+    <script>
+    
+		// 既存の音声再生関数
+		function speakText(text) {
+		   if ('speechSynthesis' in window) {
+		       const utterance = new SpeechSynthesisUtterance(text);
+		       window.speechSynthesis.speak(utterance);
+		   } else {
+		       alert("音声合成がサポートされていません");
+		   }
+		}
+
+		// 新しい音声合成関数
+		function nativeSpeak(text) {
+		   if (typeof Android !== 'undefined' && Android.speak) {
+		       Android.speak(text);
+		   } else {
+		       speakText(text); // Android.speakが使用できない場合はブラウザの音声合成を使用
+		   }
+		}
+		
+        
+    let isRunning = false; // 時報が動作中かを管理するフラグ
+    const beepAudio = new Audio("時報.mp3"); // 効果音のオーディオオブジェクト
+
+    // 次の10秒単位の時刻を取得
+    function getNextTime() {
+        const now = new Date();
+        const next = new Date(now.getTime() + (10 - now.getSeconds() % 10) * 1000);
+        next.setMilliseconds(0); // ミリ秒をリセット
+        return next;
+    }
+
+    // 時刻をアナウンスする関数
+    function announceTime() {
+        if (!isRunning) return; // 動作中でない場合は処理を停止
+
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        // アナウンス文
+        const message = `${hours}時${minutes}分${seconds}秒をお知らせします。`;
+
+        // アナウンス実行
+        nativeSpeak(message);
+
+        // 効果音を再生
+        setTimeout(() => {
+            beepAudio.currentTime = 0; // 再生位置をリセット
+            beepAudio.play().catch((e) => {
+                console.log("効果音の再生に失敗しました:", e);
+            });
+        }, 500); // アナウンスが終わるまでの時間を調整
+    }
+
+    // 次のアナウンスをスケジュール
+    function scheduleNextAnnouncement() {
+        if (!isRunning) return;
+
+        const now = new Date();
+        const delay = (10 - now.getSeconds() % 10) * 1000 - now.getMilliseconds(); // 次の10秒単位までの遅延時間
+        setTimeout(() => {
+            announceTime();
+            scheduleNextAnnouncement(); // 再帰的に次のアナウンスをスケジュール
+        }, delay);
+    }
+
+    // ボタンをクリックした際の動作
+    function toggleTimeAnnouncement() {
+        const button = document.getElementById("timeButton");
+
+        if (!isRunning) {
+            // 時報開始
+            isRunning = true;
+            announceTime(); // すぐに1回目を実行
+            scheduleNextAnnouncement(); // 次のアナウンスをスケジュール
+            button.textContent = "停止";
+            button.style.backgroundColor = "#ffcccc"; // 薄いピンクの背景色に変更
+        } else {
+            // 時報停止
+            isRunning = false;
+            const button = document.getElementById("timeButton");
+            button.textContent = "時報";
+            button.style.backgroundColor = ""; // 元の色に戻す
+            beepAudio.pause(); // 効果音の再生を停止
+            beepAudio.currentTime = 0; // 効果音の再生位置をリセット
+        }
+    }
+
+    // ページロード時にイベントリスナーを設定
+    window.onload = function () {
+        document.getElementById("timeButton").onclick = toggleTimeAnnouncement;
+        window.addEventListener("beforeunload", stopAnnouncement);
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) stopAnnouncement();
+        });
+    };
+
+    // ページが非アクティブになったときの動作
+    function stopAnnouncement() {
+        if (isRunning) {
+            isRunning = false;
+            const button = document.getElementById("timeButton");
+            button.textContent = "時報";
+            button.style.backgroundColor = ""; // 元の色に戻す
+            beepAudio.pause(); // 効果音の再生を停止
+            beepAudio.currentTime = 0; // 効果音の再生位置をリセット
+        }
+    }
+
+    </script>
+
+
+    <!-- アナログ時計 -->
+    <div class="c-clock">
+        <div class="c-clock__inner">
+            <ul class="c-clock__num">
+                <li>1</li>
+                <li>2</li>
+                <li>3</li>
+                <li>4</li>
+                <li>5</li>
+                <li>6</li>
+                <li>7</li>
+                <li>8</li>
+                <li>9</li>
+                <li>10</li>
+                <li>11</li>
+                <li>12</li>
+            </ul>
+            
+            <ul class="c-clock__num2">
+                <li>Ⅰ</li>
+                <li>Ⅱ</li>
+                <li>Ⅲ</li>
+                <li>Ⅳ</li>
+                <li>Ⅴ</li>
+                <li>Ⅵ</li>
+                <li>Ⅶ</li>
+                <li>Ⅷ</li>
+                <li>Ⅸ</li>
+                <li>Ⅹ</li>
+                <li>Ⅺ</li>
+                <li>Ⅻ</li>
+            </ul>            
+            <div class="c-clock__core">
+                <div class="c-clock__longHand"></div>
+                <div class="c-clock__hourHand"></div>
+                <div class="c-clock__secondHand"></div>
+            </div>
+        
+            <!-- 動的に更新されるラベル -->
+            <div class="c-clock__label-day" id="labelDay"></div>
+            <div class="c-clock__label-date" id="labelDate"></div>
+            <div class="c-clock__label-year" id="labelYear"></div> <!-- 追加 -->
+        </div>
+    </div>
+
+    <script id="rendered-js">
+        function analogClock() {
+            var time = new Date();
+
+            var hour = time.getHours();
+            var min = time.getMinutes();
+            var sec = time.getSeconds();
+
+            // 短針の角度計算（分の影響を考慮）
+            var hourClock = (hour % 12) * 30 + min / 60 * 30; // 時間ごとに30度、分で補正
+            var minClock = min / 60 * 360; // 長針
+            var secClock = sec / 60 * 360; // 秒針
+
+            var longHand = document.querySelector('.c-clock__longHand');
+            var hourHand = document.querySelector('.c-clock__hourHand');
+            var secondHand = document.querySelector('.c-clock__secondHand');
+
+            longHand.style.setProperty('transform', `rotate(${minClock}deg)`);
+            hourHand.style.setProperty('transform', `rotate(${hourClock}deg)`);
+            secondHand.style.setProperty('transform', `rotate(${secClock}deg) translateY(calc(60 / 16 * 1em))`);
+        }
+
+		// analogClock();を追加　6/11 「12:00から表示される」現象の対応
+		analogClock();
+        setInterval(analogClock, 1000);
+
+    </script>
+
+    <script>
+        function updateDateLabels() {
+            // 今日の日付を取得
+            const today = new Date();
+            const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+            const months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+            // 曜日、月、日、年を取得
+            const dayOfWeek = days[today.getDay()];
+            const month = months[today.getMonth()];
+            const date = today.getDate();
+            const year = today.getFullYear(); // 年を取得
+
+            // ラベルにセット
+            document.getElementById("labelDay").innerHTML = `${dayOfWeek}<br>${month}`;
+            document.getElementById("labelDate").textContent = date;
+            document.getElementById("labelYear").textContent = year; // 年をセット
+        }
+
+        // 毎秒ラベルを更新 (日付が変わる可能性に対応)
+        setInterval(updateDateLabels, 1000);
+
+        // 初回呼び出し
+        updateDateLabels();
+    </script>
+    
+		<button class="worldtime-button" onclick="location.href='worldtime.html'">世界の時刻</button>
+
+		<br>
+	    <button class="bottom-home-button" onclick="location.href='index.html'">Homeに戻る</button>	    
+    
+
+</body>
+	
+</html>
+
