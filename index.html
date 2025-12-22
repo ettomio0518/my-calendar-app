@@ -37,7 +37,7 @@
             border: 1px solid #ccc; /* 枠の色 */
             border-radius: 10px; /* 角を丸くする */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* シャドウ効果 */
-            background-color: #e7e7e7; /* 背景色 */
+            background: linear-gradient(to bottom, #eaeaff,  #b9ffff);
         }
         .container2 { 
             max-width: 580px;
@@ -45,7 +45,7 @@
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 10px;
-            background-color: #dbffdb;
+            background: linear-gradient(to bottom, #b9ffff, #ffffa6);
         }
 
 		header {
@@ -57,7 +57,11 @@
 
         h1 { font-size: 19px; color: #595959; }
         h2 { font-size: 16px; }
-        h3 { font-size: 17px; color: #4caf50;  }
+        h3 { 
+        	font-size: 17px; 
+        	color: #008e8e;  
+			margin-bottom: 5px;   /* デフォルトより小さく */
+        }
 		h4 { font-size: 20px; margin: 0; }
 
         input, textarea, button {
@@ -136,15 +140,24 @@
             cursor: pointer;
         }
 
+
 		/* 「予定の確認」ボタンのスタイルを設定 */
 		.check-button {
-		    background-color:#bfffbf;
+		    background-color:#d9ffd9;
 		    color: black;
 		    padding:  3px 10px;
 		    border-radius: 5px;
 		    cursor: pointer;
 		}
 
+		.diary-button {
+		    background-color:#ffffff;
+		    color: black;
+		    padding:  3px 10px;
+		    border-radius: 5px;
+		    cursor: pointer;
+		}
+		
 		.limit-button { /* このクラスは現在使用されていませんが、念のため残しておきます */
 		    background-color: white;
 		    color: #0000ff;
@@ -166,8 +179,13 @@
 		.save-button {
 		    font-size: 16px;
 		    padding: 3px 10px;
-		    background-color: #ff9fcf;
-		    color: white;
+		    background-color: #ffe6cc;
+		}
+
+		/* 保存・確認ボタンの上余白を減らす */
+		.save-button,
+		.check-button {
+		  margin-top: 4px;
 		}
 
 		/* 「時計」ボタンだけスタイルを変更 */
@@ -190,6 +208,37 @@
 		.calendar-button {
 		    background-color: #ffffc4;/* 背景色も変更可能 */
 		    color: blue; /* 文字色の変更 */
+		}
+
+		/* 「今日のカード」「ノート」ボタンだけスタイルを変更 12/22 */
+		#note-button,
+		#note-button2 {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding: 3px 30px; /* ボタン全体の大きさを調整 */
+		    color: blue;
+		    background-color: #ffffc6; /* 背景色も変更可能 */
+		    border-radius: 5px;		    
+		}
+		
+		/* 「現在地の天気予報」ボタンだけスタイルを変更 12/22 */
+		#weather-button {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding: 3px 30px; /* ボタン全体の大きさを調整 */
+		    color: blue;
+		    background-color: #ffffec; /* 背景色も変更可能 */
+		    border-radius: 5px;	
+		}
+				
+		/* container2のボタンを全て白くする 12/22 */
+		.container2 button {
+		  background: #fff;
+		  border: 1px solid #6bbfae;
+		  color: #004d40;
+		}
+		 
+		/* 押したときだけ： */
+		.container2 button:active {
+		  background: #e0f2f1;
 		}
 				
 		.month-number {
@@ -259,9 +308,11 @@
 		}
 
 		#scheduleInput {
-		    height: 40px;
-		    line-height: 22px;
-		    resize: none;
+		    height: 40px; /* 2行弱くらいで固定。今回のUIにはちょうど良いです。 */
+		    line-height: 22px; /* 文字の詰まり感もなく、可読性OK。 */
+		    resize: none; /* レイアウト崩れ防止。*/
+		    margin-top: 1px;
+		    margin-bottom: 6px; /* 下の「保存」「予定の確認」との間隔を詰める目的にピッタリ。 */
 		}
 
 		/* カスタムアラート */
@@ -348,7 +399,8 @@
 
 		/* 日付選択行の中央揃え 7/13 */
 	    .input-row {
-	        margin-bottom: 15px;
+			margin-top: 1px;
+			margin-bottom: 8px;
 	    }
 
         #keyNButton {
@@ -357,10 +409,16 @@
         }
  
  	    #keyNButton2 {
-	        background-color: #cb97ff;
+	        background-color: #6c6cff;
 	        color: white;
 	    }
-	           
+
+		/* 12/22 */
+ 	    #keyNButton3 {
+	        background-color: #b76f6f;
+	        color: white;
+	    }
+	    	           
 		/* 既存のスタイル (変更なし) - デスクトップで横並び 11/3 */
 		.centered-label-button {
 		    display: flex;
@@ -1358,11 +1416,11 @@
 
 		<!-- 予定入力欄 -->
 		<div class="input-row"> 
-		    <textarea id="scheduleInput" rows="2" placeholder="例: 〇〇店にてポイント10倍"></textarea>
+		    <textarea id="scheduleInput" rows="2" placeholder="例: 10:00〜13:00　〇〇店にて打合せ"></textarea>
 		</div>
 
 	    
-	    <button class="save-button" onclick="saveSchedule()">保存</button>
+	    <button class="save-button" onclick="saveSchedule()">💾 保存</button>
 
 	    <button id="toggleButton" class="check-button" onclick="toggleButtonFunction('check')">予定の確認</button>
 
@@ -2136,19 +2194,19 @@
 	<div class="link-buttons1">
 	    <button class="calendar-button" onclick="location.href='カレンダー.html'">カレンダー</button>
 	    <button class="clock-button" onclick="location.href='時計.html'">時計</button>
-	    <button  class="todaycard-button" onclick="location.href='today-card.html'">今日のカード</button>
+	    <button  id="note-button" onclick="location.href='today-card.html'">今日のカード</button>
 	</div>
 	<br>
 	
-        <button onclick="location.href='お買い物計算.html'">お買い物電卓</button>
+        <button class="diary-button" onclick="location.href='お買い物計算.html'">お買い物電卓</button>
 	    <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>        
         <br><br>
-        <button onclick="location.href='notepad.html'">ノート表示</button>
+        <button id="note-button2" onclick="location.href='notepad.html'">ノート表示</button>
 
-        <button onclick="location.href='diary.html'">簡易日記</button>
+        <button class="diary-button" onclick="location.href='diary.html'">簡易日記</button>
 
 	    <h3>天気予報</h3>
-	    <button class="calendar-button" onclick="location.href='weather.html'">現在地の天気予報</button>
+	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
 	    <br>
 	    <p class="word-label">天気サイトのアドレスを入力して下さい。</p>
 	    <label for="weatherUrl">URL:</label>
@@ -2168,7 +2226,7 @@
 
 	    <h3>さらに高機能検索</h3>	        
 	    <p class="word-label">このアプリに入力された案件が対象です。</p>
-		<button class="clock-button" onclick="location.href='高機能検索.html'">高機能検索に移動</button>
+		<button id="keyNButton3" onclick="location.href='高機能検索.html'">高機能検索に移動</button>
 	</div>
 	
 		<!-- ボタン 9/29 -->
@@ -2559,7 +2617,7 @@
   </script>
   
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 15.8 (2025-12-20)</p>
+	 © 2025 ettomio. All rights reserved. | Version 16.0 (2025-12-22)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
