@@ -37,7 +37,7 @@
             border: 1px solid #ccc; /* 枠の色 */
             border-radius: 10px; /* 角を丸くする */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* シャドウ効果 */
-            background: linear-gradient(to bottom, #eaeaff,  #b9ffff);
+            background: linear-gradient(to bottom, #f7eeff,  #b9ffff);
         }
         .container2 { 
             max-width: 580px;
@@ -63,7 +63,15 @@
 			margin-bottom: 5px;   /* デフォルトより小さく */
         }
 		h4 { font-size: 20px; margin: 0; }
-
+		/* 2. タイトル自体の設定をさらに追い込む */
+		h5.section-title {
+		    display: inline-block; /* ブロック要素としての余計な振る舞いを防ぐ   12/23 */
+		    margin: 0;             /* 上下左右すべての余白を一旦ゼロに */
+		    padding: 0;
+		    font-size: 17px;
+		    color: #008e8e;
+		}
+        
         input, textarea, button {
             padding: 10px;
             margin: 10px 0;
@@ -397,11 +405,10 @@
             background-color: #fff59b !important; /* 予定がある日 */
         }
 
-		/* 日付選択行の中央揃え 7/13 */
-	    .input-row {
-			margin-top: 1px;
-			margin-bottom: 8px;
-	    }
+		/* 4. 下に来る「日付選択」行の上の余白を消す 12/23 */
+		.input-row.date-row {
+		    margin-top: 0px !important;
+		}
 
         #keyNButton {
             background-color: #008040;
@@ -419,43 +426,46 @@
 	        color: white;
 	    }
 	    	           
-		/* 既存のスタイル (変更なし) - デスクトップで横並び 11/3 */
+		/* 共通の設定（予定内容などはこっちが適用される） 12/23 */
 		.centered-label-button {
-		    display: flex;
-		    justify-content: center;
-		    align-items: center;
-		    gap: 10px;
-		    margin-bottom: 10px;
+		    margin-top: 5px;
+		    margin-bottom: 10px; /* ここを10px程度に広げておけば、予定内容と入力欄はくっつきません */
+		    line-height: 1;
+		}
+
+		/* 💡 特定の場所（予定入力）だけ余白をゼロにする設定 12/23 */
+		.centered-label-button.margin-tight {
+		    margin-bottom: 0px !important;
 		}
 
 		/* --------------------------------- */
 
 		/* --------------------------------- */
-		/* 新規追加: 画面幅が600px以下の場合のスタイル (スマートフォン向け) 11/3 */
+		/* 新規追加: 画面幅が600px以下の場合のスタイル (スマートフォン向け) 11/3 12/23  */
 		@media (max-width: 600px) {
 		    .centered-label-button {
-		        /* 横並び (row) から 縦並び (column) に変更 (これは維持) */
 		        flex-direction: column; 
-		        
-		        /* 💡 修正点 1: 
-		           PCと同じくコンテナ自体を中央揃えに戻す
-		           （ただし、子要素の幅が100%の場合は効果が薄い） */
 		        justify-content: center; 
-		        
-		        /* 💡 修正点 2: 
-		           子要素（h3とbutton）を中央に揃える */
-		        align-items: center; /* これでh3が中央に配置されます */
+		        align-items: center; 
 		    }
 		    
-		    /* h3要素のデフォルトのマージンをリセット/調整 11/3 */
+		    /* 1. 基本のタイトル余白（予定内容などはこちらが適用される） */
 		    .centered-label-button .section-title {
-		        /* h3にデフォルトで入っているマージンをリセットし、
-		           中央揃えが効きやすくします。 */
 		        margin-top: 5px; 
 		        margin-bottom: 5px;
 		    }
 		    
-		    /* ラベルとボタンを幅いっぱいに広げ、それぞれが1行を占有するように調整 11/3 */
+		    /* 2. 【ここが修正ポイント】
+		          margin-tightが付いている場合（予定入力）だけ、
+		          タイトルとボタンの下余白をゼロに上書きする */
+		    .centered-label-button.margin-tight .section-title {
+		        margin-bottom: 0px;
+		    }
+		    .centered-label-button.margin-tight button {
+		        margin-bottom: 0px;
+		    }
+		    
+		    /* ラベルとボタンを幅いっぱいに広げる設定 */
 		    .centered-label-button label, 
 		    .centered-label-button button {
 		        width: 100%;
@@ -476,7 +486,9 @@
 		    color: #4d0000; 	        
             background-color: #c8ffe3;
     	    border-radius: 5px; 
-	    	border: 1px solid #0000ff;    	    	        
+	    	border: 1px solid #0000ff; 
+	    	margin: 0;
+            vertical-align: middle; /* テキストとの高さを合わせる */ 
 	    }
 	    
 	    .date-row {
@@ -484,6 +496,7 @@
 	        justify-content: center;
 	        align-items: center;
 	        gap: 10px;
+    		/* margin-top: -5px; マイナスの数値で上に引っ張り上げる */	        
 	    }
 
 		/* 8/11追加 */
@@ -1396,12 +1409,13 @@
 
 	<div class="container">
     <!--  <h1>予定表</h1> -->
+    
+	    <!-- 12/23に更新 margin-tight部分 -->
+		<div class="centered-label-button margin-tight">
+		    <h5 class="section-title">予定入力</h5>
+		    <button id="voiceInputButton2" onclick="startVoiceInput2()">🎤 日付音声入力</button>
+		</div>	    
 
-		<div class="centered-label-button">
-		  <h3 class="section-title">予定入力</h3>
-		  <button id="voiceInputButton2" onclick="startVoiceInput2()">🎤 日付音声入力</button>
-		</div>
-	    
 	    <!-- 日付選択行 -->
 	    <div class="input-row date-row">
 	        <label for="scheduleDate">日付選択:</label>
@@ -2617,7 +2631,7 @@
   </script>
   
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 16.0 (2025-12-22)</p>
+	 © 2025 ettomio. All rights reserved. | Version 16.1 (2025-12-23)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
