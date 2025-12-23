@@ -8,7 +8,7 @@
         /* 全体スタイル */
         body {
             font-family: Arial, sans-serif;
-                        color: #ffff00; /* 黄色 */
+            color: #ffff00; /* 黄色 */
             text-align: center;
             background: linear-gradient(to bottom, #400040,  #000066);
             margin: 0;
@@ -32,37 +32,45 @@
             margin-bottom: 1em;
         }
         
-        button {
-            font-size: 16px;
+		/* 共通ボタンスタイル */
+		button {
+		    font-size: 16px;
 		    padding-top: 3px;	
 		    padding-bottom: 3px;            
-            margin: 10px 5px;
-            border-radius: 8px;
-            border-color: #ffccff;            
-            width: 100%;
-            max-width: 200px;
-            background-color: #bfffff;
-        }       
+		    margin: 10px 5px;
+		    border-radius: 8px;
+		    border-color: #ffccff;            
+		    background-color: #bfffff;
+		    line-height: 1.2;
+		    width: 100px; /* 少しコンパクトに */
+		    white-space: nowrap; /* 改行させない */
+		    min-width: 100px; /* これ以下にはならない */
+		}
+		    
 
-		/* 「世界の時刻」ボタンだけスタイルを変更 */
+		/* 「世界の時刻」ボタン */
 		.worldtime-button {
-		    font-size: 16px; /* フォントサイズを大きく */
+		    font-size: 16px;
 		    padding-top: 2px;	
 		    padding-bottom: 2px;	
-            max-width: 130px;		    
-		    background-color: #ffffe1; /* 背景色も変更可能 */
-    		margin-bottom: 0px;		    
-		}  
+		    width: 160px; /* 少し広めに */
+		    background-color: #ffffe1;
+		    margin-bottom: 0px;
+		    line-height: 1.2;
+		    white-space: nowrap; /* 改行させない */
+		}
 
-		/* 「Homeに戻る」ボタンだけスタイルを変更 */
+		/* 「Homeに戻る」ボタン */
 		.bottom-home-button {
-		    font-size: 16px; /* フォントサイズを大きく */
+		    font-size: 16px;
 		    padding-top: 2px;	
 		    padding-bottom: 2px;
-            max-width: 150px;		    
-		    background-color: #ceffff; /* 背景色も変更可能 */
-    		margin-top: 0px;		    
-		}  
+		    width: 160px; /* 少し広めに */
+		    background-color: #ceffff;
+		    margin-top: 0px;
+		    line-height: 1.2;
+		    white-space: nowrap; /* 改行させない */
+		}
 		
         /* 横並びを実現 */
         .inline-elements {
@@ -108,7 +116,7 @@
 		
 	    <div class="inline-elements">
 	        <div class="weekday" id="current-weekday"></div>
-	        <button id="timeButton">時報</button>
+	        <button id="timeButton">🕰️&nbsp;時報</button>
 	    </div>
 
 		
@@ -479,7 +487,7 @@
             // 時報停止
             isRunning = false;
             const button = document.getElementById("timeButton");
-            button.textContent = "時報";
+            button.textContent = "🕰️ 時報";
             button.style.backgroundColor = ""; // 元の色に戻す
             beepAudio.pause(); // 効果音の再生を停止
             beepAudio.currentTime = 0; // 効果音の再生位置をリセット
@@ -500,7 +508,7 @@
         if (isRunning) {
             isRunning = false;
             const button = document.getElementById("timeButton");
-            button.textContent = "時報";
+            button.textContent = "🕰️ 時報";
             button.style.backgroundColor = ""; // 元の色に戻す
             beepAudio.pause(); // 効果音の再生を停止
             beepAudio.currentTime = 0; // 効果音の再生位置をリセット
@@ -609,10 +617,10 @@
         updateDateLabels();
     </script>
     
-		<button class="worldtime-button" onclick="location.href='worldtime.html'">世界の時刻</button>
+		<button class="worldtime-button" onclick="location.href='worldtime.html'">🌍&nbsp;世界の時刻</button>
 
 		<br>
-	    <button class="bottom-home-button" onclick="location.href='index.html'">Homeに戻る</button>	    
+	    <button class="bottom-home-button" onclick="location.href='index.html'">🏠&nbsp;Homeに戻る</button>	    
     
 
 </body>
