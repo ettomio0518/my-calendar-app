@@ -10,7 +10,13 @@
             font-family: Arial, sans-serif;
             color: #ffff00; /* 黄色 */
             text-align: center;
-            background: linear-gradient(to bottom, #400040,  #000066);
+			background: linear-gradient(
+			  to bottom,
+			  #400040 0%,
+			  #2a3f66 40%,
+			  #2a3f66 60%,
+			  #000066 100%
+			);
             margin: 0;
             padding: 0;
             display: flex;
@@ -19,6 +25,30 @@
             align-items: center;
             height: 100vh;
         }
+		/* 星屑ノイズ（控えめ・高貴寄り）12/23 */
+		body::after {
+		  content: "";
+		  position: fixed;
+		  top: 0; left: 0; right: 0; bottom: 0;
+		  background-image: radial-gradient(white 0.7px, transparent 0.7px);
+		  background-size: 2.5px 2.5px;
+		  opacity: 0.08;
+		  pointer-events: none;
+		}
+		
+	    /* 星の粒ノイズ */
+	    /*
+	    body::after {
+	      content: "";
+	      position: fixed;
+	      top:0; left:0; right:0; bottom:0;
+	      background-image: radial-gradient(white 1px, transparent 1px);
+	      background-size: 3px 3px;
+	      opacity: 0.15;
+	      pointer-events: none;
+	    } 
+	    */
+	     
         .date {
             color: #8affff; /* 空色 */        
             font-size: 1.8em;
@@ -34,6 +64,7 @@
 		    margin-bottom: 1em;
 		    letter-spacing: 0.08em;
 		    font-weight: 600;       /* 太すぎないが存在感あり */
+		    padding-bottom: 20px;		    
 		}
         
 		/* 共通ボタンスタイル */
@@ -203,7 +234,15 @@
 		  height: calc(460 / 16 * 1em); /* 時計の高さを計算 */
 		  padding: 1.2em;
 		  margin: 0 auto;
-		  background: linear-gradient(to bottom,#2f2f00, #6c6c00); /* 12/23 */
+		  background: linear-gradient(
+		    to bottom,
+		    #cece00 0%,
+		    #979700 5%,  
+		    #626200 30%,
+		    #626200 50%,  
+		    #2f2f00 92%,  
+		    #515100 100%
+		);
 		  background-position: center;
 		  background-size: cover;
 		  background-blend-mode: overlay;
@@ -219,7 +258,12 @@
 		  border-radius: 50%; /* 内部も円形に */
 		  outline: calc(6 / 16 * 1em) double #352422; /* 内部のアウトラインを設定 */
 		  outline-offset: -1.4em;
-		  background: linear-gradient(to bottom,#336699, #000000); /* 12/23 他に#310062 */
+		  background: linear-gradient(
+		    to bottom,
+		    #003e7b 0%,    /* 上：濃い青寄り */
+		    #408080 50%,   /* 中央：やや青 */
+		    #05080f 100%   /* 下：ほぼ黒 */
+		);
 		  background-position: center;
 		  background-size: cover;
 		  background-blend-mode: hard-light;
