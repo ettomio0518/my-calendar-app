@@ -2148,9 +2148,11 @@
 		    // };
 
 		    // 各ボタンの処理設定 12/14 変更
-		    document.getElementById("btnSchedule").onclick = () => {
-		        window.location.href = "today-card.html";
-		    };
+		    // 12/27書き換え
+			document.getElementById("btnSchedule").onclick = () => {
+			    sessionStorage.setItem("fromIndex", "true");
+			    window.location.href = "today-card.html";
+			};
 		    
 		    // 10/8追加
 			document.getElementById("btnSearch7").onclick = () => {
@@ -2240,7 +2242,12 @@
 	<div class="link-buttons1">
 	    <button class="calendar-button" onclick="location.href='calendar.html'">カレンダー</button>
 	    <button class="clock-button" onclick="location.href='clock.html'">時計</button>
-	    <button  id="note-button" onclick="location.href='today-card.html'">今日のカード</button>
+	<button id="note-button" onclick="
+	  sessionStorage.setItem('fromIndex', 'true');
+	  location.href='today-card.html';
+	">
+	  今日のカード
+	</button>
 	</div>
 	<br>
 	
@@ -2663,7 +2670,7 @@
   </script>
   
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 16.4 (2025-12-25)</p>
+	 © 2025 ettomio. All rights reserved. | Version 16.5 (2025-12-27)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
