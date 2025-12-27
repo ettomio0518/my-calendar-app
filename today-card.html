@@ -204,6 +204,35 @@
 	.bottom-button:hover, .top-button:hover {
 	    background: #0056b3;
 	}    
+
+	/* 以降12/27 */
+	.nearest-modal {
+	  position: fixed;
+	  inset: 0;
+	  background: rgba(0,0,0,0.5);
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  z-index: 9999;
+	}
+
+	.nearest-modal-box {
+	  background: #f0e1e1;
+	  padding: 20px;
+	  border-radius: 12px;
+	  text-align: center;
+	}
+
+	.nearest-modal-buttons {
+	  display: flex;
+	  gap: 20px;
+	  justify-content: center;
+	  margin-top: 15px;
+	}
+
+	.hidden {
+	  display: none;
+	}
 	    
   </style>
 </head>
@@ -259,6 +288,21 @@
 	  <h3 id="title">現在地の天気</h3>
 	  <div id="weather-container"></div>
 	</div> <!-- page を閉じる -->
+
+	<!-- 直近の予定 2択アラート -->
+	<div id="nearest-alert-modal" class="nearest-modal hidden">
+	  <div class="nearest-modal-box">
+	    <p class="nearest-modal-title">
+	      アラート<br>
+	      直近の予定をみますか？
+	    </p>
+
+	    <div class="nearest-modal-buttons">
+	      <button id="alert-no">いいえ</button>
+	      <button id="alert-yes">はい</button>
+	    </div>
+	  </div>
+	</div>
 
   <script>
   
@@ -3014,6 +3058,41 @@ const rokuyoData = [
 	  nativeSpeak(message);
 	}
 
+
+	// htmlを開いたときにアラート表示 12/27
+	document.addEventListener("DOMContentLoaded", () => {
+	  const modal = document.getElementById("nearest-alert-modal");
+	  const btnNo = document.getElementById("alert-no");
+	  const btnYes = document.getElementById("alert-yes");
+
+	  if (!modal || !btnNo || !btnYes) return;
+
+	  // ★ index から来たときだけ表示
+	  if (sessionStorage.getItem("fromIndex") === "true") {
+	    modal.classList.remove("hidden");
+	    sessionStorage.removeItem("fromIndex");
+	  } else {
+	    return;
+	  }
+
+	  // いいえ
+	  btnNo.onclick = () => {
+	    modal.classList.add("hidden");
+	  };
+
+	  // はい
+	  btnYes.onclick = () => {
+	    modal.classList.add("hidden");
+
+	    toggleTimeline();
+	    announceNearestSchedule();
+
+	    setTimeout(() => {
+	      toggleTimeline();
+	    }, 5000);
+	  };
+	});
+	
 	</script>
 
 
@@ -3097,9 +3176,9 @@ const rokuyoData = [
 	    });
 	    
   </script>
-  
+
   <footer>
-    © 20251218 ettomio
+    © 20251227 ettomio
   </footer>
 
   <div style="height: 60px;"></div>
