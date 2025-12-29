@@ -3035,27 +3035,50 @@ const rokuyoData = [
 	}
 
 
+	  // 12/29 追加
+	function getTodayScribbling() {
+	  const now = new Date();
+	  const y = now.getFullYear();
+	  const m = String(now.getMonth() + 1).padStart(2, '0');
+	  const d = String(now.getDate()).padStart(2, '0');
+
+	  const key = `scribbling_${y}${m}${d}`;
+	  const memo = localStorage.getItem(key);
+
+	  if (!memo || memo.trim() === "") {
+	    return "今日の走り書きはありません。";
+	  }
+
+	  return `今日の走り書きは、${memo}です。`;
+	}
+
+
 	function announceNearestSchedule() {
 	  const schedules = buildSchedulesFromLocalStorage();
 	  const targets = getNearestSchedules(schedules);
 
+	  let scheduleMessage = "";
+
 	  if (targets.length === 0) {
-	    showCustomAlert("直近の予定はありません。");
-	    nativeSpeak("直近の予定はありません。");
-	    return;
+	    scheduleMessage = "直近の予定はありません。";
+	  } else {
+	    const messages = targets.map(s => {
+	      return `${formatTime(s.start)}から${formatTime(s.end)}まで、${stripTimeRange(s.text)}`;
+	    });
+
+	    scheduleMessage =
+	      messages.length === 2
+	        ? `現在の予定と次の予定です。${messages[0]}。次は、${messages[1]}。`
+	        : `次の予定は、${messages[0]}です。`;
 	  }
 
-	  const messages = targets.map(s => {
-	    return `${formatTime(s.start)}から${formatTime(s.end)}まで、${stripTimeRange(s.text)}`;
-	  });
+	  // ★ ここで走り書きを追加
+	   const scribblingMessage = getTodayScribbling();
 
-	  const message =
-	    messages.length === 2
-	      ? `現在の予定と次の予定です。${messages[0]}。次は、${messages[1]}。`
-	      : `次の予定は、${messages[0]}です。`;
+	   const finalMessage = `${scheduleMessage}。${scribblingMessage}`;
 
-	  showCustomAlert(message);
-	  nativeSpeak(message);
+	   showCustomAlert(finalMessage);
+	   nativeSpeak(finalMessage);
 	}
 
 
@@ -3178,7 +3201,7 @@ const rokuyoData = [
   </script>
 
   <footer>
-    © 20251227 ettomio
+    © 20251229 ettomio
   </footer>
 
   <div style="height: 60px;"></div>
