@@ -900,11 +900,13 @@
     </div>
 
 	<script>
-	// 12/7 追加　今日の日付をクリックで遷移
+	// 12/7 追加　今日の日付をクリックで遷移 さらに12/30
 	document.getElementById("current-date").addEventListener("click", function() {
+	  sessionStorage.setItem('fromIndex', 'true');
 	  window.location.href = "today-card.html";
 	});
 	</script>
+
 
     <div class="navigation-buttons">
         <button onclick="changeYear(-1)">1年前</button>
@@ -2449,7 +2451,7 @@
         }
     </script>
 
-    <button onclick="location.href='紹介N.html'">紹介ページ</button>
+    <button onclick="location.href='introduction.html'">紹介ページ</button>
     
     <!-- 3/25差別化機能を追加 -->
 	<!-- 差別化ボタン（6つ）→ 非表示にしておく 4/19 -->
@@ -2670,7 +2672,7 @@
   </script>
   
 	 <p id="version-number" onclick="handleClick();">  
-	 © 2025 ettomio. All rights reserved. | Version 16.6 (2025-12-28)</p>
+	 © 2025 ettomio. All rights reserved. | Version 16.7 (2025-12-30)</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
