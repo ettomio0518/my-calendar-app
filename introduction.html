@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>音声カレンダー紹介</title>
+  <style>
+    body {
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+    }
+    header {
+      background: #4b0082;
+      color: white;
+      padding: 1em;
+      text-align: center;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      font-size: 20px;
+      margin-top: 15px;
+    }
+    .container {
+      max-width: 720px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    .section h2 {
+      border-left: 5px solid #4b0082;
+      padding-left: 10px;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      color: #4b0082;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .highlight {
+      background: #f0f8ff;
+      padding: 10px;
+      border-left: 4px solid #00a;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+	.btn {
+	  display: block;
+	  width: 85%;
+	  margin: 6px auto;
+	  padding: 12px 16px;
+
+	  background: #4b0082;
+	  color: white;
+	  text-decoration: none;
+	  border-radius: 6px;
+
+	  font-size: 1em;
+	  line-height: 1.4;
+	  text-align: center;
+
+	  white-space: normal;   /* ← nowrap をやめる */
+	  word-break: keep-all;
+	}
+
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.85em;
+      margin: 40px 0 80px;
+      color: #666;
+    }
+
+    /* 戻るボタン（右上）を統一デザインに変更 */
+    .top-right-button {
+      position: absolute;
+      top: 2px;
+      right: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .top-right-button:hover {
+      background-color: #0056b3;
+    }
+
+	/* 11/4 Top/Bottomボタン */
+	.bottom-button, .top-button {
+	    position: fixed;
+	    bottom: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	    z-index: 9999;
+	    display: none;
+	}
+	.bottom-button:hover, .top-button:hover {
+	    background: #0056b3;
+	}
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+      }
+      .btn {
+        width: 60%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+    <h1>舞いカレンダー 紹介ページ</h1>
+  </header>
+
+  <div class="container">
+    <div class="section">
+      <img src="紹介580.png" alt="サンプル画像">
+      <p><strong>マイカレンダーと読みます。</strong>従来の「音声カレンダー」の機能に加えて、簡易的にGoogleカレンダーに進めるようにしました。これによりハイブリッド型カレンダーアプリに生まれ変わりました。<br><span style="color: blue;">さらに最強ツール<strong>「今日のカード」</strong>を搭載しました。</span></p>
+
+      <p><strong>音声で予定をお知らせ！</strong><br>シンプル操作で使える多機能カレンダーアプリです。</p>
+    </div>
+
+    <div class="section">
+      <h2>📱 簡易版の主な機能</h2>
+      <ul>
+        <li>カレンダー表示（祝日色分け、2020〜2040年対応）</li>
+        <li>日付をタップで予定を音声で確認</li>
+        <li>祝日をタップで祝日名を音声で確認</li>
+        <li>10件までの予定登録</li>
+      </ul>
+    </div>
+
+	<div class="section">
+	    <h2>🌟 プレミアム版の拡張機能</h2>
+
+		<h3 style="margin-top: 30px; border-bottom: 2px solid #ff9999; padding-bottom: 5px;">
+		🆕 「今日のカード」機能 強化！
+		</h3>
+
+		<p>
+		<strong>予定・天気・メモ・日記を「今日」1ページに集約。</strong><br>
+		その日に必要な情報を、迷わず・静かに確認できる最強ツールです。
+		</p>
+
+		<ul style="margin-top: 15px;">
+		  <li>
+		    ⏰ <strong>時間ブロックをタップ</strong><br>
+		    予定内容を <strong>アラート＋音声</strong> でお知らせ。<br>
+		    視覚と聴覚の両方で確認でき、スマホでも直感的に操作できます。
+		  </li>
+
+		  <li style="margin-top: 10px;">
+		    📣 <strong>直近の予定を自動判定</strong><br>
+		    現在時刻から一番近い予定を検知し、<strong>アラート＋音声通知</strong>。<br>
+		    まるで秘書のように「次」を教えてくれます。
+		  </li>
+
+		  <li style="margin-top: 10px;">
+		    📅 <strong>時間割グラフ表示</strong><br>
+		    一日の流れをひと目で把握。<br>
+		    予定の重なりも回避済みで、安心して使えます。
+		  </li>
+
+		  <li style="margin-top: 10px;">
+		    🌤️ <strong>暦・天候情報をまとめて表示</strong><br>
+		    天気／六曜／星座／和風月名まで統合。<br>
+		    実用性と日本的な楽しさを両立しました。
+		  </li>
+
+		  <li style="margin-top: 10px;">
+		    ✍️ <strong>日記＆走り書きメモを連携</strong><br>
+		    ・走り書き：ひらめき、買い物メモなど自由に記録<br>
+		    ・7日以上前の走り書きは削除可能<br>
+		    ・日記機能も、より使いやすく改善されています
+		  </li>
+		</ul>
+
+		<p style="margin-top: 10px;">
+		📌 <strong>「今日」に必要な情報を、1画面で。</strong><br>
+		考えなくても、開けば分かる。<br>
+		舞いカレンダーが目指す「静かな便利さ」を体現した機能です。
+		</p>
+	    
+	    
+	    <h3 style="margin-top: 20px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">🎙️ 音声入力がさらに進化しました！</h3>
+	    <p>予定入力や高機能検索の音声入力にて、<strong>最大3つまでの変換候補を表示</strong>するようになりました。</p>
+	    <p>これにより、認識精度が向上し、聞き間違いや入力ミスにも柔軟に対応できます。より快適で、誰でも使いやすい音声操作を実現しています。</p>
+
+	    <h3 style="margin-top: 20px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">💻 Web版をご利用の方へ（PCブラウザ）</h3>
+	    <p><strong>パソコンのブラウザからWeb版をご利用の際は、音声入力ではなく手動入力を推奨しています。</strong></p>
+	    <p>これは、音声認識に使用している <strong>Web Speech API</strong> が、PC環境ではブラウザやOSの制限により安定して動作しない場合があるためです。</p>
+	    <p style="font-size: 0.9em; padding-left: 10px; border-left: 3px solid #f99;">
+	        <strong>（不安定になる理由）</strong><br>
+	        音声認識処理は、マイクの音声を**外部の高性能なサーバー**に送信し、その結果をリアルタイムで受け取る仕組みです。PCのブラウザ環境では、他のアプリケーションやネットワークのわずかな途切れの影響を受けやすく、サーバーとの接続が不安定になり、<strong>「音声認識エラー」が頻繁に発生</strong>することが確認されています。
+	    </p>
+	    <p>そのため、<strong>確実な操作と快適な入力のために、手動入力をご利用ください。</strong></p>
+
+
+	    <ul style="margin-top: 20px;">
+	        <li>予定登録は無制限（音声入力を含む全ての入力に対応）</li>
+	        <li>
+	            <h3 style="margin-top: 5px;">📱 <strong>iPhoneでWeb版の音声入力機能をご利用の方へ</strong></h3>
+	            音声入力機能は、AppleのSafariブラウザで<strong><strong>Safari 14.1以降（iOS 14.5以降に相当）</strong></strong>でのみ動作します。ご利用前に、Safariのバージョンをご確認ください。
+	            <br>
+	            🚨 <strong>重要なご注意</strong>
+	            <ul>
+	                <li><strong>必ずSafariブラウザでWebサイトを直接開くか、ブックマークからアクセスしてください。</strong></li>
+	                <li><span style="color: blue;"><strong>「ホーム画面に追加」した状態（PWA）では、音声入力は動作しません</strong>（Appleの仕様による制限です）<strong>。</strong></span></li>
+	                <li><strong>音声入力が使えない場合は、手動入力をご利用ください。</strong></li>
+	            </ul>
+	        </li>
+	        <li>予定のある日はカレンダーに色付き表示</li>
+	        <li>時刻の音声読み上げ付きアナログ時計</li>
+	        <li>割引・税込み対応のお買い物電卓</li>
+	        <li>6分類対応のメモ機能と簡易日記（一覧表示）</li>
+	        <li>キーワード検索・年齢計算・誕生日メッセージ</li>
+	        <li>ブックマーク・通常電卓など便利ツールも充実</li>
+	        <li>マスコット「カレミン」をクリックすると主な機能に直接アクセス可能</li>
+	        <li>データの保存と復元機能を搭載</li>
+	        <li><span style="color: blue;">世界の時刻表示</span>を搭載</li>
+	        <li><span style="color: blue;">現在地の天気予報</span>を搭載　ヘッダーの「舞い ♪ カレンダー」クリックで表示</li>
+	        <li><span style="color: blue;"><strong>今日のカード</strong></span>を搭載　ヘッダー下の今日の赤文字の日付(例 2025/12/11)をクリックで表示</li>	  
+			<li><strong>カレンダーで、例 「9時から13時までテスト」と入力すると、それが今日ならば自動的に「今日のカード」の「今日の時間割」に反映されます。</strong></li>
+			<li><span style="color: blue;">「今日の時間割」で表示される時間ブロックをタップで予定内容をアラートと音声出力します。</span></li>
+			<li><span style="color: blue;"><strong>「直近の予定出力」で現時刻に一番近い予定内容をアラートと音声で出力します。</strong></span></li>
+			<li><span style="color: blue;"><strong>「今日の走り書き」で今日の買い物メモなどをアラートと音声で確認できます。</strong></span></li>
+
+	    </ul>
+	</div>
+
+    <div class="section highlight">
+      <h2>🔊 注意事項とヒント</h2>
+      <ul>
+        <li>端末の音声読み上げ（TTS）機能が必要です</li>
+        <li>日本語読み上げに対応</li>
+        <li>不要になった予定は削除を推奨（容量節約）</li>
+        <li>**削除したくない過去の行事などは残すことにより、日付に色は残ります**</li>
+        <li>天気予報表示のために端末の位置情報を利用します。位置情報は端末内でのみ使用され、外部に送信・共有されることはありません。</li>        
+        <li>個人情報の入力はご遠慮ください</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>📌 その他</h2>
+      <ul>
+        <li>最新の情報はアプリ内のお知らせをご覧ください</li>
+        <li>ご質問・ご要望は以下のメール宛先までどうぞ<br>📧 ettomio0518+gplay@gmail.com</li>
+        <li>プライバシーポリシーの内容は今後予告なく変更される可能性があります</li>
+      </ul>
+      <a class="btn" href="https://docs.google.com/document/d/1wz-kjORhGOlZnl9Vgn_JgI2E0sDPB4WQu4OTph6CrVk/view">プライバシーポリシーへ</a>
+    </div>
+
+    <div class="section">
+      <h2>📺 プロモーション動画</h2>
+      <a class="btn" href="https://www.youtube.com/shorts/BuQaFeQsyPg">簡易版紹介動画</a><br>
+      <a class="btn" href="https://www.youtube.com/shorts/pPWS5uicft4">正規版紹介動画</a><br>
+      <a class="btn" href="https://www.youtube.com/shorts/X9R4FjDXs6Q">音声入力・出力・検索機能動画</a><br>
+        <a class="btn" href="https://youtube.com/shorts/QeUBo5uy608">最新版の紹介動画</a>
+    </div>
+
+    <div class="section">
+      <h2>🌐 案内サイト</h2>
+      <a class="btn" href="https://ettomio.blog.jp/archives/27567409.html">案内サイトへ</a><br>
+      <a class="btn" href="https://play.google.com/store/apps/details?id=com.ettomio.my_calendar_app">Androidアプリ「舞いカレンダー」へ</a><br>
+	<a class="btn" href="https://ettomio0518.github.io/my-calendar-app/index.html">Web版「舞いカレンダー」へ</a>      
+    </div>
+  </div>
+
+
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+			// --- Bottomボタンの表示制御 ---
+			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
+			if (
+			    scrollY > scrollThreshold &&
+			    docHeight - viewHeight - scrollY > scrollThreshold
+			) {
+			    bottomBtn.style.display = "block";
+			} else {
+			    bottomBtn.style.display = "none";
+			}
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
+  
+  <footer>
+    © 20251230 ettomio
+  </footer>
+
+
+</body>
+</html>
