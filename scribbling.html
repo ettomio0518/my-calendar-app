@@ -18,11 +18,19 @@
     align-items: center;
     justify-content: center;
     position: relative;
+    height: 30px;    
   }
-  header h1 {
-    margin: 0;
-    font-size: 1.4rem;
+
+  h1 {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
+  #lockMark {
+    font-size: 16px;
+  }
+
   header button {
     position: absolute;
     right: 16px;
@@ -35,7 +43,7 @@
   
   button {
     margin: 3px;
-    background-color: #dcfedd;
+    background-color: #ffffff;
     border: 1px solid #444;
     border-radius: 5px;
     font-size: 15px;       /* ← 明示 */
@@ -45,20 +53,20 @@
   .save-button {
     background: #ffecff;
     min-width: 72px;
-    padding: 8px 14px;
+    padding: 4px 12px;
     font-size: 15px;
     white-space: nowrap;
     line-height: 1.2;
   }
   .button2 {
-    background: #fff2e6;
+    background: #ffffff;
     min-width: 72px;
-    padding: 8px 14px;
+    padding: 4px 12px;
     font-size: 15px;
     white-space: nowrap;
     line-height: 1.2;
   }
-            
+  
   main {
     max-width: 720px;
     margin: 0 auto;
@@ -77,118 +85,164 @@
   .date-row button {
     padding: 4px 10px;
   }
+
   textarea {
     width: 100%;
-    height: 200px;
+    height: 250px;
     box-sizing: border-box;
     font-size: 1rem;
   }
-  .action-row {
-    margin-top: 10px;
-    display: flex;
-    gap: 10px;
-  }
-  .action-row button {
-    padding: 6px 16px;
-    font-size: 1rem;
-  }
+  
   .warn {
+    font-size: 15px;
     color: red;
     margin-top: 10px;
+    margin-bottom: 8px;    
   }
+  
   footer {
     text-align: center;
     padding: 12px;
   }	 
-
-  .action-row {
-    margin-top: 6px;   /* 今より少し詰める */
-  }
-
-  .notice {
-    margin-top: 6px;
-    font-size: 14px;
-  }
-
-
+    
 </style>
 </head>
+
 <body>
+
 <header>
-  <h1>走り書き</h1>
+  <h1>走り書き <span id="lockMark"></span></h1>
   <button onclick="location.href='today-card.html'">戻る</button>
 </header>
 
 <main>
-  <div class="date-row">
-	<!-- 日付ラベル削除 -->
 
+  <div class="date-row">
     <button onclick="moveDate(-1)">◁</button>
     <button onclick="setToday()">今日</button>
     <button onclick="moveDate(1)">▷</button>
-    <input type="date" id="dateInput">    
+    <input type="date" id="dateInput">
   </div>
 
   <textarea id="memo" placeholder="アイデア・買い物メモなど自由に走り書き"></textarea>
 
-    <div class="action-row">
+  <div class="action-row">
     <button class="save-button" onclick="saveMemo()">💾 保存</button>
     <button class="button2" onclick="deleteMemo()">破棄</button>
     <button class="button2" onclick="deleteOldMemos()">7日以上前を破棄</button>
   </div>
 
-  <p class="warn">雑記ですので逐一データは破棄してください。容量を圧迫してしまいます。</p>
+  <p class="warn">
+    雑記ですので逐一データは破棄してください。容量を圧迫してしまいます。
+  </p>
+
+  <div class="action-row">
+    <button class="save-button" onclick="protectMemo()">🔒 破棄不可</button>
+    <button class="button2" onclick="unprotectMemo()">🔓 解除</button>
+  </div>
+  
 </main>
 
 <script>
   const dateInput = document.getElementById('dateInput');
   const memo = document.getElementById('memo');
+  const lockMark = document.getElementById('lockMark');
 
-  function formatKey(date) {
+  function memoKey(date) {
     return 'scribbling_' + date.replace(/-/g, '');
   }
 
+  function metaKey(date) {
+    return 'scribbling_meta_' + date.replace(/-/g, '');
+  }
+
+  function isProtected(date) {
+    const meta = JSON.parse(
+      localStorage.getItem(metaKey(date)) || '{}'
+    );
+    return meta.protected === true;
+  }
+
+  function updateLockMark() {
+    lockMark.textContent = isProtected(dateInput.value) ? '🔒' : '';
+  }
+
   function loadMemo() {
-    const key = formatKey(dateInput.value);
-    memo.value = localStorage.getItem(key) || '';
+    memo.value = localStorage.getItem(memoKey(dateInput.value)) || '';
+    updateLockMark();
   }
 
   function saveMemo() {
-    const key = formatKey(dateInput.value);
-    localStorage.setItem(key, memo.value);
+    localStorage.setItem(memoKey(dateInput.value), memo.value);
     alert('保存しました');
   }
 
-  function deleteMemo() {
-    const key = formatKey(dateInput.value);
-    localStorage.removeItem(key);
-    memo.value = '';
-    alert('破棄しました');
+  function protectMemo() {
+    localStorage.setItem(
+      metaKey(dateInput.value),
+      JSON.stringify({ protected: true })
+    );
+    updateLockMark();
+    alert('破棄不可に設定されました。');
   }
 
-  function deleteOldMemos() {
-    const now = new Date();
-    let count = 0;
+  function unprotectMemo() {
+    localStorage.removeItem(metaKey(dateInput.value));
+    updateLockMark();
+    alert('破棄不可を解除しました。');
+  }
 
-    for (let i = localStorage.length - 1; i >= 0; i--) {
-      const key = localStorage.key(i);
-      if (!key.startsWith('scribbling_')) continue;
+function deleteMemo() {
+  if (isProtected(dateInput.value)) {
+    alert('破棄不可に設定されています。');
+    return;
+  }
 
-      const dateStr = key.replace('scribbling_', '');
-      const y = dateStr.substring(0, 4);
-      const m = dateStr.substring(4, 6);
-      const d = dateStr.substring(6, 8);
-      const memoDate = new Date(`${y}-${m}-${d}`);
+  localStorage.removeItem(memoKey(dateInput.value));
+  localStorage.removeItem(metaKey(dateInput.value));
 
-      const diffDays = (now - memoDate) / (1000 * 60 * 60 * 24);
-      if (diffDays >= 7) {
-        localStorage.removeItem(key);
-        count++;
-      }
+  loadMemo();   // ← これが決定的に重要
+  alert('破棄しました');
+}
+
+
+function deleteOldMemos() {
+  const now = new Date();
+  let deleted = 0;
+  let protectedCount = 0;
+
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+
+    if (!key.startsWith('scribbling_') || key.startsWith('scribbling_meta_')) {
+      continue;
     }
 
-    alert(`${count}件の走り書きを破棄しました`);
+    const dateStr = key.replace('scribbling_', '');
+    const y = dateStr.slice(0, 4);
+    const m = dateStr.slice(4, 6);
+    const d = dateStr.slice(6, 8);
+
+    const memoDate = new Date(`${y}-${m}-${d}`);
+    const diffDays = (now - memoDate) / (1000 * 60 * 60 * 24);
+
+    if (diffDays >= 7) {
+      const date = `${y}-${m}-${d}`;
+
+      if (isProtected(date)) {
+        protectedCount++;
+      } else {
+        localStorage.removeItem(key);
+        localStorage.removeItem(metaKey(date));
+        deleted++;
+      }
+    }
   }
+
+  loadMemo(); // ← ★ これを追加 ★
+
+  alert(`${deleted}件の走り書きを破棄しました。${protectedCount}件は破棄できません。`);
+}
 
   function setToday() {
     const now = new Date();
@@ -199,29 +253,27 @@
     loadMemo();
   }
 
-
   function moveDate(diff) {
     const parts = dateInput.value.split('-');
     const d = new Date(parts[0], parts[1] - 1, parts[2]);
     d.setDate(d.getDate() + diff);
 
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    dateInput.value = `${y}-${m}-${day}`;
+    dateInput.value =
+      d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
 
     loadMemo();
   }
 
-
   dateInput.addEventListener('change', loadMemo);
 
-  // 初期表示：今日
+  // 初期表示
   setToday();
 </script>
 
   <footer>
-    © 20251219 ettomio
+    © 20251231 ettomio
   </footer>
   
 </body>
