@@ -109,10 +109,11 @@
         
 		.nav-button {
 		  box-sizing: border-box;
-		  min-width: 2.2em;   /* ◁ ▷ 用 */
+		  min-width: 2.5em;   /* ◁ ▷ 用 */
 		  padding: 0.3em 0.4em;
-		  font-size: 14px;
 		  border-radius: 6px;
+	      font-size: 15px;       /* ← 明示 */
+	      line-height: 1.2;      /* ← 超重要 */		  
 		}
         
         .save-button {
@@ -257,8 +258,8 @@
 
 
       <!-- 日記入力 -->
-      <label for="diaryContent">日記:</label>
-      <textarea id="diaryContent" rows="5"></textarea>
+      <!-- <label for="diaryContent">日記:</label> -->
+      <textarea id="diaryContent" rows="12"></textarea>
 
       <button class="save-button" onclick="saveDiary()">💾 保存</button>
 
@@ -539,7 +540,7 @@
   
   <footer>
     <br><br>
-    © 20251219 ettomio
+    © 20260102 ettomio
   </footer>
   <div style="height: 50px;"></div>
   
