@@ -96,7 +96,6 @@
         }
         button {
             font-size: 14px;
-            padding: 2px 2px;
             padding: 5px 10px; /* ボタンの余白を調整 */
             background-color: #f7eeff;
             color: black;
@@ -125,7 +124,6 @@
 
         .btn-show-text {  /* 3/15に */
             font-size: 14px;
-            padding: 2px 2px;
             padding: 3px 5px; /* ボタンの余白を調整 */
             background-color: #ffe9d2;
             color: black;
@@ -192,17 +190,22 @@
 		    background: #0056b3;
 		}    
 	
-	    /* 戻るボタン 12/18 */
-		.top-right-button {
-		  position: absolute;
-		  top: 50%;
-		  right: 10px;
-		  transform: translateY(-50%);
-		  cursor: pointer;
-		}
-
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+	      width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 15px;
+	      right: 10px;
+	      background-color: #e1ffff;
+	      color: #400040;
+		  border: 1px solid #ff8000; /* 枠線を表示 */		      
+	      border-radius: 20px;
+	      padding: 4px 12px;
+	      font-size: 14px;
+	      cursor: pointer;
+	    }
 	    .top-right-button:hover {
-	      background-color: #f4f4f4;
+	      background-color: #e3e3f0;
 	    }
 
 	    footer {
@@ -229,7 +232,7 @@
 <body>
 
 <header>
-  <h1>簡易日記</h1>
+  <h1>簡易日記 diary</h1>
 	<button class="top-right-button" onclick="goBack()">戻る</button>
 	</header>
 
