@@ -28,6 +28,7 @@
 		  margin: 0;                  /* ← これ超重要 */
 		  font-size: 18px;
 		  font-weight: normal;
+		  margin-left: 30px; /* ← 左に30pxの余白 */  		  
 		}
 
 		section{
@@ -59,12 +60,6 @@
             margin-bottom: 10px;
         } 
         
-	    h4 {
-	      font-size: 20px;
-	      margin-bottom: 10px;
-	      margin-left: 30px; /* ← 左に30pxの余白 */  	      
-	    }	
-
 		button{
 		    border: 1px solid #000; /* 枠の色 */ 
             border-radius: 5px; /* 角を丸くする */
@@ -176,7 +171,7 @@
 
 <body>
 	<header class="app-header">
-	  <h4>買い物電卓 calculator</h4>
+	  <h4>🧮 お買い物電卓 calculator</h4>
 	  <button class="top-right-button"
 	    onclick="window.location.href='index.html'">戻る</button>
 	</header>
@@ -323,8 +318,7 @@
             }
             totalBasePrice = Math.round(totalBasePrice * 100) / 100; // 小数点以下2桁に丸める
             total = Math.round(total * 100) / 100; // 小数点以下2桁に丸める
-            document.getElementById('totalPrice').innerHTML =
-  `定価合計は${totalBasePrice}円、<strong>税込み合計は${total.toFixed(2)}円です。</strong>`;
+            document.getElementById('totalPrice').innerText = `定価合計は${totalBasePrice}円、<strong>税込み合計は${total.toFixed(2)}円です。</strong>`;
             document.getElementById('extraFields').style.display = 'block';
             const message =(`定価合計は${totalBasePrice}円、税込み合計は${total.toFixed(2)}円です。若干の誤差が生じるかもしれません。`);
             showCustomAlert(message);
