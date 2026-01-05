@@ -318,7 +318,8 @@
             }
             totalBasePrice = Math.round(totalBasePrice * 100) / 100; // 小数点以下2桁に丸める
             total = Math.round(total * 100) / 100; // 小数点以下2桁に丸める
-            document.getElementById('totalPrice').innerText = `定価合計は${totalBasePrice}円、<strong>税込み合計は${total.toFixed(2)}円です。</strong>`;
+            document.getElementById('totalPrice').innerHTML =
+  `定価合計は${totalBasePrice}円、<strong>税込み合計は${total.toFixed(2)}円です。</strong>`;
             document.getElementById('extraFields').style.display = 'block';
             const message =(`定価合計は${totalBasePrice}円、税込み合計は${total.toFixed(2)}円です。若干の誤差が生じるかもしれません。`);
             showCustomAlert(message);
