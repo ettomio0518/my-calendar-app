@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>今月の買い物金額の詳細</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            margin: 0;
+            background-color: #ececf7; /* 背景色 */
+        }
+		section{
+		  background:#e3ffff; margin:14px; padding:14px;
+		  border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.08);
+		}        
+	    .container {
+	        max-width: 600px; /* コンテナの最大横幅を設定 */
+	        margin: 0 auto; /* 中央に配置 */
+	    }
+        .amount-box {
+            width: 30%; /* 横幅を調整 */
+            box-sizing: border-box; /* パディングとボーダーを含む */
+        }
+
+		header {
+		  background: #8080ff;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: left;
+		  position: relative; 
+		}
+		h1 {
+		  font-size: 18px;
+		  margin: 0;  /* 上下・右は0 */
+		  margin-left: 30px; /* ← 左に30pxの余白 */   
+		}    
+		        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        h2 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }      
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .action-button {
+            margin-top: 10px;
+        }
+        .action-button2 {
+            margin-top: 10px;
+            background-color: #ffffbd; /* 背景色 */
+        }
+        .action-button3 {
+            margin-top: 10px;
+            border-radius: 5px; /* 角を丸くする */            
+            background-color: #d5ffff; /* 背景色 */
+            padding: 3px 10px; /* 内側余白 */
+        }
+        .inline {
+            display: inline-block;
+            margin-right: 5px;
+        }
+        /* .hidden {
+            display: none;
+        } */
+		.custom-alert {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #ffcccb;
+		    color: black;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
+		}
+
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 13px;
+	      right: 75px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 5px 10px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	    
+	    /* homeに戻るボタン 5/6 */
+	    .top-right2-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 13px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 5px 10px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right2-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	    	    
+    </style>
+</head>
+<body>
+    <div class="container">
+    
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='shopping.html'">back</button>
+	    <button class="top-right2-button" onclick="location.href='index.html'">home</button>
+	    
+	    <h1>今月の買い物 receipt </h1>
+  	</header>
+
+	<section>
+    <h2>日々の買い物 → 月集計</h2>
+    <p class="section-note">選択月の日々のデータ</p> 
+        <label for="monthPicker">月選択:</label>
+        <input type="month" id="monthPicker">
+        <button onclick="showMonthlyDetails()">表示</button>
+        <div id="details"></div>
+        <p>10日間周期ぐらいで保存してください</p>
+
+        <button class="action-button" onclick="calculateMonthlyTotal()">日々の金額の合計</button>
+        <label for="monthlyTotal">月間合計:</label>
+        <input type="text" id="monthlyTotal" class="amount-box" readonly> 円
+        <button class="action-button2" onclick="saveMonthlyTotal()">保存</button>
+        <br>        
+        <button class="action-button3" onclick="showHistory()">履歴を表示</button><br>
+        <p>記号は期間の名称です</p>
+        <div id="history"></div>
+	</section>
+	
+	<section>	
+        <h2>月を選択し買い物合計金額を表示</h2>
+        <label for="selectedMonth">月選択:</label>
+        <input type="month" id="selectedMonth">
+        <br>
+        <button class="action-button" onclick="showSelectedMonthTotal()">選択月の合計</button>
+        <label for="selectedMonthTotal">選択された月の合計:</label>
+        <input type="text" id="selectedMonthTotal" class="amount-box" readonly> 円
+	</section>
+       
+    </div>
+
+    <script>
+        let canShowDeleteButtons = false;
+        // let canShowSubDeleteButtons = false; // 使っていないので
+        let alertShown = false; // アラートが表示されたかを記録するフラグ
+
+        function showCustomAlert(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.classList.add('custom-alert');
+            alertDiv.textContent = message;
+
+            document.body.appendChild(alertDiv);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000); // 3秒後に削除
+        }
+
+        function showMonthlyDetails() {
+            const month = document.getElementById('monthPicker').value;
+            if (!month) {
+                alert('月を選択してください');
+                return;
+            }
+
+            const detailsDiv = document.getElementById('details');
+            detailsDiv.innerHTML = '';
+
+            let lastDay = new Date(parseInt(month.split('-')[0]), parseInt(month.split('-')[1]), 0).getDate();
+            let dataExists = false; // 日々のデータが存在するかどうかのフラグ
+
+            for (let i = 1; i <= lastDay; i++) {
+                const dateKey = `shopping_${month.replace('-', '')}${i.toString().padStart(2, '0')}`;
+                const amount = localStorage.getItem(dateKey);
+                if (amount) {
+                    dataExists = true; // データが存在することを記録
+                    detailsDiv.innerHTML += `
+                        <div id="${dateKey}">
+                            <span>${i}日:</span>
+                            <input type="text" value="${amount}" class="amount-box" readonly> 円
+                            
+                        </div>
+                    `;
+                }
+            }
+
+            if (!dataExists) {
+                showCustomAlert('期間のデータはありません。');
+            }
+        }
+
+        
+        
+        function deleteEntry(key) {
+            localStorage.removeItem(key);
+            const element = document.getElementById(key);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        function calculateMonthlyTotal() {
+            const month = document.getElementById('monthPicker').value;
+            if (!month) {
+                alert('月を選択してください');
+                return;
+            }
+
+            let total = 0;
+            let lastDay = new Date(parseInt(month.split('-')[0]), parseInt(month.split('-')[1]), 0).getDate();
+            for (let i = 1; i <= lastDay; i++) {
+                const dateKey = `shopping_${month.replace('-', '')}${i.toString().padStart(2, '0')}`;
+                const amount = parseFloat(localStorage.getItem(dateKey)) || 0;
+                total += amount;
+            }
+            document.getElementById('monthlyTotal').value = total;
+        }
+
+
+		function saveMonthlyTotal() {
+		    const month = document.getElementById('monthPicker').value;
+		    if (!month) {
+		        alert('月を選択してください');
+		        return;
+		    }
+
+		    const totalAmount = document.getElementById('monthlyTotal').value;
+		    if (!totalAmount) {
+		        alert('合計金額を計算してください');
+		        return;
+		    }
+
+		    let subIndex = 1;
+		    let key;
+		    while (localStorage.getItem(`TA_${month.replace('-', '')}sub${subIndex}`)) {
+		        subIndex++;
+		    }
+		    key = `TA_${month.replace('-', '')}sub${subIndex}`;
+
+		    localStorage.setItem(key, totalAmount);
+		    alert(`${key}として保存しました`);
+
+		    // Show delete buttons after save
+		    const detailsDiv = document.getElementById('details');
+		    const buttons = detailsDiv.getElementsByTagName('button');
+		    for (let button of buttons) {
+		        button.classList.remove('hidden');
+		    }
+
+		    alert('データ量の肥大と誤計算につながります。保存後は日々の明細を消去します。');
+
+		    // アラートOK後に日々のデータを強制的に削除
+		    const lastDay = new Date(parseInt(month.split('-')[0]), parseInt(month.split('-')[1]), 0).getDate();
+		    for (let i = 1; i <= lastDay; i++) {
+		        const dateKey = `shopping_${month.replace('-', '')}${i.toString().padStart(2, '0')}`;
+		        localStorage.removeItem(dateKey);
+		    }
+		    document.getElementById('details').innerHTML = ''; // 画面からも削除
+		}
+
+
+		function showHistory() {
+		    const month = document.getElementById('monthPicker').value;
+		    if (!month) {
+		        alert('月を選択してください');
+		        return;
+		    }
+
+		    const historyDiv = document.getElementById('history');
+		    historyDiv.innerHTML = '';
+
+		    let totalAmount = 0;
+		    let hasHistory = false; // 履歴が存在するかどうかのフラグ
+
+		    for (let i = 1; ; i++) {
+		        const key = `TA_${month.replace('-', '')}sub${i}`;
+		        const amount = localStorage.getItem(key);
+		        if (!amount) break;
+		        hasHistory = true; // 履歴が存在することを記録
+		        totalAmount += parseFloat(amount);
+		        historyDiv.innerHTML += `
+		            <div id="${key}">
+		                <span>${key}:</span>
+		                <input type="text" value="${amount}" class="amount-box" readonly> 円
+		                
+		            </div>
+		        `;
+		    }
+
+		    if (hasHistory) {
+		        historyDiv.innerHTML += `
+		            <div class="inline">
+		                <label for="historyTotal">月の合計:</label>
+		                <input type="text" value="${totalAmount}" id="historyTotal" class="amount-box" readonly> 円
+		                <button class="action-button2" onclick="saveHistoryTotal('${month.replace('-', '')}', ${totalAmount})">保存</button>
+		            </div>
+		        `;
+		    } else {
+		        showCustomAlert('表示できる履歴はありません。');
+		    }
+		}
+
+
+        function deleteSubEntry(key) {
+            localStorage.removeItem(key);
+            const element = document.getElementById(key);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        function saveHistoryTotal(month, totalAmount) {
+            const key = `TA_${month}reg`;
+            localStorage.setItem(key, totalAmount);
+            alert(`${key}として保存しました`);
+
+            canShowSubDeleteButtons = true;
+
+            // Show delete buttons after save
+            const historyDiv = document.getElementById('history');
+            const buttons = historyDiv.getElementsByTagName('button');
+            for (let button of buttons) {
+                button.classList.remove('hidden');
+            }
+
+            // alert('保存後は期間の小計を消去しても構いません。');
+        }
+
+        
+		// 既存の音声再生関数
+		function speakText(text) {
+		    if ('speechSynthesis' in window) {
+		        const utterance = new SpeechSynthesisUtterance(text);
+		        window.speechSynthesis.speak(utterance);
+		    } else {
+		        alert("音声合成がサポートされていません");
+		    }
+		}
+
+		// 新しい音声合成関数
+		function nativeSpeak(text) {
+		    if (typeof Android !== 'undefined' && Android.speak) {
+		        Android.speak(text);
+		    } else {
+		        speakText(text); // Android.speakが使用できない場合はブラウザの音声合成を使用
+		    }
+		}
+		        
+		function showSelectedMonthTotal() {
+		    const month = document.getElementById('selectedMonth').value;
+		    if (!month) {
+		        alert('月を選択してください');
+		        return;
+		    }
+
+		    const key = `TA_${month.replace('-', '')}reg`;
+		    const totalAmount = localStorage.getItem(key) || 0;
+		    document.getElementById('selectedMonthTotal').value = totalAmount;
+
+		    // "〇〇年〇〇月"形式でアラートを表示
+		    const [year, monthNumber] = month.split('-');
+			const message=`${year}年${monthNumber}月の買い物の合計金額は${totalAmount}円です`;    
+		    showCustomAlert(message);
+		    nativeSpeak(message);
+		}
+
+    </script>
+</body>
+
+</html>
