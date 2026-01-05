@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>お買い物計算</title>
+    <style>
+	    body {
+	      font-family: Arial, sans-serif;
+	      padding: 20px;
+	      max-width: 500px;
+	      margin: auto;
+	      background-color: #ffe6ff;
+	    }
+
+		.app-header {
+		  background: #8080ff;
+		  color: white;
+
+		  display: flex;
+		  align-items: center;        /* ← 縦中央 */
+		  justify-content: space-between;
+
+		  padding: 10px 14px;         /* ← 余白を最小限に */
+		}
+
+		.app-header h4 {
+		  margin: 0;                  /* ← これ超重要 */
+		  font-size: 18px;
+		  font-weight: normal;
+		}
+
+		section{
+		  background:#e3ffff; margin:14px; padding:14px;
+		  border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.08);
+		}
+        table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        input[type="number"], input[type="text"] {
+            width: 70px; /* 幅を少し広げました */
+            height: 30px; /* 縦幅を調整 */
+            box-sizing: border-box;
+        }
+	    h1 {
+	      text-align: center;
+	      font-size: 20px;
+	      margin-bottom: 10px;
+	    }
+	    
+        h2 {
+            font-size: 16px;
+            color: #0000ff;
+            margin-bottom: 10px;
+        }    
+        h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        } 
+        
+	    h4 {
+	      font-size: 20px;
+	      margin-bottom: 10px;
+	      margin-left: 30px; /* ← 左に30pxの余白 */  	      
+	    }	
+
+		button{
+		    border: 1px solid #000; /* 枠の色 */ 
+            border-radius: 5px; /* 角を丸くする */
+		    padding:2px 10px;
+		}	                                      
+        .tax-button {
+		    border: 1px solid #000; /* 枠の色 */ 
+		    border-radius:5px; 
+  			width: 100%;
+  			max-width: 60px;   /* ボタンとしての上限 */
+            padding: 3px;
+            margin: 1.5px; /* 周囲の余白 */
+            font-size: 13px;
+  			min-height: 24px;   /* 高さを固定しない */
+  			line-height: 1.2;
+            background-color: lightgray;
+        }
+        .tax-button.active {
+            background-color: yellow;
+        }
+        .discount-row {
+            margin-bottom: 20px;
+        }
+        .add-button {
+            padding: 3px 10px; /* 内側余白 */
+            margin: 3px; /* 周囲の余白 */
+            border: 1px solid #000; /* 枠の色 */
+            border-radius: 5px; /* 角を丸くする */
+            cursor: pointer; /* カーソルをポインタに変更 */
+        }       
+        .total-button {
+            background-color: #c4ffe1; /* 背景色 */
+            padding: 3px 10px; /* 内側余白 */
+            margin: 3px; /* 周囲の余白 */
+            border-radius: 5px; /* 角を丸くする */
+            cursor: pointer; /* カーソルをポインタに変更 */
+        }
+        .save-button {
+            background-color: #ffffbd; /* 背景色 */
+            padding: 3px 10px; /* 内側余白 */
+            margin: 3px; /* 周囲の余白 */
+            border-radius: 5px; /* 角を丸くする */
+            cursor: pointer; /* カーソルをポインタに変更 */
+        }
+  
+		.custom-alert {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #ffcccb;
+		    color: black;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
+		}
+
+		/* 11/4 Top/Bottomボタン */
+		.bottom-button, .top-button {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #007bff;
+		    color: white;
+		    border: none;
+		    border-radius: 20px;
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		    display: none;
+		}
+		.bottom-button:hover, .top-button:hover {
+		    background: #0056b3;
+		}    
+	    
+		/* 11/4 Top/Bottomボタン */
+		.bottom-button, .top-button {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #007bff;
+		    color: white;
+		    border: none;
+		    border-radius: 20px;
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		    display: none;
+		}
+		.bottom-button:hover, .top-button:hover {
+		    background: #0056b3;
+		}
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	    }	
+	    	    		        
+    </style>
+</head>
+
+<body>
+	<header class="app-header">
+	  <h4>買い物電卓 calculator</h4>
+	  <button class="top-right-button"
+	    onclick="window.location.href='index.html'">戻る</button>
+	</header>
+
+
+<section>
+    <!-- 割引計算行 -->
+<h2>🏷 割引計算</h2>    
+        <div class="discount-row">
+        <table>
+            <tr>
+                <th>単価</th>
+                <th>％割引</th>
+                <th>割引後</th>
+                <th>転送</th>
+            </tr>
+            <tr>
+                <td><input type="number" id="discountPrice" onchange="updateDiscountedPrice()"></td>
+                <td><input type="number" id="discountRate" onchange="updateDiscountedPrice()"></td>
+                <td><input type="text" id="discountedPrice" readonly></td>
+                <td><button class="save-button" onclick="transferDiscount()">転送</button></td>
+            </tr>
+        </table>
+    </div>
+
+    <p>割引商品については上記の電卓を使い、割引後の価格を下記の単価に転送して下さい。<br>個数欄はタップする毎に増えていきます。</p>
+    <h2>🧾 明細</h2>
+    <table id="itemTable">
+        <tr>
+            <th>単価</th>
+            <th>個数</th>
+            <th>税％</th>
+            <th>消去</th>
+            <th>小計</th>
+        </tr>
+    </table>
+    <button class="add-button" onclick="addItemRow()">行を追加</button>
+    <button class="total-button" onclick="calculateTotal()">合計</button>    
+    <p id="totalPrice"></p>
+</section>    
+    
+<section>    
+	<div id="extraFields">
+		<h2>📅 今月の買い物記録に転記</h2>
+	    <label for="purchaseDate">購入日:</label>
+	    <input type="date" id="purchaseDate">
+	    <br><br>
+	    <button class="add-button" onclick="showAlert()">アラート</button>
+	    <div id="alertMessage" style="display:none;">買い物を2回、3回とされるとその合計金額を入力して下さい。</div>
+	    <label for="totalAmount">合計金額:</label>
+	    <input type="number" id="totalAmount">
+	    <button class="save-button" onclick="saveTotalAmount()">保存</button>
+	</div>
+    <br>
+
+    <button class="total-button" onclick="window.location.href='receipt.html'">今月の買い物記録</button>
+</section>    
+
+
+<section>    
+    <h3>オマケ: 🍚 生活の目安：ご飯一膳いくら ?</h3>
+    <p>お米の価格が高騰しています。ここではご飯一膳を精米65gで計算しています</p>
+    <label for="ricePrice">精米5Kgの価格 (円): </label>
+    <input type="number" id="ricePrice" placeholder="円" step="100">
+    <button onclick="calculatePrice()">計算</button>
+    <span id="result">一膳の価格: - 円</span>
+</section>
+    
+    <script>
+        let itemIndex = 0;
+
+        function addItemRow() {
+            if (itemIndex >= 20) {
+			showCustomAlert("申し訳ございません。計算はここまでです。");
+            nativeSpeak("申し訳ございません。計算はここまでです。");			
+                return;
+            }
+            
+            const table = document.getElementById('itemTable');
+            const row = table.insertRow(-1);
+            row.innerHTML = `
+                <td><input type="number" id="price${itemIndex}" onchange="updateSubtotal(${itemIndex});checkAndAddRow(${itemIndex})"></td>
+                <td><input type="text" id="quantity${itemIndex}" value="1" onclick="increaseQuantity(${itemIndex})" onchange="updateSubtotal(${itemIndex})"></td>
+                <td>
+                    <button class="tax-button" onclick="setTaxRate(${itemIndex}, 8)">8</button>
+                    <button class="tax-button" onclick="setTaxRate(${itemIndex}, 10)">10</button>
+                </td>
+                <td><button onclick="clearRow(${itemIndex})">消去</button></td>
+                <td><input type="text" id="subtotal${itemIndex}" readonly></td>
+            `;
+            itemIndex++;
+        }
+
+        function checkAndAddRow(index) {
+            const price = document.getElementById(`price${index}`).value;
+            if (price && itemIndex - 1 === index) {
+                addItemRow();
+            }
+        }
+
+        function setTaxRate(index, taxRate) {
+            const buttons = document.querySelectorAll(`#itemTable tr:nth-child(${index + 2}) .tax-button`);
+            buttons.forEach(button => button.classList.remove('active'));
+            
+            const activeButton = Array.from(buttons).find(button => button.textContent.includes(taxRate));
+            if (activeButton) activeButton.classList.add('active');
+            
+            document.getElementById(`price${index}`).setAttribute("data-tax-rate", taxRate);
+            updateSubtotal(index);
+        }
+
+        function updateSubtotal(index) {
+            const price = parseFloat(document.getElementById(`price${index}`).value) || 0;
+            const quantity = parseInt(document.getElementById(`quantity${index}`).value) || 0;
+            const taxRate = parseFloat(document.getElementById(`price${index}`).getAttribute("data-tax-rate")) || 0;
+            const subtotal = (price * quantity) * (1 + taxRate / 100);
+            document.getElementById(`subtotal${index}`).value = subtotal.toFixed(2);
+        }
+
+        function clearRow(index) {
+            document.getElementById(`price${index}`).value = '';
+            document.getElementById(`quantity${index}`).value = '1'; // 個数を1に戻す
+            document.getElementById(`subtotal${index}`).value = '';
+            setTaxRate(index, 8); // Reset tax rate to 8% and update button color
+        }
+
+        function increaseQuantity(index) {
+            const quantityInput = document.getElementById(`quantity${index}`);
+            let quantity = parseInt(quantityInput.value) || 0;
+            quantity++;
+            quantityInput.value = quantity;
+            updateSubtotal(index);
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            let totalBasePrice = 0;
+            for (let i = 0; i < itemIndex; i++) {
+                const price = parseFloat(document.getElementById(`price${i}`).value) || 0;
+                const quantity = parseInt(document.getElementById(`quantity${i}`).value) || 0;
+                const subtotal = parseFloat(document.getElementById(`subtotal${i}`).value) || 0;
+                totalBasePrice += price * quantity;
+                total += subtotal;
+            }
+            totalBasePrice = Math.round(totalBasePrice * 100) / 100; // 小数点以下2桁に丸める
+            total = Math.round(total * 100) / 100; // 小数点以下2桁に丸める
+            document.getElementById('totalPrice').innerHTML =
+  `定価合計は${totalBasePrice}円、<strong>税込み合計は${total.toFixed(2)}円です。</strong>`;
+            document.getElementById('extraFields').style.display = 'block';
+            const message =(`定価合計は${totalBasePrice}円、税込み合計は${total.toFixed(2)}円です。若干の誤差が生じるかもしれません。`);
+            showCustomAlert(message);
+            nativeSpeak(message);
+        }
+                    
+        function updateDiscountedPrice() {
+            const price = parseFloat(document.getElementById('discountPrice').value) || 0;
+            const discountRate = parseFloat(document.getElementById('discountRate').value) || 0;
+            const discountedPrice = price * (1 - discountRate / 100);
+            document.getElementById('discountedPrice').value = discountedPrice.toFixed(2);
+        }
+
+		function transferDiscount() {
+		    if (itemIndex >= 20) {
+		        showCustomAlert("申し訳ございません。計算はここまでです。");
+		        nativeSpeak("申し訳ございません。計算はここまでです。");
+		        return; // 転送を防ぐ
+		    }
+
+		    const discountedPrice = parseFloat(document.getElementById('discountedPrice').value) || 0;
+
+		    let emptyRowIndex = -1;
+		    for (let i = 0; i < itemIndex; i++) {
+		        const priceCell = document.getElementById(`price${i}`);
+		        if (priceCell && !priceCell.value) {
+		            emptyRowIndex = i;
+		            break;
+		        }
+		    }
+
+		    if (emptyRowIndex === -1) {
+		        addItemRow();
+		        emptyRowIndex = itemIndex - 1;
+		    }
+
+		    // 割引後の価格を空いている行に転送
+		    document.getElementById(`price${emptyRowIndex}`).value = discountedPrice.toFixed(2);
+		    updateSubtotal(emptyRowIndex);
+		    checkAndAddRow(emptyRowIndex);
+
+		    // 割引計算をクリア
+		    clearDiscount();
+		}
+
+        
+        function clearDiscount() {
+            document.getElementById('discountPrice').value = '';
+            document.getElementById('discountRate').value = '';
+            document.getElementById('discountedPrice').value = '';
+        }
+
+        function showAlert() {
+            const alertMessage = document.getElementById('alertMessage');
+            alertMessage.style.display = 'block';
+            setTimeout(() => {
+                alertMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        function saveTotalAmount() {
+            const date = document.getElementById('purchaseDate').value;
+            const totalAmount = document.getElementById('totalAmount').value;
+            if (date && totalAmount) {
+                localStorage.setItem(`shopping_${date.replace(/-/g, '')}`, totalAmount);
+                alert('合計金額が保存されました');
+            } else {
+                alert('日付と合計金額を入力してください');
+            }
+        }
+
+        // 初期表示時に1行目を追加
+        window.onload = function() {
+            addItemRow();
+        };
+        
+        
+		// カスタム通知を表示する関数
+		function showCustomAlert(message) {
+		    const alertContainer = document.createElement('div');
+		    alertContainer.className = 'custom-alert';
+		    alertContainer.textContent = message;
+
+		    document.body.appendChild(alertContainer);
+
+	    // 5秒後に通知を自動的に消去
+	    setTimeout(() => {
+	        document.body.removeChild(alertContainer);
+	    }, 5000);
+	}
+
+
+		// 既存の音声再生関数
+		function speakText(text) {
+		   if ('speechSynthesis' in window) {
+		       const utterance = new SpeechSynthesisUtterance(text);
+		       window.speechSynthesis.speak(utterance);
+		   } else {
+		       alert("音声合成がサポートされていません");
+		   }
+		}
+
+		// 新しい音声合成関数
+		function nativeSpeak(text) {
+		   if (typeof Android !== 'undefined' && Android.speak) {
+		       Android.speak(text);
+		   } else {
+		       speakText(text); // Android.speakが使用できない場合はブラウザの音声合成を使用
+		   }
+		}
+
+    
+        function calculatePrice() {
+            const ricePrice = parseFloat(document.getElementById("ricePrice").value);
+            if (isNaN(ricePrice) || ricePrice <= 0) {
+                alert("正しい価格を入力してください");
+                return;
+            }
+            const totalServings = 5000 / 65; // 5Kgあたり77杯
+            const pricePerServing = ricePrice / totalServings;
+            const roundedPrice = Math.floor(pricePerServing); // 小数点以下切り捨て
+            const roundedPrice2 = Math.round(pricePerServing * 10) / 10; // 小数第二位で四捨五入
+            const message2 = `あなたのご飯一膳はほぼ${roundedPrice}円になります`;
+            showCustomAlert(message2);
+            nativeSpeak(message2);
+            document.getElementById("result").textContent = `一膳の価格: ${roundedPrice2} 円`;
+            //const utterance = new SpeechSynthesisUtterance(message);
+            //speechSynthesis.speak(utterance);
+        }        
+    </script>
+
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+			// --- Bottomボタンの表示制御 ---
+			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
+			if (
+			    scrollY > scrollThreshold &&
+			    docHeight - viewHeight - scrollY > scrollThreshold
+			) {
+			    bottomBtn.style.display = "block";
+			} else {
+			    bottomBtn.style.display = "none";
+			}
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
+  
+  <footer>
+    © 20260105 ettomio
+  </footer>
+    
+	<div style="height: 50px;"></div>
+		        
+</body>
+</html>
+
+
