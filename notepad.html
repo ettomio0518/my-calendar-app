@@ -5,23 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メモの入力と確認</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 18px;
-            margin: 7px;
-            background-color: #ffffc4;
-        }
-		header {
+	    body {
+	      font-family: Arial, sans-serif;
+	      padding: 20px;
+	      max-width: 500px;
+	      margin: auto;
+	      background-color: #ffe6ff;
+	    }
+        
+		.app-header {
 		  background: #8080ff;
 		  color: white;
-		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
-		  text-align: center;
-		  position: relative;  /* ← これが重要 */
+
+		  display: flex;
+		  align-items: center;        /* ← 縦中央 */
+		  justify-content: space-between;
+
+		  padding: 10px 14px;         /* ← 余白を最小限に */
+		  
 		}
-		h1 {
-		  font-size: 20px;
-		  margin: 0;
-		}    	            
+
+		.app-header h1 {
+	  	  /* margin: 0;   */    /* ← これ超重要 */
+  		  margin-left: 30px; /* ← 左に30pxの余白 */  
+		  font-size: 18px;
+		  font-weight: normal;
+		}
+          
         .container {
             display: flex;
             flex-direction: column;
@@ -119,10 +129,8 @@
 
 	    footer {
 	      text-align: center;
-	      font-size: 0.85em;
-	      margin: 40px 0 80px;
-	      color: #666;
-	    }
+	      padding: 12px;
+	    }	
 
 		/* 11/4 Top/Bottomボタン */
 		.bottom-button, .top-button {
@@ -148,7 +156,7 @@
 	    /* 戻るボタン 5/6 */
 	    .top-right-button {
           width: auto; /* ボタンの幅を自動調整 */
-	      position: absolute;
+  		  position: static;   /* ← absolute をやめる */
 	      top: 10px;
 	      right: 10px;
 	      background-color: #ccffff;
@@ -175,11 +183,11 @@
 </head>
 <body>
 
-  	<header>
-    <!-- Homeに戻るボタン 5/6 -->
-    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
-    <h1>ノート notepad</h1>
-  	</header>
+<header class="app-header">
+  <h1>📓🔒 ノート notepad</h1>
+  <button class="top-right-button"
+    onclick="window.location.href='index.html'">戻る</button>
+</header>
   	
 <div class="container">
   	    
@@ -446,9 +454,9 @@
 	    });
 	    
   </script>
-  
+    
   <footer>
-    © 20251220 ettomio
+    © 20260106 ettomio
   </footer>
 
   
