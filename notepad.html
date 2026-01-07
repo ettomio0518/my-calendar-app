@@ -41,26 +41,51 @@
             margin: auto;
             background-color: #cbe4e4;
         }
-        .input-row {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        .input-row label, .input-row input, .input-row textarea, .input-row button {
-            margin: 5px;
-        }
-        .input-row textarea {
-            font-size: 16px;
-            width: 95%;
-            min-height: 150px;
-            max-height: 300px;
-        }
+        
+		.detail-container {
+		    padding: 8px 10px;
+		}
+        
+		.input-row {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: flex-start;
+		    margin-left: 8px;
+		    width: 100%;
+		}
+		
+		.input-row label {
+		    margin: 6px 0 2px 0;   /* 上下だけ */
+		}
+
+		.input-row input,
+		.input-row textarea,
+		.input-row select {
+		    margin: 0 0 8px 0;     /* 左右ゼロ */
+		}
+		.input-row textarea {
+		    width: 100%;
+		    min-height: 150px;
+		    max-height: 300px;
+		}
+
+		.input-row,
+		.input-row * {
+		    box-sizing: border-box;
+		}
+
         .input-row input {
             height: 30px;
             font-size: 16px;
         }
+        
+		.url-box {
+		    width: 94%;           /* ← 90 → 94 で十分効く */
+		    max-width: 560px;     /* ← 10pxだけ増やす */
+		    margin-left: 8px;     /* ← ラベルと揃う */
+		    margin-right: auto;
+		}
+        
         .table-container {
             width: 100%;
             overflow-x: auto;
@@ -191,7 +216,7 @@
   	
 <div class="container">
   	    
-    <div class="input-row" style="width: 90%; max-width: 500px; margin: auto;">
+		<div class="input-row">
         <label for="keyword">キーワード:</label>
         <input type="text" id="keyword" maxlength="20" onfocus="showKeywordAlert(); this.onfocus=null;" class="input-field">
         <label for="category">カテゴリー:</label>
@@ -209,7 +234,7 @@
     </div>
     <button id="toggleMemoList" onclick="toggleMemoList()">ノートの確認</button>
     <div id="memoList" class="table-container"></div>
-    <div class="url-box" style="width: 90%; max-width: 550px; margin: auto;">
+	<div class="url-box">
         <label for="urlContent" style="color: #800000;">ノート詳細 (クリッカブル対応):</label>
         <div id="urlContent" class="detail-container"></div>
     </div>
@@ -456,11 +481,10 @@
   </script>
     
   <footer>
-    © 20260105 ettomio
+    © 20260107 ettomio
   </footer>
 
   
   </body>
 </html>
-
 
