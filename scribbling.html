@@ -35,6 +35,7 @@
 	    font-size: 16px;
 	  }
 
+	  /* 今は使用していないが、将来のために残しておく */ 
 	  header button {
 	    position: absolute;
 	    right: 16px;
@@ -111,6 +112,7 @@
 
     /* 戻るボタン 5/6 */
     .top-right-button {
+	  position: static;   /* ← flex に任せる */    
       width: auto; /* ボタンの幅を自動調整 */
 	  position: static;           /* ← absolute をやめる */
       top: 15px;
@@ -296,7 +298,7 @@ function deleteOldMemos() {
 </script>
 
   <footer>
-    © 20260106 ettomio
+    © 20260107 ettomio
   </footer>
   
 </body>
