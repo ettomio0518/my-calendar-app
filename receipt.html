@@ -5,18 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>今月の買い物金額の詳細</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            margin: 0;
-            background-color: #ececf7; /* 背景色 */
-        }
+	    body {
+	      font-family: Arial, sans-serif;
+		  margin: 0;
+		  padding: 0;              /* ← ここも 0 に */
+	      background-color: #ffe6ff;
+	    }
+
+		.app {
+		  width: 100%;
+		  max-width: 500px;
+		  margin: 0 auto;          /* ← ここで中央寄せ */
+		  padding: 16px;
+		  box-sizing: border-box;
+		}
+		
 		section{
-		  background:#e3ffff; margin:14px; padding:14px;
-		  border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.08);
-		}        
+		  background:#e3ffff; 
+		  margin: 14px 0;   /* ← 縦だけ余白 */
+		  padding:14px;
+		  border-radius:14px; 
+		  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+		}
+		      
 	    .container {
 	        max-width: 600px; /* コンテナの最大横幅を設定 */
 	        margin: 0 auto; /* 中央に配置 */
@@ -126,10 +137,19 @@
 	      text-align: center;
 	      padding: 12px;
 	    }	
-	    	    	    
+
+		/* スマホ */
+		@media (max-width: 480px) {
+		  .app {
+		    padding: 10px;   /* ← ここが効きます */
+		  }
+		}
+			    	    	    
     </style>
 </head>
+
 <body>
+  <div class="app">
     <div class="container">
     
   	<header>
@@ -168,15 +188,10 @@
         <label for="selectedMonthTotal">選択された月の合計:</label>
         <input type="text" id="selectedMonthTotal" class="amount-box" readonly> 円
 	</section>
-	
-  <footer>
-    © 20260105 ettomio
-  </footer>
-         
+
+    </div>
     </div>
 
-
-  
     <script>
         let canShowDeleteButtons = false;
         // let canShowSubDeleteButtons = false; // 使っていないので
@@ -403,6 +418,10 @@
 		}
 
     </script>
+    
+  <footer>
+    © 20260108 ettomio
+  </footer>
      
 </body>
 
