@@ -7,11 +7,18 @@
     <style>
 	    body {
 	      font-family: Arial, sans-serif;
-	      padding: 20px;
-	      max-width: 500px;
-	      margin: auto;
+		  margin: 0;
+		  padding: 0;              /* ← ここも 0 に */
 	      background-color: #ffe6ff;
 	    }
+
+		.app {
+		  width: 100%;
+		  max-width: 500px;
+		  margin: 0 auto;          /* ← ここで中央寄せ */
+		  padding: 16px;
+		  box-sizing: border-box;
+		}
 
 		.app-header {
 		  background: #8080ff;
@@ -32,8 +39,11 @@
 		}
 
 		section{
-		  background:#e3ffff; margin:14px; padding:14px;
-		  border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.08);
+		  background:#e3ffff; 
+		  margin: 14px 0;   /* ← 縦だけ余白 */
+		  padding:14px;
+		  border-radius:14px; 
+		  box-shadow:0 2px 6px rgba(0,0,0,0.08);
 		}
         table {
             width: 100%;
@@ -140,36 +150,23 @@
 		    background: #0056b3;
 		}    
 	    
-		/* 11/4 Top/Bottomボタン */
-		.bottom-button, .top-button {
-		    position: fixed;
-		    bottom: 20px;
-		    left: 50%;
-		    transform: translateX(-50%);
-		    background: #007bff;
-		    color: white;
-		    border: none;
-		    border-radius: 20px;
-		    padding: 10px 20px;
-		    font-size: 16px;
-		    cursor: pointer;
-		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-		    z-index: 9999;
-		    display: none;
-		}
-		.bottom-button:hover, .top-button:hover {
-		    background: #0056b3;
-		}
-
 	    footer {
 	      text-align: center;
 	      padding: 12px;
 	    }	
+
+		/* スマホ */
+		@media (max-width: 480px) {
+		  .app {
+		    padding: 10px;   /* ← ここが効きます */
+		  }
+		}
 	    	    		        
     </style>
 </head>
 
 <body>
+  <div class="app">
 	<header class="app-header">
 	  <h4>🧮 お買い物電卓 calculator</h4>
 	  <button class="top-right-button"
@@ -239,7 +236,8 @@
     <button onclick="calculatePrice()">計算</button>
     <span id="result">一膳の価格: - 円</span>
 </section>
-    
+  </div>
+      
     <script>
         let itemIndex = 0;
 
@@ -534,7 +532,7 @@
   </script>
   
   <footer>
-    © 20260105 ettomio
+    © 20260108 ettomio
   </footer>
     
 	<div style="height: 50px;"></div>
