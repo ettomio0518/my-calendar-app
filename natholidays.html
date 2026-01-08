@@ -6,23 +6,32 @@
     <title>日本の祝日一覧</title>    
     <style>
 
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            position: relative;
-            background-color: #ffffcc;            
-        }
+	    body {
+	      font-family: Arial, sans-serif;
+		  margin: 0;
+		  padding: 0;              /* ← ここも 0 に */
+	      background-color: #ffe6ff;
+	    }
+
+		.app {
+		  width: 100%;
+		  max-width: 500px;
+		  margin: 0 auto;          /* ← ここで中央寄せ */
+		  padding: 16px;
+		  box-sizing: border-box;
+		}
+		
 		header {
-		  background: #55aaaa;
+		  background: #8080ff;
 		  color: white;
 		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
 		  text-align: left;
-		  position: relative;
+		  position: relative; 
 		}
 		h1 {
 		  font-size: 20px;
 		  margin: 0;  /* 上下・右は0 */
-		  margin-left: 50px; /* ← 左に50pxの余白 */ 
+		  margin-left: 25px; /* ← 左に25pxの余白 */ 
 		}    	    
 
         /* 横並びを改行するための設定 */
@@ -31,11 +40,21 @@
             flex-wrap: wrap;
             justify-content: center;
         }        
-        select {
-            font-size: 16px;
-            padding: 5px;
-            margin-bottom: 20px;
-        }
+        
+		select {
+		    font-size: 16px;
+		    padding: 5px;
+		    /* margin-bottom: 20px; ← 削除 */
+		}
+
+		.year-select {
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		  gap: 10px;
+		  margin: 20px 0;
+		}
+        
         table {
             width: 90%;
             margin: 0 auto;
@@ -98,19 +117,35 @@
 	    .top-right2-button:hover {
 	      background-color: #f4f4f4;
 	    }
-	            
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	    }	
+
+		/* スマホ */
+		@media (max-width: 480px) {
+		  .app {
+		    padding: 10px;   /* ← ここが効きます */
+		  }
+		}
+			            
     </style>
 </head>
 <body>
+  <div class="app">
+
   	<header>
     <!-- Homeに戻るボタン 5/6 -->
 	    <button class="top-right-button" onclick="location.href='calendar.html'">back</button>
 	    <button class="top-right2-button" onclick="location.href='index.html'">home</button>
-	    <h1>日本の祝日一覧</h1>
+	    <h1>🎌 日本の祝日一覧</h1>
   	</header>
-    <br>
-    <label for="yearSelect">年を選択:</label>
-    <select id="yearSelect"></select>
+
+<div class="year-select">
+  <label for="yearSelect">年を選択:</label>
+  <select id="yearSelect"></select>
+</div>
     <table id="holidayTable">
         <thead>
             <tr>
@@ -122,7 +157,12 @@
             <!-- 祝日一覧がここに表示されます -->
         </tbody>
     </table>
+    </div>
 
+  <footer>
+    © 20260108 ettomio
+  </footer>
+        
     <script>
         // CSVデータを配列として定義
         const holidaysData = [
@@ -557,5 +597,6 @@
         yearSelect.value = currentYear;
         displayHolidays(currentYear);
     </script>
+    
 </body>
 </html>
