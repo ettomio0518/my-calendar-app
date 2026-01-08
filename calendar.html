@@ -7,21 +7,35 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+		  margin: 0;
+		  padding: 0;              /* ← ここも 0 に */            
             text-align: center;
             position: relative;
-            background: linear-gradient(to bottom, #ffffd9, #ffe3c8);
+            background: linear-gradient(to bottom, #ffffd9, #ffe3c8, #ffe1ff);
         }
-	    header {
-	      background: #55aaaa;
-	      color: white;
-          padding: 0.2em;
-	      text-align: left;
-	      position: relative;
-	    }
-        h1 {
+        
+		.app {
+		  width: 100%;
+		  max-width: 500px;
+		  margin: 0 auto;          /* ← ここで中央寄せ */
+		  padding: 16px;
+		  box-sizing: border-box;
+		}
+		        
+		header {
+		  background: #8080ff;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: left;
+		  position: relative; 
+		}
+		
+		h1 {
 		  font-size: 18px;
-		  margin-left: 10px; /* ← 左に10pxの余白 */       
-         }
+		  margin: 0;  /* 上下・右は0 */
+		  margin-left: 30px; /* ← 左に30pxの余白 */   
+		}  
+		
         button {
             font-size: 16px;
             padding: 3px 10px;
@@ -35,18 +49,23 @@
         button:hover {
             background-color: #f4f4f4;
         }
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-        }
-        .month {
-            width: 40%;
-            margin: 1%;
-            border: 1px solid #000;
-            border-radius: 5px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+		.container {
+		    display: flex;
+		    flex-wrap: wrap;
+		    justify-content: space-between; /* ← これが効きます */
+		}
+
+		.month {
+		    width: 48%;
+		    margin-top: 12px;     
+		    margin-bottom: 12px;   /* 縦だけ余白 */
+		    border: 1px solid #000;
+		    border-radius: 5px;
+		    padding: 10px;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+		    box-sizing: border-box;
+		}
+
         .month h3 {
             text-align: center;
         }
@@ -117,32 +136,46 @@
 	      background-color: #f4f4f4;
 	    }
 
-	    /* Topボタン：最初は非表示にしておき、スクロールで表示 5/5 */
-	    .top-button {
-	      position: fixed;
-	      bottom: 20px;
-	      left: 50%;
-	      transform: translateX(-50%);
-	      background: #007bff;
-	      color: white;
-	      border: none;
-	      border-radius: 20px;
-	      padding: 10px 20px;
-	      font-size: 16px;
-	      cursor: pointer;
-	      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-	      z-index: 9999;
-	      display: none; /* 最初は非表示 */
-	    }
-	    .top-button:hover {
-	      background: #0056b3;
-	    }
+		/* 11/4 Top/Bottomボタン */
+		.bottom-button, .top-button {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #007bff;
+		    color: white;
+		    border: none;
+		    border-radius: 20px;
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		    display: none;
+		}
+		.bottom-button:hover, .top-button:hover {
+		    background: #0056b3;
+		}    
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	    }	
+	    
+		/* スマホ */
+		@media (max-width: 480px) {
+		  .app {
+		    padding: 10px;   /* ← ここが効きます */
+		  }
+		}
+			    
     </style>
 </head>
 <body>
+  <div class="app">
 	  <header>
       <button class="top-right-button" onclick="location.href='index.html'">戻る</button>	
-	  <h1>カレンダー (2020-2040)</h1>
+	  <h1>📅 カレンダー (2020-2040)</h1>
 	  </header>
 
     <label for="yearSelect">年を選択:</label>    
@@ -174,7 +207,8 @@
     <button onclick="location.href='natholidays.html'">祝日一覧</button>
     <button onclick="location.href='clock.html'">時計</button>
     <div class="container" id="calendar"></div>
-    
+    </div>
+        
     <script>
         // CSVデータを配列として定義
         const holidaysData = [
@@ -671,32 +705,94 @@
     </script>
 
 
-	  <!-- スクロールで表示されるTopボタン 5/5 -->
-	  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
 
-	  <!-- JavaScript -->
-	  <script>
-	    // Topに戻る
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
 	    function scrollToTop() {
-	      window.scrollTo({
-	        top: 0,
-	        behavior: 'smooth'
-	      });
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
 	    }
 
-	    // スクロールしてボタン表示制御
-	    window.addEventListener("scroll", function () {
-	      const topBtn = document.getElementById("topBtn");
-	      if (window.scrollY > 300) {
-	        topBtn.style.display = "block";
-	      } else {
-	        topBtn.style.display = "none";
-	      }
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+			// --- Bottomボタンの表示制御 ---
+			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
+			if (
+			    scrollY > scrollThreshold &&
+			    docHeight - viewHeight - scrollY > scrollThreshold
+			) {
+			    bottomBtn.style.display = "block";
+			} else {
+			    bottomBtn.style.display = "none";
+			}
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
 	    });
-	  </script>
+	    
+  </script>
       
+  <footer>
+    © 20260108 ettomio
+  </footer>
+        
 	  <!-- HTML末尾にこれを追加 5/5 -->
-	  <div style="height: 80px;"></div>
+	  <div style="height: 60px;"></div>
       
 </body>
 
