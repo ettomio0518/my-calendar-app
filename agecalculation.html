@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>年齢計算</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #ffffcc;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #cbe4e4;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            margin: 7px;
+            background-color: #ffffc4;
+        }
+		header {
+		  background: #55aaaa;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: center;
+		  position: relative;
+		}
+		h1 {
+		  font-size: 20px;
+		  margin: 0;
+		}    	            
+
+        label, p {
+            font-size: 16px;
+        }
+        input[type="text"], select, button {
+            font-size: 16px;
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .calc-button {
+            color: blue; /* 計算ボタンの文字色を青色に設定 */
+            font-weight:bold;
+            border: 1px solid #8000ff;            
+            background-color: #ccffff;                         
+        }
+               
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 2px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+	                   
+    </style>
+
+</head>
+
+<body>
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>🎂  年齢計算</h1>
+  	</header>
+
+    <div class="container">
+        <label for="westernDate">誕生日（西暦: YYYY/MM/DD）:</label>
+        <input type="text" id="westernDate" placeholder="例: 2000/01/01">
+
+        <label>または 和暦:</label>
+        <label for="era">元号を選択してください:</label>
+        <select id="era">
+            <option value="">選択してください</option>
+            <option value="昭和">昭和</option>
+            <option value="平成">平成</option>
+            <option value="令和">令和</option>
+        </select>
+        <label for="japaneseDate">日本の日付を入力してください (例: 45/01/01):</label>
+        <input type="text" id="japaneseDate" placeholder="例: 45/01/01">
+
+        <button class="calc-button" onclick="calculateAge()">計算</button>
+        <button onclick="clearFields()">消去</button>
+
+        <div id="result" class="result"></div>
+    </div>
+    
+    <script>
+        // ページロード時にイベントリスナーを設定
+        document.addEventListener('DOMContentLoaded', () => {
+            const goButton = document.getElementById('goButton');
+        });
+
+        function calculateAge() {
+            let birthDate;
+            const westernDate = document.getElementById("westernDate").value;
+            const era = document.getElementById("era").value;
+            const japaneseDate = document.getElementById("japaneseDate").value;
+
+            if (westernDate) {
+                // 西暦を使用
+                birthDate = new Date(westernDate);
+            } else if (era && japaneseDate) {
+                // 和暦を使用
+                const [year, month, day] = japaneseDate.split("/").map(Number);
+                const eraOffset = { "昭和": 1925, "平成": 1988, "令和": 2018 }[era];
+                birthDate = new Date(eraOffset + year, month - 1, day);
+            } else {
+                alert("正しい日付を入力してください");
+                return;
+            }
+
+            if (isNaN(birthDate)) {
+                alert("日付形式が不正です");
+                return;
+            }
+
+            const today = new Date();
+            let ageYears = today.getFullYear() - birthDate.getFullYear();
+            let ageMonths = today.getMonth() - birthDate.getMonth();
+            let ageDays = today.getDate() - birthDate.getDate();
+
+            if (ageDays < 0) {
+                ageMonths--;
+                const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+                ageDays += lastMonth.getDate();
+            }
+            if (ageMonths < 0) {
+                ageYears--;
+                ageMonths += 12;
+            }
+
+            document.getElementById("result").innerText = `現在 ${ageYears}歳 ${ageMonths}ヶ月 ${ageDays}日`;
+
+            // 誕生日チェック
+            if (ageYears >= 0 && ageMonths === 0 && ageDays === 0) {
+                alert("お誕生日おめでとうございます。ビートルズのバースディを贈ります。");
+                nativeSpeak("Happy Birthday to you.");
+                setTimeout(navigate, 1500); // 少し待ってから遷移
+            }
+        }
+
+        function clearFields() {
+            document.getElementById('westernDate').value = '';
+            document.getElementById('era').value = '';
+            document.getElementById('japaneseDate').value = '';
+            document.getElementById('result').innerText = '';
+        }
+
+		// 既存の音声再生関数
+		function speakText(text) {
+		   if ('speechSynthesis' in window) {
+		       const utterance = new SpeechSynthesisUtterance(text);
+		       window.speechSynthesis.speak(utterance);
+		   } else {
+		       alert("音声合成がサポートされていません");
+		   }
+		}
+
+		// 新しい音声合成関数
+		function nativeSpeak(text) {
+		   if (typeof Android !== 'undefined' && Android.speak) {
+		       Android.speak(text);
+		   } else {
+		       speakText(text); // Android.speakが使用できない場合はブラウザの音声合成を使用
+		   }
+		}
+
+
+        // YouTubeへ遷移する関数
+        function navigate() {
+            window.location.href = "https://www.youtube.com/watch?v=zGwtwBJDBDA";
+        }
+    </script>
+        
+</body>
+</html>
