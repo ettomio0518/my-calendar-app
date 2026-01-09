@@ -9,18 +9,19 @@
         body {
             font-family: Arial, sans-serif;
             margin: 15px;
-            background-color: #ffe6ff; /* 背景色 */
+            background-color: #ffffd2; /* 背景色 */
         }
         .container {
             max-width: 350px; /* 最大幅を設定 */
-            margin: 20px auto; /* 中央揃え */
+            margin: 5px auto; /* 中央揃え */
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(to bottom, #ddffff, #ffd2ff);
         }
 		header {
-		  background: #55aaaa;
+		  background: #8080ff;
 		  color: white;
 		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
 		  text-align: left;
@@ -39,6 +40,21 @@
             color: blue; /* 特定のラベルを青色に設定 */
             font-weight:bold;
         }
+        
+		.input-row {
+		  display: grid;
+		  grid-template-columns: 1fr 1fr; /* 横2列 */
+		  gap: 8px;
+		}
+
+		.input-row label {
+		  font-size: 13px;
+		}
+
+		.input-row input {
+		  width: 100%;
+		}
+        
         input[type="number"], select, button {
             font-size: 15px; /* フォントサイズを設定 */
             padding: 2px;
@@ -57,28 +73,64 @@
             font-weight:bold;             
         }
 
-        .clear-button {
-            font-size: 16px;
-            padding: 2px;
-            margin-top: 10px;
-            width: 40%;
-        }
         .male-button {
             color: blue; /* 男性計算ボタンの文字色を青色に設定 */
+            width: 40%;
+			margin-right: 5px;            
         }
+        
         .female-button {
             color: red; /* 女性計算ボタンの文字色を赤色に設定 */
+            width: 40%;
         }
+        
+		.image-clear-row {
+		  display: flex;
+		  align-items: center;
+		  justify-content: space-between;
+		  margin-top: 10px;
+		}
+
+		/* 通常 */
+		.image-clear-row {
+		  display: flex;
+		  align-items: center;
+		  justify-content: space-between;
+		  margin-top: 10px;
+		}
+
+		.clear-button {
+		  width: 25%;        /* ← 40%を解除 */
+		  padding: 2px 14px;
+		  font-size: 15px;
+		}
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	    }
+	            
         /* メディアクエリ：画面幅が600px以下の場合に適用 */
-        @media (max-width: 600px) {
-            body {
-                font-size: 14px;
-            }
-            input[type="number"], select, button {
-                font-size: 14px;
-                padding: 6px;
-            }
-        }
+		/* スマホ */
+		@media (max-width: 600px) {
+		  body {
+		    font-size: 14px;
+		  }
+
+		  input[type="number"], select {
+		    font-size: 14px;
+		    padding: 6px;
+		  }
+
+		  .image-clear-row {
+		    flex-direction: column;
+		    gap: 8px;
+		  }
+
+		  .image-clear-row img {
+		    max-width: 80%;
+		  }
+		}
         
 	    /* 戻るボタン 5/6 */
 	    .top-right-button {
@@ -110,32 +162,68 @@
 
     <div class="container">
 
-        <div>
-            <label for="volume1"><span class="label-highlight">1本目</span> 容量（ml）:</label>
-            <input type="number" id="volume1">
-            <label for="percentage1">アルコール度数（%）:</label>
-            <input type="number" id="percentage1">
-            <p id="weight1">アルコール重量: 0g</p>
-        </div>
-        <div>
-            <label for="volume2"><span class="label-highlight">2本目</span> 容量（ml）:</label>
-            <input type="number" id="volume2">
-            <label for="percentage2">アルコール度数（%）:</label>
-            <input type="number" id="percentage2">
-            <p id="weight2">アルコール重量: 0g</p>
-        </div>
-        <div>
-            <label for="volume3"><span class="label-highlight">3本目</span> 容量（ml）:</label>
-            <input type="number" id="volume3">
-            <label for="percentage3">アルコール度数（%）:</label>
-            <input type="number" id="percentage3">
-            <p id="weight3">アルコール重量: 0g</p>
-        </div>
+		<div>
+		  <label><span class="label-highlight">1本目</span></label>
+
+		  <div class="input-row">
+		    <div>
+		      <label for="volume1">容量（ml）</label>
+		      <input type="number" id="volume1">
+		    </div>
+		    <div>
+		      <label for="percentage1">アルコール度数（%）</label>
+		      <input type="number" id="percentage1">
+		    </div>
+		  </div>
+
+		  <p id="weight1">アルコール重量: 0g</p>
+		</div>
+
+		<div>
+		  <label><span class="label-highlight">2本目</span></label>
+
+		  <div class="input-row">
+		    <div>
+		      <label for="volume1">容量（ml）</label>
+		      <input type="number" id="volume2">
+		    </div>
+		    <div>
+		      <label for="percentage1">アルコール度数（%）</label>
+		      <input type="number" id="percentage2">
+		    </div>
+		  </div>
+
+		  <p id="weight2">アルコール重量: 0g</p>
+		</div>
+		        
+		<div>
+		  <label><span class="label-highlight">3本目</span></label>
+
+		  <div class="input-row">
+		    <div>
+		      <label for="volume1">容量（ml）</label>
+		      <input type="number" id="volume3">
+		    </div>
+		    <div>
+		      <label for="percentage1">アルコール度数（%）</label>
+		      <input type="number" id="percentage3">
+		    </div>
+		  </div>
+
+		  <p id="weight3">アルコール重量: 0g</p>
+		</div>
+
+        
         <button class="male-button" onclick="calculate('male')">男性計算</button>
+        
         <button class="female-button" onclick="calculate('female')">女性計算</button>
+
         <p id="totalWeight">アルコール重量の総計: 0g</p>
         <p id="result"></p>
-        <button class="clear-button" onclick="clearFields()">消去</button>
+<div class="image-clear-row">
+  <img src="osake.png" alt="サンプル画像">
+  <button class="clear-button" onclick="clearFields()">消去</button>
+</div>
     </div>
 
     <audio id="cautionAudio" src="注意.mp3" preload="auto"></audio>
@@ -216,5 +304,9 @@
             document.getElementById('result').innerText = '';
         }
     </script>
+    
+  <footer>
+    © 20241108 ettomio
+  </footer>    
 </body>
 </html>
