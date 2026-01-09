@@ -105,6 +105,11 @@
 		  font-size: 15px;
 		}
 
+		.total-bold {   /* 2026/1/9追加 */
+		  font-weight: bold;
+		  /*font-size: 17px;   /* 少し強調したい場合 */
+		}
+
 	    footer {
 	      text-align: center;
 	      padding: 12px;
@@ -262,9 +267,11 @@
             const percentage3 = parseFloat(document.getElementById('percentage3').value) || 0;
             const weight3 = calculateWeight(volume3, percentage3);
             document.getElementById('weight3').innerText = `アルコール重量: ${weight3.toFixed(2)}g`;
-
             const totalWeight = weight1 + weight2 + weight3;
-            document.getElementById('totalWeight').innerText = `アルコール重量の総計: ${totalWeight.toFixed(2)}g`;
+            // 以下は26/1/9に追加
+            const totalEl = document.getElementById('totalWeight');
+totalEl.innerText = `アルコール重量の総計: ${totalWeight.toFixed(2)}g`;
+totalEl.classList.add('total-bold');
 
             let limit = gender === 'male' ? 40 : 20;
             const resultElement = document.getElementById('result');
@@ -292,6 +299,10 @@
             document.getElementById('weight3').innerText = 'アルコール重量: 0g';
             document.getElementById('totalWeight').innerText = 'アルコール重量の総計: 0g';
             document.getElementById('result').innerText = '';
+            // 以下は1/9に追加
+            const totalEl = document.getElementById('totalWeight');
+  totalEl.innerText = 'アルコール重量の総計: 0g';
+  totalEl.classList.remove('total-bold');
         }
     </script>
     
