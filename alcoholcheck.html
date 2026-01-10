@@ -120,6 +120,37 @@
 	      text-align: center;
 	      padding: 12px;
 	    }
+
+		/*
+		@keyframes drunkWink {
+		  0%   { transform: rotate(0deg); }
+		  15%  { transform: rotate(10deg); }   ← 揺らぎを大きく
+		  30%  { transform: rotate(-10deg); }
+		  45%  { transform: rotate(10deg); }
+		  60%  { transform: rotate(0deg); }
+		  75%  { transform: rotate(8deg); }
+		  90%  { transform: rotate(-8deg); }
+		  100% { transform: rotate(0deg); }
+		} 
+		 */
+ 
+		 /* 回転だけでなく、一瞬スケールを混ぜると
+		「目をつぶってる感」が出ます。
+		 */
+		@keyframes drunkWink {
+		  0%   { transform: rotate(0deg) scale(1); }
+		  20%  { transform: rotate(10deg) scale(1.05); }
+		  40%  { transform: rotate(-10deg) scale(0.95); }
+		  60%  { transform: rotate(10deg) scale(1.05); }
+		  80%  { transform: rotate(-8deg) scale(0.98); }
+		  100% { transform: rotate(0deg) scale(1); }
+		}
+
+		/* 無限ループ用クラス */
+		.drunk-animate {
+		  animation: drunkWink 1.2s ease-in-out infinite;
+		  transform-origin: center bottom;
+		}
 	            
         /* メディアクエリ：画面幅が600px以下の場合に適用 */
         @media (max-width: 600px) {
@@ -225,7 +256,8 @@
         <p id="totalWeight">アルコール重量の総計: 0g</p>
         <p id="result"></p>
 		<div class="image-clear-row">
-		  <img src="osake.png" alt="サンプル画像">
+    	  <!-- osake.png に id を付ける -->		
+		  <img src="osake.png" alt="サンプル画像" id="osakeImage">
 		  <button class="clear-button" onclick="clearFields()">消去</button>
 		</div>
     </div>
@@ -263,6 +295,10 @@
 
         function calculate(gender) {
 		  // ボタンの見た目切り替え
+		  // --- osake.png を酩酊状態に ---
+		  const osake = document.getElementById('osakeImage');
+		  osake.classList.add('drunk-animate');
+  		  
 		  const maleBtn = document.getElementById('maleBtn');
 		  const femaleBtn = document.getElementById('femaleBtn');
 
@@ -326,12 +362,16 @@ totalEl.classList.add('total-bold');
 			  totalEl.innerText = 'アルコール重量の総計: 0g';
 			  totalEl.classList.remove('total-bold');
 	document.getElementById('maleBtn').classList.remove('gender-active');
-	document.getElementById('femaleBtn').classList.remove('gender-active');		
+	document.getElementById('femaleBtn').classList.remove('gender-active');	
+
+			// 消去ボタンでアニメーション停止	
+		    const osake = document.getElementById('osakeImage');
+		    osake.classList.remove('drunk-animate');		
         }
     </script>
     
   <footer>
-    © 20241108 ettomio
+    © 20241108 ettomio/ Updated: 2026-01-10
   </footer>    
 </body>
 </html>
