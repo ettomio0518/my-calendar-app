@@ -26,7 +26,7 @@
             background-color: #ffffc4;
         }
 		header {
-		  background: #55aaaa;
+		  background: #8080ff;
 		  color: white;
 		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
 		  text-align: center;
@@ -59,9 +59,21 @@
             color: blue; /* 計算ボタンの文字色を青色に設定 */
             font-weight:bold;
             border: 1px solid #8000ff;            
-            background-color: #ccffff;                         
+            background-color: #ccffff;
+            width: 25%;  
+            margin: 15px;  
+	    	border-radius: 5px;                                              
         }
-               
+
+        .clear-button {
+            color: blue; /* 計算ボタンの文字色を青色に設定 */
+            font-weight:bold;
+            border: 1px solid #8000ff;            
+            background-color: #ffffff;
+            width: 25%;
+	    	border-radius: 5px;                                                
+        }
+                      
 	    /* 戻るボタン 5/6 */
 	    .top-right-button {
           width: auto; /* ボタンの幅を自動調整 */
@@ -79,7 +91,44 @@
 	    .top-right-button:hover {
 	      background-color: #f4f4f4;
 	    }
-	                   
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	    }
+
+        /* イラスト表示用 */
+        .illustration {
+            margin-top: 20px;
+            text-align: center;   /* 横幅中央 */
+        }
+
+        .illustration img {
+            max-width: 256px;     /* 指定どおり */
+            width: 100%;
+            height: auto;
+        }
+
+        .illustration p {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* バースデー回転アニメーション */
+        @keyframes spinOnce {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spin {
+            animation: spinOnce 1s ease-in-out;
+        }
+                	    	                   
     </style>
 
 </head>
@@ -107,11 +156,17 @@
         <input type="text" id="japaneseDate" placeholder="例: 45/01/01">
 
         <button class="calc-button" onclick="calculateAge()">計算</button>
-        <button onclick="clearFields()">消去</button>
+        <button class="clear-button" onclick="clearFields()">消去</button>
 
         <div id="result" class="result"></div>
+        
+        <div class="illustration">
+		<img id="myb4" src="myb4.png" alt="18歳の時に描いたビートルズ">
+            <p>18歳の時に描いたビートルズ</p>
+        </div>
+                
     </div>
-    
+
     <script>
         // ページロード時にイベントリスナーを設定
         document.addEventListener('DOMContentLoaded', () => {
@@ -160,11 +215,21 @@
             document.getElementById("result").innerText = `現在 ${ageYears}歳 ${ageMonths}ヶ月 ${ageDays}日`;
 
             // 誕生日チェック
-            if (ageYears >= 0 && ageMonths === 0 && ageDays === 0) {
-                alert("お誕生日おめでとうございます。ビートルズのバースディを贈ります。");
-                nativeSpeak("Happy Birthday to you.");
-                setTimeout(navigate, 1500); // 少し待ってから遷移
-            }
+			if (ageYears >= 0 && ageMonths === 0 && ageDays === 0) {
+			    alert("お誕生日おめでとうございます。ビートルズのバースディを贈ります。");
+
+			    const img = document.getElementById("myb4");
+			    if (img) {
+			        img.classList.remove("spin"); // 念のため
+			        void img.offsetWidth;         // 再描画トリガ
+			        img.classList.add("spin");
+			    }
+
+			    nativeSpeak("Happy Birthday to you.");
+
+			    // 回転が終わってから YouTube へ
+			    setTimeout(navigate, 1800);
+			}
         }
 
         function clearFields() {
@@ -198,8 +263,11 @@
         function navigate() {
             window.location.href = "https://www.youtube.com/watch?v=zGwtwBJDBDA";
         }
-    </script>
         
+    </script>
+  <footer>
+    © 20260112 ettomio
+  </footer>
+          
 </body>
 </html>
-
