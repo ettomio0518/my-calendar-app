@@ -33,7 +33,7 @@
         }
         
 		header {
-		  background: #55aaaa;
+		  background: #8080ff;
 		  color: white;
 		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
 		  text-align: center;
@@ -121,6 +121,11 @@
 	    .top-right-button:hover {
 	      background-color: #f4f4f4;
 	    }
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	    }
 	    
     </style>
 </head>
@@ -163,19 +168,30 @@
         </div>
         <div class="history" id="history"></div>
     </div>
-
+		  <img src="soroban.png" alt="サンプル画像">
 </div>
 
 <script>
-    let display = document.getElementById('display');
-    let history = document.getElementById('history');
+    const display = document.getElementById('display');
+    const history = document.getElementById('history');
+
     let currentInput = '';
+    let previousValue = null;
+    let internalValue = null;
     let operator = '';
-    let previousInput = '';
     let decimalAdded = false;
 
-    function appendNumber(number) {
-        currentInput += number;
+    const DISPLAY_PRECISION = 12;
+
+    /* ---------- 表示専用丸め ---------- */
+    function formatDisplay(value) {
+        if (!isFinite(value)) return 'Error';
+        return Number(value.toFixed(DISPLAY_PRECISION)).toString();
+    }
+
+    /* ---------- 入力 ---------- */
+    function appendNumber(num) {
+        currentInput += num;
         display.value = currentInput;
     }
 
@@ -187,62 +203,86 @@
         }
     }
 
+    /* ---------- 演算子 ---------- */
     function setOperator(op) {
-        if (currentInput === '') return;
+        if (currentInput === '' && internalValue === null) return;
+
         if (op === 'sqrt') {
-            const originalValue = currentInput; // ルートを取る前の値
-            currentInput = roundResult(Math.sqrt(parseFloat(currentInput))).toString();
+            const value = internalValue ?? parseFloat(currentInput);
+            if (value < 0) {
+                display.value = 'Error';
+                return;
+            }
+            internalValue = Math.sqrt(value);
+            currentInput = formatDisplay(internalValue);
             display.value = currentInput;
-            addHistory(`√${originalValue} = ${currentInput}`);
-        } else if (op === '**') {
-            const originalValue = currentInput; // 2乗する前の値
-            const squared = Math.pow(parseFloat(currentInput), 2);
-            currentInput = roundResult(squared).toString();
-            display.value = currentInput;
-            addHistory(`${originalValue}² = ${currentInput}`);
-        } else {
-            if (operator) calculate();
-            operator = op;
-            previousInput = currentInput;
-            currentInput = '';
-            decimalAdded = false;
+            addHistory(`√${formatDisplay(value)} = ${currentInput}`);
+            decimalAdded = currentInput.includes('.');
+            return;
         }
+
+        if (op === '**') {
+            const value = internalValue ?? parseFloat(currentInput);
+            internalValue = value * value;
+            currentInput = formatDisplay(internalValue);
+            display.value = currentInput;
+            addHistory(`${formatDisplay(value)}² = ${currentInput}`);
+            decimalAdded = currentInput.includes('.');
+            return;
+        }
+
+        if (internalValue === null) {
+            internalValue = parseFloat(currentInput);
+        }
+
+        operator = op;
+        previousValue = internalValue;
+        currentInput = '';
+        decimalAdded = false;
     }
 
+    /* ---------- 計算 ---------- */
     function calculate() {
-        if (previousInput === '' || currentInput === '') return;
+        if (operator === '' || currentInput === '') return;
+
+        const currentValue = parseFloat(currentInput);
         let result;
+
         switch (operator) {
-            case '+':
-                result = parseFloat(previousInput) + parseFloat(currentInput);
-                break;
-            case '-':
-                result = parseFloat(previousInput) - parseFloat(currentInput);
-                break;
-            case '*':
-                result = parseFloat(previousInput) * parseFloat(currentInput);
-                break;
+            case '+': result = previousValue + currentValue; break;
+            case '-': result = previousValue - currentValue; break;
+            case '*': result = previousValue * currentValue; break;
             case '/':
-                result = parseFloat(previousInput) / parseFloat(currentInput);
+                if (currentValue === 0) {
+                    display.value = 'Error';
+                    return;
+                }
+                result = previousValue / currentValue;
                 break;
             default:
-                result = parseFloat(currentInput);
+                return;
         }
-        result = roundResult(result);
-        display.value = result;
-        addHistory(`${previousInput} ${operator} ${currentInput} = ${display.value}`);
-        currentInput = result.toString();
-        previousInput = '';
+
+        internalValue = result;
+        const displayResult = formatDisplay(result);
+        display.value = displayResult;
+
+        addHistory(`${formatDisplay(previousValue)} ${operator} ${formatDisplay(currentValue)} = ${displayResult}`);
+
+        currentInput = displayResult;
         operator = '';
+        previousValue = null;
         decimalAdded = currentInput.includes('.');
     }
 
+    /* ---------- 操作 ---------- */
     function clearDisplay() {
         currentInput = '';
-        previousInput = '';
+        previousValue = null;
+        internalValue = null;
         operator = '';
-        display.value = '';
         decimalAdded = false;
+        display.value = '';
     }
 
     function backspace() {
@@ -251,21 +291,18 @@
         decimalAdded = currentInput.includes('.');
     }
 
-	function addHistory(entry) {
-	    let historyItem = document.createElement('div');
-	    historyItem.classList.add('history-item');
-	    historyItem.innerHTML = `<span class="history-text">${entry}</span>`;
-	    history.appendChild(historyItem);
-	    history.scrollTop = history.scrollHeight;
-	}
-
-
-    // 計算結果を丸める関数（希望の小数点以下桁数に丸める）
-    function roundResult(value, precision = 10) {
-        const factor = Math.pow(10, precision); // 小数点以下を希望の桁数まで整数化
-        return Math.round(value * factor) / factor; // 整数化後に丸めて元の桁数に戻す
+    /* ---------- 履歴 ---------- */
+    function addHistory(text) {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.innerHTML = `<span class="history-text">${text}</span>`;
+        history.appendChild(div);
+        history.scrollTop = history.scrollHeight;
     }
 </script>
-
+  <footer>
+    © 20260111 ettomio
+  </footer>
+  
 </body>
 </html>
