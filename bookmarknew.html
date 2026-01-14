@@ -153,14 +153,35 @@
 	      background: #0056b3;
 	    }
 
+		/* 11/4 Top/Bottomボタン */
+		.bottom-button, .top-button {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #007bff;
+		    color: white;
+		    border: none;
+		    border-radius: 20px;
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		    display: none;
+		}
+		.bottom-button:hover, .top-button:hover {
+		    background: #0056b3;
+		}    
+
 	    /* 戻るボタン 5/6 */
 	    .top-right-button {
           width: auto; /* ボタンの幅を自動調整 */
 	      position: absolute;
-	      top: 5px;
+	      top: 3px;
 	      right: 10px;
 	      background-color: #ccffff;
-	      color: black;
+	      border: none;
 	      border-radius: 20px;
 	      padding: 6px 12px;
 	      font-size: 14px;
@@ -170,8 +191,39 @@
 	    .top-right-button:hover {
 	      background-color: #f4f4f4;
 	    }
-	    	    
-    </style>
+	    
+		/* 以降1/14追加 */
+		.category-with-image {
+		  display: flex;
+		  align-items: flex-start;   /* ← 上端を揃える基準 */
+		  gap: 20px;   /* 12 → 16 */
+		  max-width: 100%;
+		}
+
+		.category-area {
+		  flex: 1;
+		}
+
+		.bookmark-image {
+		  width: 210px;        /* 140 × 1.5 = 210 */
+		  max-width: 50vw;     /* スマホ横幅の半分までOK */
+		  height: auto;
+		}
+
+		/* 
+		@media (max-width: 600px) {
+		  .category-with-image {
+		    flex-direction: column;
+		  }
+		}
+		 */
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	    }	   
+		 
+</style>
 </head>
 
 <body>
@@ -193,28 +245,45 @@
         <input type="text" id="siteUrl" placeholder="アドレスを入力してください">
 
         <br>
-        <label for="category">カテゴリー:</label>
-		<select id="category">
-		    <option value="1">ニュース</option>
-		    <option value="2">天気</option>
-		    <option value="3">仕事・学習</option>
-		    <option value="4">趣味</option>
-		    <option value="5">その他</option>
-		</select>
-        <br>
-        <button class="save-button" onclick="addBookmark()">保存</button>
-        <br>
-        <button id="toggleButton" class="toggle-button" onclick="toggleList()">リストを開く</button>
-        
-		<div id="listContainer" class="list-container" style="display: none;">
-		    <div id="newsList" class="category-list"></div>
-		    <div id="weatherList" class="category-list"></div>
-		    <div id="workList" class="category-list"></div>
-		    <div id="hobbyList" class="category-list"></div>
-		    <div id="otherList" class="category-list"></div>
-		</div>
-    </div>
 
+		<!-- カテゴリー + イラスト 1/14 -->
+		<div class="category-with-image">
+		  <div class="category-area">
+		    <label for="category">カテゴリー:</label>
+		    <select id="category">
+		      <option value="1">ニュース</option>
+		      <option value="2">天気</option>
+		      <option value="3">仕事・学習</option>
+		      <option value="4">趣味</option>
+		      <option value="5">その他</option>
+		    </select>
+
+		    <button class="save-button" onclick="addBookmark()">保存</button>
+		  </div>
+
+		  <img src="bookmark.png" alt="十二支" class="bookmark-image">
+		</div>
+
+
+		<div class="main-area">
+		  <div class="left-area">
+
+		<div class="toggle-row">
+		  <button id="toggleButton" class="toggle-button" onclick="toggleList()">リストを開く</button>
+
+		</div>
+		    <div id="listContainer" class="list-container" style="display: none;">
+		        <div id="newsList" class="category-list"></div>
+		        <div id="weatherList" class="category-list"></div>
+		        <div id="workList" class="category-list"></div>
+		        <div id="hobbyList" class="category-list"></div>
+		        <div id="otherList" class="category-list"></div>
+		    </div>
+		  </div>
+
+		</div>
+	</div>
+	
     <script>
         function addBookmark() {
             const siteName = document.getElementById('siteName').value.trim();
@@ -323,32 +392,94 @@ function displayBookmarkList() {
         });
     </script>
     
-  <!-- スクロールで表示されるTopボタン 5/5 -->
-  <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
 
-  <!-- JavaScript -->
   <script>
-    // Topに戻る
-    function scrollToTop() {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    }
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
 
-    // スクロールしてボタン表示制御
-    window.addEventListener("scroll", function () {
-      const topBtn = document.getElementById("topBtn");
-      if (window.scrollY > 300) {
-        topBtn.style.display = "block";
-      } else {
-        topBtn.style.display = "none";
-      }
-    });
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+			// --- Bottomボタンの表示制御 ---
+			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
+			if (
+			    scrollY > scrollThreshold &&
+			    docHeight - viewHeight - scrollY > scrollThreshold
+			) {
+			    bottomBtn.style.display = "block";
+			} else {
+			    bottomBtn.style.display = "none";
+			}
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
   </script>
-  	
+
+  <footer>
+    © 20260114 ettomio
+  </footer>
+
 	<!-- HTML末尾にこれを追加 5/5 -->
-	<div style="height: 80px;"></div>
-  	    
+	<div style="height: 50px;"></div>
+	
 </body>
 </html>
