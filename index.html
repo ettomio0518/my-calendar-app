@@ -820,6 +820,19 @@
 	}
 	</script>
 
+	<script>
+	function openOCRReader() {
+	  if (typeof Android !== "undefined" && Android.openOCRReader) {
+	    Android.openOCRReader(); // WebView内ならアプリ側へ
+	  } else {
+	    window.open(
+	      'https://ettomio0518.github.io/ettomio-ocr-reader/',
+	      '_blank'
+	    ); // 通常ブラウザなら直接開く
+	  }
+	}
+	</script>
+
 
     <script> // 9/23追加 10/31修正
 	/**
@@ -2308,6 +2321,8 @@
 		<br>
 		<button onclick="openQRReader()">QRコードリーダー</button>
 		<br>
+		<button onclick="openOCRReader()">簡易版OCR</button>
+		<br>		
 		<div id="calendarHint" style="font-size: 14px; color: #666; margin-top: 8px;">
 		  🦊 カレンダーが小さく表示された場合は、二本指でふわっと広げてください♪
 		</div>		
@@ -2673,7 +2688,7 @@
   
 	 <p id="version-number" onclick="handleClick();">  
 		© 2025 ettomio. All rights reserved.
-		Version 18.0 / Updated: 2026-01-12
+		Version 18.1 / Updated: 2026-01-18
 	 </p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
@@ -2681,6 +2696,4 @@
 
 </body>
 </html>
-
-
 
