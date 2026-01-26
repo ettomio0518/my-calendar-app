@@ -2002,44 +2002,47 @@
 		    });
 		}
 
-        // --- 「予定の音声出力」表示関数 (変更なし) ---
-        function displaySchedules() {
-            const keys = Object.keys(localStorage)
-                .filter(key => key.startsWith('ScheduledText'))
-                .sort((a, b) => {
-                    const dateA = a.match(/ScheduledText(\d{8})_/)?.[1] || '';
-                    const dateB = b.match(/ScheduledText(\d{8})_/)?.[1] || '';
-                    return dateA.localeCompare(dateB);
-                });
+        // --- 「予定の音声出力」表示関数) ---
+		function displaySchedules() {
 
-            if (keys.length === 0) {
-                showCustomAlert("登録されている予定はありません。");
-                nativeSpeak("登録されている予定はありません。");
-                return;
-            }
+		    const today = new Date();
+		    today.setHours(0, 0, 0, 0);
 
-            let fullScheduleText = "登録されている予定は、";
-            keys.forEach(key => {
-                const scheduleText = localStorage.getItem(key);
-                const dateMatchForKey = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-                const scheduleContentMatch = scheduleText.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
+		    const todayYMD = parseInt(
+		        `${today.getFullYear()}` +
+		        `${String(today.getMonth() + 1).padStart(2, '0')}` +
+		        `${String(today.getDate()).padStart(2, '0')}`
+		    );
 
-                let displayDate = "";
-                let scheduleContent = scheduleText;
+		    const todayKeys = Object.keys(localStorage)
+		        .filter(key => key.startsWith('ScheduledText'))
+		        .filter(key => {
+		            const match = key.match(/ScheduledText(\d{8})_/);
+		            return match && parseInt(match[1]) === todayYMD;
+		        });
 
-                if (dateMatchForKey) {
-                    displayDate = `${parseInt(dateMatchForKey[2])}月${parseInt(dateMatchForKey[3])}日`;
-                }
-                if (scheduleContentMatch) {
-                    scheduleContent = scheduleContentMatch[2].trim();
-                } else {
-                    scheduleContent = scheduleText.trim();
-                }
-                fullScheduleText += `${displayDate} の予定、${scheduleContent}。`;
-            });
-            showCustomAlert(fullScheduleText); // デバッグ用
-            nativeSpeak(fullScheduleText);
-        }
+		    // 今日の予定がない場合
+		    if (todayKeys.length === 0) {
+		        const msg = `今日 ${today.getMonth() + 1}月${today.getDate()}日の予定は特にありません。`;
+		        showCustomAlert(msg);
+		        nativeSpeak(msg);
+		        return;
+		    }
+
+		    // 今日の予定がある場合
+		    let fullScheduleText = `今日 ${today.getMonth() + 1}月${today.getDate()}日の予定は、`;
+
+		    todayKeys.forEach(key => {
+		        const scheduleText = localStorage.getItem(key);
+		        const contentMatch = scheduleText.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
+		        const scheduleContent = contentMatch ? contentMatch[2].trim() : scheduleText.trim();
+		        fullScheduleText += `${scheduleContent}。`;
+		    });
+
+		    showCustomAlert(fullScheduleText);
+		    nativeSpeak(fullScheduleText);
+		}
+
 
         // --- 新しい関数: ローカルストレージに基づいて日付に色を適用 --- (変更なし)
         function applyScheduleColorsToCalendar() {
@@ -2688,7 +2691,7 @@
   
 	 <p id="version-number" onclick="handleClick();">  
 		© 2025 ettomio. All rights reserved.
-		Version 18.2 / Updated: 2026-01-19
+		Version 18.3 / Updated: 2026-01-27
 	 </p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
@@ -2696,5 +2699,4 @@
 
 </body>
 </html>
-
 
