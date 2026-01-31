@@ -9,19 +9,17 @@
 /* ===============================
    和風テーマ・全体設定
    =============================== */
-
 body {
     font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
-    background: #bed7da; /* 浅葱色寄り */
+    background: #bed7da; /* 浅葱色（あさぎいろ） */
     margin: 0;
     padding: 0;
-    color: #0000aa;
+    color: #0000aa; /* 落ち着いた紺色 */
 }
 
 /* ===============================
-   ヘッダー（浅葱色）
+   ヘッダー
    =============================== */
-
 .wf-header {
     background: #649fa4; /* 濃い浅葱色 */
     padding: 15px 20px;
@@ -32,8 +30,7 @@ body {
 .wf-title {
     margin: 0;
     padding-left: 10px; /* ← 和風の余白 */
-    text-align: left; /* ← ここを center → left に変更 */
-    font-size: 24px;
+    font-size: 20px;
     color: #fff;
     letter-spacing: 2px;
 }
@@ -42,7 +39,7 @@ body {
     position: absolute;
     right: 15px;
     top: 12px;
-    padding: 4px 12px; /* 上下を詰める */
+    padding: 4px 12px;
     font-size: 14px;
     border: none;
     border-radius: 20px;
@@ -59,9 +56,8 @@ body {
 /* ===============================
    カード（和紙風）
    =============================== */
-
 .wf-card {
-    background: #fffffc; /* 胡粉色 */
+    background: #fffffc; /* 胡粉色（ごふんいろ） */
     margin: 20px;
     border-radius: 10px;
     border: 1px solid #e6e2d3;
@@ -78,7 +74,6 @@ body {
     background: #f3f1eb;
     border: none;
     cursor: pointer;
-    letter-spacing: 1px;
     color: #0f4c81; /* 藍色 */
     border-bottom: 1px solid #e6e2d3;
     transition: background 0.2s;
@@ -91,25 +86,23 @@ body {
 /* 折りたたみ内容 */
 .wf-card-content {
     padding: 15px;
-    display: none; /* JSで開閉 */
+    display: none; /* JSで制御 */
     animation: fadeIn 0.4s ease;
 }
 
-/* ふわっと表示 */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ===============================
-   入力行（横並び）
+   入力・選択エリア
    =============================== */
-
 .wf-row {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 input, select {
@@ -122,26 +115,19 @@ input, select {
     min-width: 120px;
 }
 
-/* ===============================
-   ボタン（和風配色）
-   =============================== */
-
-.wf-btn-convert {
-    padding: 6px 14px; /* 上下を詰める */
-    background: #0f4c81; /* 藍色 */
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
+/* 単位の注釈（alertの代わり） */
+.wf-unit-note {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 15px;
+    min-height: 1.2em;
+    padding-left: 8px;
+    border-left: 3px solid #649fa4;
 }
 
-.wf-btn-convert:hover {
-    background: #0c3a63;
-}
-
+/* ご破算ボタン */
 .wf-btn-clear {
-    padding: 6px 14px;
+    padding: 6px 20px;
     background: #f8b500; /* 山吹色 */
     color: #333;
     border: none;
@@ -155,9 +141,8 @@ input, select {
 }
 
 /* ===============================
-   テーブル
+   結果表示テーブル
    =============================== */
-
 .wf-table {
     width: 100%;
     border-collapse: collapse;
@@ -167,524 +152,209 @@ input, select {
 .wf-table th, .wf-table td {
     padding: 10px;
     border-bottom: 1px solid #e6e2d3;
+    text-align: left;
 }
 
 .wf-table th {
     background: #f3f1eb;
+    color: #0f4c81;
+}
+
+/* 1/31 追加 */
+.unit-code { 
+	font-size: 12px; 
+	color: #666; 
+	margin-left: 4px; 
 }
 
 /* ===============================
-   tooltip（単位説明）
+   フッター
    =============================== */
-
-.wf-tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: help;
-    margin-left: 4px;
-    color: #0f4c81;
-    font-weight: bold;
-}
-
-.wf-tooltip-text {
-    visibility: hidden;
-    opacity: 0;
-    width: 180px;
-    background: #fffffc;
-    border: 1px solid #c8c2b4;
-    padding: 8px;
-    border-radius: 6px;
-    position: absolute;
-    z-index: 10;
-    top: 24px;
-    left: 0;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-    transition: opacity 0.2s;
+footer {
+    text-align: center;
+    padding: 0px;
     font-size: 14px;
 }
 
-.wf-tooltip:hover .wf-tooltip-text {
-    visibility: visible;
-    opacity: 1;
+.spacer {
+    height: 50px;
 }
-
-/* ===============================
-   スマホ最適化
-   =============================== */
-
-@media (max-width: 600px) {
-    .wf-title { font-size: 20px; }
-    .wf-card { margin: 12px; }
-    .wf-card-toggle { font-size: 16px; }
-    input, select { font-size: 15px; }
-}
-
-footer {
-  text-align: center;
-  padding: 12px;
-}		    footer {
-  text-align: center;
-  padding: 12px;
-}	
-	    
 </style>
 </head>
 
 <body>
 
-    <!-- 和風ヘッダー（浅葱色） -->
     <header class="wf-header">
         <h1 class="wf-title">📐 和風・度量衡コンバーター</h1>
         <button class="wf-back-button" onclick="location.href='index.html'">戻る</button>
     </header>
 
     <main id="converter-root">
-
-        <!-- ▼ 長さのカード（折りたたみ） -->
-        <section class="wf-card">
-            <button class="wf-card-toggle" data-target="length-content">長さの換算</button>
-            <div id="length-content" class="wf-card-content">
-                <div class="wf-row">
-                    <input type="number" id="length-value" placeholder="数値を入力">
-                    <select id="length-unit"></select>
-                    <button class="wf-btn-convert" onclick="runConvert('length')">換算</button>
-                    <button class="wf-btn-clear" onclick="clearFields('length')">ご破算</button>
-                </div>
-                <table class="wf-table">
-                    <thead><tr><th>単位</th><th>結果</th></tr></thead>
-                    <tbody id="length-results"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ▼ 面積 -->
-        <section class="wf-card">
-            <button class="wf-card-toggle" data-target="area-content">面積の換算</button>
-            <div id="area-content" class="wf-card-content">
-                <div class="wf-row">
-                    <input type="number" id="area-value" placeholder="数値を入力">
-                    <select id="area-unit"></select>
-                    <button class="wf-btn-convert" onclick="runConvert('area')">換算</button>
-                    <button class="wf-btn-clear" onclick="clearFields('area')">ご破算</button>
-                </div>
-                <table class="wf-table">
-                    <thead><tr><th>単位</th><th>結果</th></tr></thead>
-                    <tbody id="area-results"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ▼ 容積 -->
-        <section class="wf-card">
-            <button class="wf-card-toggle" data-target="volume-content">容積の換算</button>
-            <div id="volume-content" class="wf-card-content">
-                <div class="wf-row">
-                    <input type="number" id="volume-value" placeholder="数値を入力">
-                    <select id="volume-unit"></select>
-                    <button class="wf-btn-convert" onclick="runConvert('volume')">換算</button>
-                    <button class="wf-btn-clear" onclick="clearFields('volume')">ご破算</button>
-                </div>
-                <table class="wf-table">
-                    <thead><tr><th>単位</th><th>結果</th></tr></thead>
-                    <tbody id="volume-results"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ▼ 重量 -->
-        <section class="wf-card">
-            <button class="wf-card-toggle" data-target="weight-content">重量の換算</button>
-            <div id="weight-content" class="wf-card-content">
-                <div class="wf-row">
-                    <input type="number" id="weight-value" placeholder="数値を入力">
-                    <select id="weight-unit"></select>
-                    <button class="wf-btn-convert" onclick="runConvert('weight')">換算</button>
-                    <button class="wf-btn-clear" onclick="clearFields('weight')">ご破算</button>
-                </div>
-                <table class="wf-table">
-                    <thead><tr><th>単位</th><th>結果</th></tr></thead>
-                    <tbody id="weight-results"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ▼ 温度 -->
-        <section class="wf-card">
-            <button class="wf-card-toggle" data-target="temperature-content">温度の換算</button>
-            <div id="temperature-content" class="wf-card-content">
-                <div class="wf-row">
-                    <input type="number" id="temperature-value" placeholder="数値を入力">
-                    <select id="temperature-unit"></select>
-                    <button class="wf-btn-convert" onclick="runConvert('temperature')">換算</button>
-                    <button class="wf-btn-clear" onclick="clearFields('temperature')">ご破算</button>
-                </div>
-                <table class="wf-table">
-                    <thead><tr><th>単位</th><th>結果</th></tr></thead>
-                    <tbody id="temperature-results"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- ▼ 圧力 -->
-        <section class="wf-card">
-            <button class="wf-card-toggle" data-target="pressure-content">圧力の換算</button>
-            <div id="pressure-content" class="wf-card-content">
-                <div class="wf-row">
-                    <input type="number" id="pressure-value" placeholder="数値を入力">
-                    <select id="pressure-unit"></select>
-                    <button class="wf-btn-convert" onclick="runConvert('pressure')">換算</button>
-                    <button class="wf-btn-clear" onclick="clearFields('pressure')">ご破算</button>
-                </div>
-                <table class="wf-table">
-                    <thead><tr><th>単位</th><th>結果</th></tr></thead>
-                    <tbody id="pressure-results"></tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
+        </main>
 
 <script>
-// ===============================
-// 単位データ（内部は英語コード、UI は漢字）
-// ===============================
+/* ===============================
+   単位データと定義
+   =============================== */
+// 1坪の正確な定義（400/121 平方メートル）
+const TSUBO_TO_M2 = 3.305785123966942;
 
 const UNIT_TABLE = {
     length: {
-        units: {
-            m: 1,
-            km: 1000,
-            inch: 0.0254,
-            foot: 0.3048,
-            yard: 0.9144,
-            mile: 1609.344,
-            sun: 0.0303,
-            shaku: 0.303,
-            nautical: 1852
-        },
-        labels: {
-            m: "メートル",
-            km: "キロメートル",
-            inch: "インチ",
-            foot: "フィート",
-            yard: "ヤード",
-            mile: "マイル",
-            sun: "寸",
-            shaku: "尺",
-            nautical: "海里"
-        },
-        tips: {
-            sun: "1寸 = 約3.03cm",
-            shaku: "1尺 = 約30.3cm",
-            nautical: "1海里 = 1852m"
-        }
+        name: "長さの換算",
+        units: { m: 1, km: 1000, inch: 0.0254, foot: 0.3048, yard: 0.9144, mile: 1609.344, sun: 0.030303, shaku: 0.30303, nautical: 1852 },
+        labels: { m: "メートル", km: "キロメートル", inch: "インチ", foot: "フィート", yard: "ヤード", mile: "マイル", sun: "寸", shaku: "尺", nautical: "海里" },
+        tips: { sun: "1寸 = 約3.03cm", shaku: "1尺 = 約30.3cm", nautical: "1海里 = 1852m" }
     },
-
     area: {
-        units: {
-            m2: 1,
-            a: 100,
-            ha: 10000,
-            km2: 1_000_000,
-            yd2: 0.836127,
-            ac: 4046.8564224,
-            tsubo: 3.305785,
-            han: 300 * 3.305785,
-            cho: 10 * 300 * 3.305785
+        name: "面積の換算",
+        units: { 
+            m2: 1, a: 100, ha: 10000, km2: 1000000, yd2: 0.836127, ac: 4046.856, 
+            tsubo: TSUBO_TO_M2, 
+            han: TSUBO_TO_M2 * 300, 
+            cho: TSUBO_TO_M2 * 3000 
         },
-        labels: {
-            m2: "平方メートル",
-            a: "アール",
-            ha: "ヘクタール",
-            km2: "平方キロメートル",
-            yd2: "平方ヤード",
-            ac: "エーカー",
-            tsubo: "坪",
-            han: "反",
-            cho: "町"
-        },
-        tips: {
-            tsubo: "1坪 = 約3.305785㎡",
-            han: "1反 = 300坪（約991.7㎡）",
-            cho: "1町 = 10反（約9917㎡）"
-        }
+        labels: { m2: "平方メートル", a: "アール", ha: "ヘクタール", km2: "平方キロ", yd2: "平方ヤード", ac: "エーカー", tsubo: "坪", han: "反", cho: "町" },
+        tips: { tsubo: "1坪 = 約3.31㎡", han: "1反 = 300坪", cho: "1町 = 10反" }
     },
-
     volume: {
-        units: {
-            ml: 1,
-            l: 1000,
-            dl: 100,
-            m3: 1_000_000,
-            gallon: 3785.41,
-            shaku: 18.0390798626,
-            go: 180.390798626,
-            sho: 1803.90798626,
-            to: 18039.0798626
-        },
-        labels: {
-            ml: "ミリリットル",
-            l: "リットル",
-            dl: "デシリットル",
-            m3: "立方メートル",
-            gallon: "ガロン",
-            shaku: "勺",
-            go: "合",
-            sho: "升",
-            to: "斗"
-        },
-        tips: {
-            shaku: "1勺 = 約18.04ml",
-            go: "1合 = 約180.39ml",
-            sho: "1升 = 約1.803L",
-            to: "1斗 = 約18.03L"
-        }
+        name: "容積の換算",
+        units: { ml: 1, l: 1000, dl: 100, m3: 1000000, gallon: 3785.41, shaku: 18.039, go: 180.39, sho: 1803.9, to: 18039 },
+        labels: { ml: "ミリリットル", l: "リットル", dl: "デシリットル", m3: "立方メートル", gallon: "ガロン", shaku: "勺", go: "合", sho: "升", to: "斗" },
+        tips: { go: "1合 = 約180ml", sho: "1升 = 10合", to: "1斗 = 10升" }
     },
-
     weight: {
-        units: {
-            mg: 1,
-            g: 1000,
-            kg: 1_000_000,
-            ton: 1_000_000_000,
-            carat: 200,
-            ounce: 28349.5231,
-            pound: 453592.37,
-            kan: 3750000
-        },
-        labels: {
-            mg: "ミリグラム",
-            g: "グラム",
-            kg: "キログラム",
-            ton: "トン",
-            carat: "カラット",
-            ounce: "オンス",
-            pound: "ポンド",
-            kan: "貫"
-        },
-        tips: {
-            kan: "1貫 = 約3.75kg"
-        }
-	}, 
-
-    temperature: {
-        units: {
-            K: 1,
-            C: 1, 
-            F: 1
-        },
-        labels: {
-            K: "ケルビン",
-            C: "摂氏（℃）",
-            F: "華氏（℉）"
-        },
-        tips: {
-            K: "絶対温度（0K = -273.15℃）",
-            C: "水の氷点を0℃とした温度",
-            F: "華氏温度（32℉ = 0℃）"
-        }
+        name: "重量の換算",
+        units: { mg: 1, g: 1000, kg: 1000000, ton: 1000000000, carat: 200, ounce: 28349.5, pound: 453592, kan: 3750000 },
+        labels: { mg: "ミリグラム", g: "グラム", kg: "キログラム", ton: "トン", carat: "カラット", ounce: "オンス", pound: "ポンド", kan: "貫" },
+        tips: { kan: "1貫 = 3.75kg" }
     },
-
+    temperature: {
+        name: "温度の換算",
+        labels: { K: "ケルビン", C: "摂氏（℃）", F: "華氏（℉）" },
+        tips: { K: "絶対零度は 0K", C: "水が凍るのは 0℃", F: "水が凍るのは 32℉" }
+    },
     pressure: {
-        units: {
-            Pa: 1,
-            hPa: 100,
-            mmHg: 133.322,
-            atm: 101325
-        },
-        labels: {
-            Pa: "パスカル",
-            hPa: "ヘクトパスカル",
-            mmHg: "ミリメートル水銀柱",
-            atm: "標準大気圧"
-        },
-        tips: {
-            Pa: "SI単位の圧力",
-            hPa: "気圧の一般的な単位（1hPa = 100Pa）",
-            mmHg: "水銀柱の高さで表す圧力",
-            atm: "1気圧 = 1013.25hPa"
-        }
+        name: "圧力の換算",
+        units: { Pa: 1, hPa: 100, mmHg: 133.322, atm: 101325 },
+        labels: { Pa: "パスカル", hPa: "ヘクトパスカル", mmHg: "水銀柱(mmHg)", atm: "標準大気圧" },
+        tips: { hPa: "1hPa = 100Pa", atm: "1気圧 = 1013.25hPa" }
     }
 };
 
+/* ===============================
+   HTML生成・初期化
+   ============================== */
+const root = document.getElementById('converter-root');
 
-// 温度
-function convertTemperature(value, unit) {
-    let K, C, F;
+for (const key in UNIT_TABLE) {
+    const category = UNIT_TABLE[key];
+    const section = document.createElement('section');
+    section.className = 'wf-card';
+    section.innerHTML = `
+        <button class="wf-card-toggle" data-target="${key}-content">${category.name}</button>
+        <div id="${key}-content" class="wf-card-content">
+            <div class="wf-row">
+                <input type="number" id="${key}-value" placeholder="数値を入力" oninput="runConvert('${key}')">
+                <select id="${key}-unit" onchange="runConvert('${key}')"></select>
+            </div>
+            <div id="${key}-tip" class="wf-unit-note"></div>
+            <button class="wf-btn-clear" onclick="clearFields('${key}')">ご破算</button>
+            <table class="wf-table">
+                <thead><tr><th>単位</th><th>結果</th></tr></thead>
+                <tbody id="${key}-results"></tbody>
+            </table>
+        </div>
+    `;
+    root.appendChild(section);
 
-    if (unit === "K") {
-        K = value;
-        C = value - 273.15;
-        F = C * 9/5 + 32;
-    } else if (unit === "C") {
-        C = value;
-        K = value + 273.15;
-        F = value * 9/5 + 32;
-    } else {
-        F = value;
-        C = (value - 32) * 5/9;
-        K = C + 273.15;
-    }
-
-    return {
-        K: K.toFixed(2),
-        C: C.toFixed(2),
-        F: F.toFixed(2)
-    };
+	// セレクトボックスの選択肢を追加
+	const select = document.getElementById(`${key}-unit`);
+	for (const unitKey in category.labels) {
+	    const option = document.createElement('option');
+	    option.value = unitKey;
+	    option.textContent = `${category.labels[unitKey]} (${unitKey})`;
+	    select.appendChild(option);
+	}
 }
 
-// 圧力
-function convertPressure(value, unit) {
-    const Pa = {
-        Pa: value,
-        hPa: value / 100,
-        mmHg: value / 133.322,
-        atm: value / 101325
-    };
+/* ===============================
+   計算・制御ロジック
+   ============================== */
 
-    if (unit === "hPa") return convertPressure(value * 100, "Pa");
-    if (unit === "mmHg") return convertPressure(value * 133.322, "Pa");
-    if (unit === "atm") return convertPressure(value * 101325, "Pa");
+// 換算実行
+function runConvert(categoryKey) {
+    const valInput = document.getElementById(`${categoryKey}-value`);
+    const unitSelect = document.getElementById(`${categoryKey}-unit`);
+    const tipArea = document.getElementById(`${categoryKey}-tip`);
+    const tbody = document.getElementById(`${categoryKey}-results`);
+    
+    const value = parseFloat(valInput.value);
+    const unit = unitSelect.value;
 
-    return {
-        Pa: Pa.Pa.toFixed(3),
-        hPa: Pa.hPa.toFixed(3),
-        mmHg: Pa.mmHg.toFixed(3),
-        atm: Pa.atm.toFixed(6)
-    };
-}
-
-// 汎用変換
-function convertGeneric(category, value, unit) {
-    const table = UNIT_TABLE[category].units;
-    const baseValue = value * table[unit];
-
-    const result = {};
-    for (const key in table) {
-        result[key] = (baseValue / table[key]).toFixed(6);
-    }
-    return result;
-}
-
-// ===============================
-// セレクトボックスに単位を自動挿入
-// ===============================
-
-function populateUnits() {
-    for (const category in UNIT_TABLE) {
-        const select = document.getElementById(`${category}-unit`);
-        if (!select) continue;
-
-        const labels = UNIT_TABLE[category].labels;
-        const tips = UNIT_TABLE[category].tips || {};
-
-        for (const key in labels) {
-            const option = document.createElement("option");
-            option.value = key;
-
-            // tooltip付きラベル
-            if (tips[key]) {
-                option.innerHTML = `${labels[key]} ⓘ`;
-                option.setAttribute("data-tip", tips[key]);
-            } else {
-                option.textContent = labels[key];
-            }
-
-            select.appendChild(option);
-        }
-    }
-}
-
-// ===============================
-// tooltip（セレクト選択時に表示）
-// ===============================
-
-document.addEventListener("change", function(e) {
-    if (e.target.tagName === "SELECT") {
-        const tip = e.target.selectedOptions[0].dataset.tip;
-        if (tip) {
-            alert(`${tip}`);
-        }
-    }
-});
-
-// ===============================
-// ご破算（クリア）
-// ===============================
-
-function clearFields(category) {
-    document.getElementById(`${category}-value`).value = "";
-    document.getElementById(`${category}-results`).innerHTML = "";
-}
-
-// ===============================
-// 折りたたみ制御
-// ===============================
-
-document.addEventListener("click", function(e) {
-    if (e.target.classList.contains("wf-card-toggle")) {
-        const target = document.getElementById(e.target.dataset.target);
-        target.style.display = target.style.display === "block" ? "none" : "block";
-    }
-});
-
-// ===============================
-// 変換実行
-// ===============================
-
-function runConvert(category) {
-    const value = parseFloat(document.getElementById(`${category}-value`).value);
-    const unit = document.getElementById(`${category}-unit`).value;
-    const tbody = document.getElementById(`${category}-results`);
+    // 注釈の更新
+    tipArea.textContent = UNIT_TABLE[categoryKey].tips?.[unit] || "";
 
     if (isNaN(value)) {
-        tbody.innerHTML = `<tr><td colspan="2">数値を入力してください</td></tr>`;
+        tbody.innerHTML = "";
         return;
     }
 
-    let result;
-
-    if (category === "temperature") {
-        result = convertTemperature(value, unit);
-    } else if (category === "pressure") {
-        result = convertPressure(value, unit);
+    let results = {};
+    if (categoryKey === "temperature") {
+        results = calcTemp(value, unit);
     } else {
-        result = convertGeneric(category, value, unit);
+        const units = UNIT_TABLE[categoryKey].units;
+        const base = value * units[unit];
+        for (const k in units) {
+            let res = base / units[k];
+            // 浮動小数点誤差の補正（299.999...問題を解消）
+            results[k] = Math.abs(res - Math.round(res)) < 1e-9 ? Math.round(res) : res.toFixed(6);
+        }
     }
 
-    const labels = UNIT_TABLE[category]?.labels || {
-        K: "ケルビン",
-        C: "摂氏",
-        F: "華氏",
-        Pa: "Pa",
-        hPa: "hPa",
-        mmHg: "mmHg",
-        atm: "atm"
-    };
+    const labels = UNIT_TABLE[categoryKey].labels;
+    tbody.innerHTML = Object.entries(results) 
+    	.map(([u, v]) => 
+    		`<tr> <td>${labels[u]} <span class="unit-code">(${u})</span>
+    		</td> <td>${Number(v).toLocaleString(undefined, {maximumFractionDigits:6})}</td> 
+		</tr>` ) 
+		.join("");
+	}
 
-    tbody.innerHTML = Object.entries(result)
-        .map(([u, v]) => `<tr><td>${labels[u] || u}</td><td>${v}</td></tr>`)
-        .join("");
+// 温度専用計算
+function calcTemp(v, u) {
+    let k, c, f;
+    if (u === "K") { k = v; c = v - 273.15; f = c * 9/5 + 32; }
+    else if (u === "C") { c = v; k = v + 273.15; f = v * 9/5 + 32; }
+    else { f = v; c = (v - 32) * 5/9; k = c + 273.15; }
+    return { K: k.toFixed(2), C: c.toFixed(2), F: f.toFixed(2) };
 }
 
-// ===============================
-// 初期化
-// ===============================
-populateUnits();
+// ご破算（クリア）
+function clearFields(key) {
+    document.getElementById(`${key}-value`).value = "";
+    document.getElementById(`${key}-results`).innerHTML = "";
+    document.getElementById(`${key}-tip`).textContent = "";
+}
 
-// ★ 初期状態を閉じる
-document.querySelectorAll(".wf-card-content").forEach(el => {
-    el.style.display = "none";
+// 折りたたみイベント
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("wf-card-toggle")) {
+        const targetId = e.target.dataset.target;
+        const content = document.getElementById(targetId);
+        const isVisible = content.style.display === "block";
+        content.style.display = isVisible ? "none" : "block";
+    }
 });
 
-// ★ 初期状態を開く 
-// document.querySelectorAll(".wf-card-content").forEach(el => { el.style.display = "block";
-// });
+// 初期状態：長さのカードだけ開いておく
+document.getElementById("length-content").style.display = "block";
 </script>
 
-  <footer>
-    © 20260129 ettomio
-  </footer>
+<footer>
+    © 20260131 ettomio - 舞いカレンダー
+</footer>
 
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
