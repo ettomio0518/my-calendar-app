@@ -1,308 +1,398 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高機能電卓</title>
-    <style>
-        /* スタイリング */
-        .calculator-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 20px;
-        }
-        .calculator {
-            width: 300px;
-            padding: 20px;
-            border: 1px solid #333;
-            border-radius: 8px;
-            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
-            background-color: #d0d0ff; /* 背景色 */
-        }
-        .display {
-            width: 100%;
-            height: 40px;
-            font-size: 1.7em;
-            text-align: right;
-            padding: 5px;
-            margin-bottom: 10px;
-            border: 1px solid #333;
-            border-radius: 4px;
-            background-color: #e8ffe8; /* 背景色 */
-        }
-        
-		header {
-		  background: #8080ff;
-		  color: white;
-		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
-		  text-align: center;
-		  position: relative;
-		}
-		h1 {
-		  font-size: 20px;
-		  margin: 0;
-		}    	
-		        
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px;
-        }
-        .button {
-            width: 100%;
-            height: 55px;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-        .history {
-            margin-top: 10px;
-            max-height: 180px;
-            overflow-y: scroll;
-            font-size: 0.9em;
-            color: #666;
-        }
-        /* スクロールバーのスタイル */
-        .history::-webkit-scrollbar {
-            width: 16px; /* スクロールバーの幅 */
-        }
-        .history::-webkit-scrollbar-thumb {
-            background-color: #888; /* スクロールバーの色 */
-            border-radius: 8px; /* 丸みを追加 */
-            border: 4px solid transparent; /* 周りに余白を追加 */
-            background-clip: content-box; /* 背景の切り取り */
-        }
-        .history::-webkit-scrollbar-thumb:hover {
-            background-color: #555; /* ホバー時の色 */
-        }
-        .history::-webkit-scrollbar-track {
-            background-color: #ccc; /* 背景の色 */
-            border-radius: 8px; /* 丸みを追加 */
-        }
-        .history-item {
-            padding: 5px;
-            border-bottom: 1px solid #ddd;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>簡易電卓 - 5x5レイアウト</title>
+  <style>
+    /* 全体のコンテナ */
+    .calculator-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
 
-        body {
-            background-color: #cbe4e4; /* 背景色 */
-        }
+    /* 電卓本体の幅を少し広げて調整 */
+    .calculator {
+      width: 320px; 
+      padding: 15px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+      background-color: #d0d0ff;
+    }
 
-        button {
-            font-size: 18px; /* フォントサイズ */
-            padding: 3px 10px; /* 内側余白 */
-            margin: 1px; /* 周囲の余白 */
-            border-radius: 5px; /* 角を丸くする */
-            background-color: #ccffff; /* 背景色 */
-            color: black; /* 文字色 */
-    		border: 1px solid black; /* 枠線を表示 */
-            cursor: pointer; /* カーソルをポインタに変更 */
-        }
+    /* Mランプ */
+    .memory-indicator {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: red;
+      visibility: hidden;
+      margin-bottom: 3px;
+      text-align: left;
+    }
 
-		.history-text {
-		    color: blue;
-		    font-weight: bold;
-		}
+    .display {
+      width: 100%;
+      height: 45px;
+      font-size: 1.7em;
+      text-align: right;
+      padding: 5px;
+      margin-bottom: 10px;
+      border: 1px solid #333;
+      border-radius: 4px;
+      background-color: #e8ffe8;
+      box-sizing: border-box;
+    }
 
-	    /* 戻るボタン 5/6 */
-	    .top-right-button {
-          width: auto; /* ボタンの幅を自動調整 */
-	      position: absolute;
-	      top: 10px;
-	      right: 10px;
-	      background-color: #ccffff;
-	      color: black;
-	      border-radius: 20px;
-	      padding: 6px 12px;
-	      font-size: 14px;
-    	  border: 1px solid black; /* 枠線を表示 */	      
-	      cursor: pointer;
-	    }
-	    .top-right-button:hover {
-	      background-color: #f4f4f4;
-	    }
+    header {
+      background: #8080ff;
+      color: white;
+      padding: 1em 0;
+      text-align: center;
+      position: relative;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0;
+    }
 
-	    footer {
-	      text-align: center;
-	      padding: 12px;
-	    }
-	    
-    </style>
+    /* 5列レイアウトへの変更点 */
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); /* 4から5に変更 */
+      gap: 6px;
+    }
+
+    .button {
+      width: 100%;
+      height: 55px;
+      font-size: 1.2em; /* 5列で見やすくするため少し小さく調整 */
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid black;
+      background-color: #ccffff;
+      color: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    /* 数字キー（青色・白抜き） */
+    .digit-button {
+      background-color: #3366cc;
+      color: white;
+    }
+
+    .clear-button {
+      background-color: #ff9933;
+      color: white;
+    }
+
+    /* 履歴クリアボタン */
+    .history-clear-button {
+      margin-top: 10px;
+      width: 100%;
+      height: 40px;
+      font-size: 1.1em;
+      background-color: #228855;
+      color: white;
+      border: 1px solid #004422;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .history-clear-button:hover {
+      background-color: #2a9966;
+    }
+
+    .history {
+      margin-top: 10px;
+      max-height: 180px;
+      overflow-y: scroll;
+      font-size: 0.9em;
+      color: #666;
+      border-top: 1px solid #aaa;
+      padding-top: 5px;
+    }
+    .history-item {
+      padding: 5px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    body {
+      background-color: #cbe4e4;
+    }
+
+    .history-text {
+      color: blue;
+      font-weight: bold;
+    }
+
+    .top-right-button {
+      width: auto;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: #ccffff;
+      color: black;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 14px;
+      border: 1px solid black;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      padding: 12px;
+      font-size: 14px;      
+    }
+    
+  </style>
 </head>
 <body>
 
-  	<header>
-    <!-- Homeに戻るボタン 5/6 -->
-	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
-	    <h1>🔢  簡易電卓</h1>
-  	</header>
-  	
+<header>
+  <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+  <h1>🔢 簡易電卓</h1>
+</header>
+
 <div class="calculator-container">
-    <div class="calculator">
-        <input type="text" id="display" class="display" readonly>
-        <div class="buttons">
-            <button class="button" onclick="clearDisplay()">C</button>
-            <button class="button" onclick="backspace()">←</button>
-            <button class="button" onclick="setOperator('**')">x²</button>
-            <button class="button" onclick="setOperator('sqrt')">√</button>
+  <div class="calculator">
+    <div class="memory-indicator" id="memoryIndicator">M</div>
+    <input type="text" id="display" class="display" readonly>
 
-            <button class="button" onclick="appendNumber('7')">7</button>
-            <button class="button" onclick="appendNumber('8')">8</button>
-            <button class="button" onclick="appendNumber('9')">9</button>
-            <button class="button" onclick="setOperator('/')">÷</button>
+    <div class="buttons">
+      <button class="button clear-button" onclick="memoryClear()">MC</button>
+      <button class="button" onclick="memoryRecall()">MR</button>
+      <button class="button" onclick="memorySubtract()">M-</button>
+      <button class="button" onclick="memoryAdd()">M+</button>
+      <button class="button clear-button" onclick="clearDisplay()">C</button>
 
-            <button class="button" onclick="appendNumber('4')">4</button>
-            <button class="button" onclick="appendNumber('5')">5</button>
-            <button class="button" onclick="appendNumber('6')">6</button>
-            <button class="button" onclick="setOperator('*')">×</button>
+      <button class="button digit-button" onclick="appendNumber('7')">7</button>
+      <button class="button digit-button" onclick="appendNumber('8')">8</button>
+      <button class="button digit-button" onclick="appendNumber('9')">9</button>
+      <button class="button" onclick="setOperator('/')">÷</button>
+      <button class="button" onclick="backspace()">←</button>
 
-            <button class="button" onclick="appendNumber('1')">1</button>
-            <button class="button" onclick="appendNumber('2')">2</button>
-            <button class="button" onclick="appendNumber('3')">3</button>
-            <button class="button" onclick="setOperator('-')">-</button>
+      <button class="button digit-button" onclick="appendNumber('4')">4</button>
+      <button class="button digit-button" onclick="appendNumber('5')">5</button>
+      <button class="button digit-button" onclick="appendNumber('6')">6</button>
+      <button class="button" onclick="setOperator('*')">×</button>
+      <button class="button" onclick="setOperator('**')">x²</button>
 
-            <button class="button" onclick="appendNumber('0')">0</button>
-            <button class="button" onclick="appendDecimal()">.</button>
-            <button class="button" onclick="calculate()">=</button>
-            <button class="button" onclick="setOperator('+')">+</button>
-        </div>
-        <div class="history" id="history"></div>
+      <button class="button digit-button" onclick="appendNumber('1')">1</button>
+      <button class="button digit-button" onclick="appendNumber('2')">2</button>
+      <button class="button digit-button" onclick="appendNumber('3')">3</button>
+      <button class="button" onclick="setOperator('-')">-</button>
+      <button class="button" onclick="setOperator('sqrt')">√</button>
+
+      <button class="button digit-button" onclick="appendNumber('0')">0</button>
+      <button class="button digit-button" onclick="appendNumber('00')">00</button>
+      <button class="button digit-button" onclick="appendDecimal()">.</button>
+      <button class="button" onclick="setOperator('+')">+</button>
+      <button class="button" onclick="calculate()">=</button>
     </div>
-		  <img src="soroban.png" alt="サンプル画像">
+
+    <button class="history-clear-button" onclick="clearHistory()">履歴クリア</button>
+    <div class="history" id="history"></div>
+  </div>
+  <img src="soroban.png" alt="そろばん" style="margin-top:10px; width:100px;">
 </div>
 
 <script>
-    const display = document.getElementById('display');
-    const history = document.getElementById('history');
+  const display = document.getElementById('display');
+  const history = document.getElementById('history');
+  const memoryIndicator = document.getElementById('memoryIndicator');
 
-    let currentInput = '';
-    let previousValue = null;
-    let internalValue = null;
-    let operator = '';
-    let decimalAdded = false;
+  let currentInput = '';
+  let previousValue = null;
+  let internalValue = null;
+  let operator = '';
+  let decimalAdded = false;
+  let memoryValue = 0;
 
-    const DISPLAY_PRECISION = 12;
+  const DISPLAY_PRECISION = 12;
 
-    /* ---------- 表示専用丸め ---------- */
-    function formatDisplay(value) {
-        if (!isFinite(value)) return 'Error';
-        return Number(value.toFixed(DISPLAY_PRECISION)).toString();
+  function updateMemoryIndicator() {
+    memoryIndicator.style.visibility = (memoryValue !== 0) ? 'visible' : 'hidden';
+  }
+
+  function formatDisplay(value) {
+    if (!isFinite(value)) return 'Error';
+    return Number(value.toFixed(DISPLAY_PRECISION)).toString();
+  }
+
+  function appendNumber(num) {
+    currentInput += num;
+    display.value = currentInput;
+  }
+
+  function appendDecimal() {
+    if (!decimalAdded) {
+      currentInput += '.';
+      display.value = currentInput;
+      decimalAdded = true;
+    }
+  }
+
+  function setOperator(op) {
+    // ★ 追加：途中計算を確定する  
+    if (operator && currentInput !== '') { calculate(); }
+    
+    if (currentInput === '' && internalValue === null) return;
+
+    if (op === 'sqrt') {
+      const value = internalValue ?? parseFloat(currentInput);
+      if (value < 0) {
+        display.value = 'Error';
+        return;
+      }
+      internalValue = Math.sqrt(value);
+      currentInput = formatDisplay(internalValue);
+      display.value = currentInput;
+      addHistory(`√${formatDisplay(value)} = ${currentInput}`);
+      decimalAdded = currentInput.includes('.');
+      return;
     }
 
-    /* ---------- 入力 ---------- */
-    function appendNumber(num) {
-        currentInput += num;
-        display.value = currentInput;
+    if (op === '**') {
+      const value = internalValue ?? parseFloat(currentInput);
+      internalValue = value * value;
+      currentInput = formatDisplay(internalValue);
+      display.value = currentInput;
+      addHistory(`${formatDisplay(value)}² = ${currentInput}`);
+      decimalAdded = currentInput.includes('.');
+      return;
     }
 
-    function appendDecimal() {
-        if (!decimalAdded) {
-            currentInput += '.';
-            display.value = currentInput;
-            decimalAdded = true;
+    if (internalValue === null) {
+      internalValue = parseFloat(currentInput);
+    }
+
+    operator = op;
+    previousValue = internalValue;
+    currentInput = '';
+    decimalAdded = false;
+  }
+
+  function calculate() {
+    if (operator === '' || currentInput === '') return;
+
+    const currentValue = parseFloat(currentInput);
+    let result;
+
+    switch (operator) {
+      case '+': result = previousValue + currentValue; break;
+      case '-': result = previousValue - currentValue; break;
+      case '*': result = previousValue * currentValue; break;
+      case '/':
+        if (currentValue === 0) {
+          display.value = 'Error';
+          return;
         }
+        result = previousValue / currentValue;
+        break;
+      default:
+        return;
     }
 
-    /* ---------- 演算子 ---------- */
-    function setOperator(op) {
-        if (currentInput === '' && internalValue === null) return;
+    internalValue = result;
+    const displayResult = formatDisplay(result);
+    display.value = displayResult;
 
-        if (op === 'sqrt') {
-            const value = internalValue ?? parseFloat(currentInput);
-            if (value < 0) {
-                display.value = 'Error';
-                return;
-            }
-            internalValue = Math.sqrt(value);
-            currentInput = formatDisplay(internalValue);
-            display.value = currentInput;
-            addHistory(`√${formatDisplay(value)} = ${currentInput}`);
-            decimalAdded = currentInput.includes('.');
-            return;
-        }
+    addHistory(`${formatDisplay(previousValue)} ${operator} ${formatDisplay(currentValue)} = ${displayResult}`);
 
-        if (op === '**') {
-            const value = internalValue ?? parseFloat(currentInput);
-            internalValue = value * value;
-            currentInput = formatDisplay(internalValue);
-            display.value = currentInput;
-            addHistory(`${formatDisplay(value)}² = ${currentInput}`);
-            decimalAdded = currentInput.includes('.');
-            return;
-        }
+    currentInput = displayResult;
+    operator = '';
+    previousValue = null;
+    decimalAdded = currentInput.includes('.');
+  }
 
-        if (internalValue === null) {
-            internalValue = parseFloat(currentInput);
-        }
+  /* ---------- メモリ機能 ---------- */
 
-        operator = op;
-        previousValue = internalValue;
-        currentInput = '';
-        decimalAdded = false;
+  function memoryClear() {
+    memoryValue = 0;
+    addHistory(`MC → Memory = 0`);
+    updateMemoryIndicator();
+  }
+
+  function memoryRecall() {
+    currentInput = formatDisplay(memoryValue);
+    display.value = currentInput;
+    addHistory(`MR = ${currentInput}`);
+    currentInput = '';
+  }
+
+  function memoryAdd() {
+    if (operator && currentInput !== '') {
+      calculate();
     }
 
-    /* ---------- 計算 ---------- */
-    function calculate() {
-        if (operator === '' || currentInput === '') return;
+    const value = parseFloat(currentInput || '0');
+    memoryValue += value;
 
-        const currentValue = parseFloat(currentInput);
-        let result;
+    addHistory(`M+ ${formatDisplay(value)} → Memory = ${formatDisplay(memoryValue)}`);
+    updateMemoryIndicator();
 
-        switch (operator) {
-            case '+': result = previousValue + currentValue; break;
-            case '-': result = previousValue - currentValue; break;
-            case '*': result = previousValue * currentValue; break;
-            case '/':
-                if (currentValue === 0) {
-                    display.value = 'Error';
-                    return;
-                }
-                result = previousValue / currentValue;
-                break;
-            default:
-                return;
-        }
+    currentInput = '';
+    display.value = '';
+    internalValue = null;
+    operator = '';
+  }
 
-        internalValue = result;
-        const displayResult = formatDisplay(result);
-        display.value = displayResult;
-
-        addHistory(`${formatDisplay(previousValue)} ${operator} ${formatDisplay(currentValue)} = ${displayResult}`);
-
-        currentInput = displayResult;
-        operator = '';
-        previousValue = null;
-        decimalAdded = currentInput.includes('.');
+  function memorySubtract() {
+    if (operator && currentInput !== '') {
+      calculate();
     }
 
-    /* ---------- 操作 ---------- */
-    function clearDisplay() {
-        currentInput = '';
-        previousValue = null;
-        internalValue = null;
-        operator = '';
-        decimalAdded = false;
-        display.value = '';
-    }
+    const value = parseFloat(currentInput || '0');
+    memoryValue -= value;
 
-    function backspace() {
-        currentInput = currentInput.slice(0, -1);
-        display.value = currentInput;
-        decimalAdded = currentInput.includes('.');
-    }
+    addHistory(`M- ${formatDisplay(value)} → Memory = ${formatDisplay(memoryValue)}`);
+    updateMemoryIndicator();
 
-    /* ---------- 履歴 ---------- */
-    function addHistory(text) {
-        const div = document.createElement('div');
-        div.className = 'history-item';
-        div.innerHTML = `<span class="history-text">${text}</span>`;
-        history.appendChild(div);
-        history.scrollTop = history.scrollHeight;
-    }
+    currentInput = '';
+    display.value = '';
+    internalValue = null;
+    operator = '';
+  }
+
+  /* ---------- 操作 ---------- */
+
+  function clearDisplay() {
+    currentInput = '';
+    previousValue = null;
+    internalValue = null;
+    operator = '';
+    decimalAdded = false;
+    display.value = '';
+  }
+
+  function backspace() {
+    currentInput = currentInput.slice(0, -1);
+    display.value = currentInput;
+    decimalAdded = currentInput.includes('.');
+  }
+
+  function clearHistory() {
+    history.innerHTML = '';
+  }
+
+  function addHistory(text) {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    div.innerHTML = `<span class="history-text">${text}</span>`;
+    history.appendChild(div);
+    history.scrollTop = history.scrollHeight;
+  }
 </script>
-  <footer>
-    © 20260111 ettomio
-  </footer>
-  
+
+<footer>
+  © 20260131 ettomio - 舞いカレンダー
+</footer>
+
 </body>
 </html>
