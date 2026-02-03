@@ -136,6 +136,53 @@
     .top-right-button:hover {
       background-color: #e3e3f0;
     }
+
+.calc-btn-wrapper {
+  text-align: right;
+  margin-top: 10px;
+}
+
+.calc-btn {
+  background: #a74fff;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+	        
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 99999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background: white;
+    margin: 10% auto;
+    padding: 10px;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 10px;
+}
+
+.calc-frame {
+    width: 100%;
+    height: calc(100vh - 120px);
+    border: none;
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
 	        
 </style>
 
@@ -158,8 +205,10 @@
 
 <header class="app-header">
   <h1>✏️ 走り書き scribbling <span id="lockMark"></span></h1>
-  <button class="top-right-button"
-    onclick="window.location.href='today-card.html'">戻る</button>
+  
+	<button class="top-right-button"
+  onclick="window.location.href='today-card.html'">戻る</button>
+
 </header>
 
 <main>
@@ -188,6 +237,10 @@
     <button class="save-button" onclick="protectMemo()">🔒 破棄不可</button>
     <button class="button2" onclick="unprotectMemo()">🔓 解除</button>
   </div>
+
+	<div class="calc-btn-wrapper">
+	  <button id="calc-btn" class="calc-btn">🧮 電卓</button>
+	</div>
   
 </main>
 
@@ -320,9 +373,43 @@ function deleteOldMemos() {
   setToday();
 </script>
 
-  <footer>
-    © 20260118 ettomio
-  </footer>
-  
+<footer>
+  © 20260203 ettomio
+</footer>
+
+<div id="calcModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCalcModal()">&times;</span>
+    <iframe src="calculatorapp.html?from=scribbling" class="calc-frame"></iframe>
+  </div>
+</div>
+
+<script>
+  document.getElementById("calc-btn").onclick = openCalcModal;
+
+  function openCalcModal() {
+    document.getElementById("calcModal").style.display = "block";
+  }
+
+  function closeCalcModal() {
+    document.getElementById("calcModal").style.display = "none";
+  }
+</script>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const from = params.get("from");
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const backBtn = document.querySelector(".top-right-button");
+
+    if (from === "index") {
+      backBtn.onclick = () => location.href = "index.html";
+    } else {
+      backBtn.onclick = () => location.href = "today-card.html";
+    }
+  });
+</script>
+
 </body>
 </html>
