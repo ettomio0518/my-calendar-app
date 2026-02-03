@@ -161,7 +161,66 @@
 		    padding: 10px;   /* ← ここが効きます */
 		  }
 		}
-	    	    		        
+
+	.calc-float-btn {
+	    position: fixed;
+	    bottom: 20px;
+	    right: 20px;
+	    background: #a74fff;
+	    color: white;
+	    padding: 10px 16px;
+	    border-radius: 20px;
+	    font-size: 16px;
+	    text-decoration: none;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+	    z-index: 9999;
+
+	    opacity: 0;              /* 最初は透明 */
+	    transition: opacity 0.6s ease;  /* ふわっと表示 */
+	}
+	.calc-float-btn.visible {
+	    opacity: 0.85;           /* 半透明で存在感を抑える 0.75から0.85に変更 */
+	}
+	.calc-float-btn:hover {
+	    opacity: 1;              /* ホバー時だけ100%表示 */
+	    background: #0056b3;
+	}
+	
+	/* ▼▼▼ モーダル電卓 ▼▼▼ */
+	.modal {
+	    display: none;
+	    position: fixed;
+	    z-index: 99999;
+	    left: 0;
+	    top: 0;
+	    width: 100%;
+	    height: 100%;
+	    background: rgba(0,0,0,0.4);
+	}
+
+	.modal-content {
+	    background: white;
+	    margin: 10% auto;
+	    padding: 10px;
+	    width: 90%;
+	    max-width: 400px;
+	    border-radius: 10px;
+	}
+
+	.calc-frame {
+	    width: 100%;
+	    height: calc(100vh - 120px); /* 画面の高さから余白を引く */
+	    border: none;
+	}
+
+	.close {
+	    float: right;
+	    font-size: 24px;
+	    cursor: pointer;
+	    user-select: none;
+	}
+	/* ▲▲▲ モーダル電卓 ▲▲▲ */
+	        
     </style>
 </head>
 
@@ -208,6 +267,7 @@
     <button class="add-button" onclick="addItemRow()">行を追加</button>
     <button class="total-button" onclick="calculateTotal()">合計</button>    
     <p id="totalPrice"></p>
+    
 </section>    
     
 <section>    
@@ -528,15 +588,46 @@
 	    document.addEventListener('DOMContentLoaded', () => {
 	        showScrollButtonsIfPageLong();
 	    });
+
+		window.addEventListener("scroll", () => {
+		    const btn = document.querySelector(".calc-float-btn");
+		    if (window.scrollY > 100) {
+		        btn.classList.add("visible");
+		    } else {
+		        btn.classList.remove("visible");
+		    }
+		});
 	    
-  </script>
-  
-  <footer>
-    © 20260108 ettomio
-  </footer>
-    
+	</script>
+
+	<footer>
+	  © 20260202 ettomio
+	</footer>
+
 	<div style="height: 50px;"></div>
-		        
+
+	<!-- 🧮 電卓モーダル -->
+	<div id="calcModal" class="modal">
+	  <div class="modal-content">
+	    <span class="close" onclick="closeCalcModal()">&times;</span>
+	    <iframe src="calculatorapp.html?from=shopping" class="calc-frame"></iframe>
+	  </div>
+	</div>
+
+	<!-- 🧮 モーダル起動ボタン（右下） -->
+	<a class="calc-float-btn" onclick="openCalcModal()">🧮 電卓</a>
+
+	<script>
+	function openCalcModal() {
+	    document.getElementById("calcModal").style.display = "block";
+	}
+
+	function closeCalcModal() {
+	    document.getElementById("calcModal").style.display = "none";
+	}
+
+	</script>
+
 </body>
 </html>
 
