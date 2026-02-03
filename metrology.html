@@ -179,6 +179,31 @@ footer {
 .spacer {
     height: 50px;
 }
+
+.calc-float-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #a74fff;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 20px;
+    font-size: 16px;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    z-index: 9999;
+
+    opacity: 0;              /* 最初は透明 */
+    transition: opacity 0.6s ease;  /* ふわっと表示 */
+}
+.calc-float-btn.visible {
+    opacity: 0.85;           /* 半透明で存在感を抑える 0.75から0.85に変更 */
+}
+.calc-float-btn:hover {
+    opacity: 1;              /* ホバー時だけ100%表示 */
+    background: #0056b3;
+}
+
 </style>
 </head>
 
@@ -239,6 +264,35 @@ const UNIT_TABLE = {
         units: { Pa: 1, hPa: 100, mmHg: 133.322, atm: 101325 },
         labels: { Pa: "パスカル", hPa: "ヘクトパスカル", mmHg: "水銀柱(mmHg)", atm: "標準大気圧" },
         tips: { hPa: "1hPa = 100Pa", atm: "1気圧 = 1013.25hPa" }
+	},
+    
+    /* ▼▼▼ ここから速度の換算を追加 ▼▼▼ */
+    speed: {
+        name: "速度の換算",
+        units: {
+            ms: 1,                 // m/s
+            mmin: 1/60,            // m/min
+            kmh: 1000/3600,        // km/h
+            fts: 0.3048,           // ft/s
+            ftmin: 0.3048/60,      // ft/min
+            mph: 1609.344/3600,    // mile/h
+            kt: 0.514444,          // knot
+            mach: 340.29           // Mach（海面基準）
+        },
+        labels: {
+            ms: "メートル毎秒",
+            mmin: "メートル毎分",
+            kmh: "キロメートル毎時",
+            fts: "フィート毎秒",
+            ftmin: "フィート毎分",
+            mph: "マイル毎時",
+            kt: "ノット",
+            mach: "マッハ"
+        },
+        tips: {
+            kt: "1ノット = 1海里/時 = 約0.514m/s",
+            mach: "マッハは海面基準で約340m/s"
+        }
     }
 };
 
@@ -350,14 +404,33 @@ document.addEventListener("click", (e) => {
 
 // 初期状態：長さのカードだけ開いておく
 document.getElementById("length-content").style.display = "block";
+
+
+function showCalcButtonOnScroll() {
+    const btn = document.querySelector(".calc-float-btn");
+    const scrollY = window.scrollY;
+
+    if (scrollY > 1) {   // ← ここを 50を1 に変更
+        btn.classList.add("visible");
+    } else {
+        btn.classList.remove("visible");
+    }
+}
+
+window.addEventListener("scroll", showCalcButtonOnScroll);
+window.addEventListener("load", showCalcButtonOnScroll);
+
 </script>
 
 <footer>
-    © 20260131 ettomio - 舞いカレンダー
+    © 20260202 ettomio - 舞いカレンダー
 </footer>
 
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
-	
+
+    <!-- 🧮 フローティング電卓ボタン -->
+    <a href="calculatorapp.html?from=metrology" class="calc-float-btn">🧮 電卓</a>
+    
 </body>
 </html>
