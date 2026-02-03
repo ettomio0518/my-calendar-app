@@ -250,14 +250,21 @@
 		    color: blue; /* 文字色の変更 */
 		}
 
-		/* 「今日のカード」「ノート」ボタンだけスタイルを変更 12/22 */
+		/* 「今日のカード」「ノート」「走り書き」ボタンだけスタイルを変更 12/22 */
 		#note-button,
 		#note-button2 {
 		    font-size: 16px; /* フォントサイズを大きく */
-		    padding: 3px 30px; /* ボタン全体の大きさを調整 */
+		    padding: 3px 10px; /* ボタン全体の大きさを調整 */
 		    color: blue;
-		    background-color: #ffffc6; /* 背景色も変更可能 */
-		    border-radius: 5px;		    
+		    background-color: #ffe6ff; /* 背景色も変更可能 */
+		    border-radius: 5px;	
+		}		    
+		#note-button3 {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding: 3px 10px; /* ボタン全体の大きさを調整 */
+		    color: blue;
+		    background-color:  #ffffc6; /* 背景色も変更可能 */
+		    border-radius: 5px;		    	    
 		}
 		
 		/* 「現在地の天気予報」ボタンだけスタイルを変更 12/22 */
@@ -2272,7 +2279,9 @@
         <button class="diary-button" onclick="location.href='shopping.html'">お買い物電卓</button>
 	    <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>        
         <br><br>
-        <button id="note-button2" onclick="location.href='notepad.html'">ノート表示</button>
+        <button id="note-button2" onclick="location.href='notepad.html'">ノート</button>
+        
+		<button id="note-button3" onclick="location.href='scribbling.html?from=index'">走り書き</button>
 
         <button class="diary-button" onclick="location.href='diary.html'">簡易日記</button>
 
@@ -2691,7 +2700,7 @@
   
 	 <p id="version-number" onclick="handleClick();">  
 		© 2025 ettomio. All rights reserved.
-		Version 18.5 / Updated: 2026-01-31
+		Version 18.7 / Updated: 2026-02-03
 	 </p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
@@ -2699,5 +2708,4 @@
 
 </body>
 </html>
-
 
