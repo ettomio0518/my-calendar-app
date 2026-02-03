@@ -155,7 +155,8 @@
 <body>
 
 <header>
-  <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+  <button class="top-right-button" id="back-btn" onclick="goBack()">戻る</button>
+
   <h1>🔢 簡易電卓</h1>
 </header>
 
@@ -388,10 +389,43 @@
     history.appendChild(div);
     history.scrollTop = history.scrollHeight;
   }
+  
+	const params = new URLSearchParams(location.search);
+	const from = params.get("from");
+
+	function goBack() {
+	    const routes = {
+	        metrology: "metrology.html",
+	    };
+	    location.href = routes[from] || "index.html";
+	}
+
+	document.addEventListener("DOMContentLoaded", function() {
+	    if (from === "shopping" || from === "scribbling") {
+	        const backBtn = document.getElementById("back-btn");
+	        if (backBtn) backBtn.style.display = "none";
+	    }
+	});
+
+
+	// function goBack() {
+	//     const params = new URLSearchParams(location.search);
+	//     const from = params.get("from");
+
+	//     const routes = {
+	//         metrology: "metrology.html",
+	//         // shopping: "shopping.html",
+	//         // calendar: "calendar.html",
+	//         // scribbling: "scribbling.html"
+	//     };
+
+	//     location.href = routes[from] || "index.html";
+	// }
+
 </script>
 
 <footer>
-  © 20260131 ettomio - 舞いカレンダー
+  © 20260203 ettomio - 舞いカレンダー
 </footer>
 
 </body>
