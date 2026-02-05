@@ -183,7 +183,18 @@
     font-size: 24px;
     cursor: pointer;
 }
-	        
+
+    /* 2/5 */
+    #keyNButton {
+        background-color: #c89191;
+        color: white;
+        min-width: 72px;
+        padding: 4px 12px;
+        font-size: 15px;
+        white-space: nowrap;
+        line-height: 1.2;
+    } 
+    
 </style>
 
 	<script>
@@ -236,6 +247,8 @@
   <div class="action-row">
     <button class="save-button" onclick="protectMemo()">🔒 破棄不可</button>
     <button class="button2" onclick="unprotectMemo()">🔓 解除</button>
+	<button id="keyNButton" onclick="location.href='AdvancedSearch.html?from=scribbling'">高機能検索</button>
+
   </div>
 
 	<div class="calc-btn-wrapper">
@@ -374,7 +387,7 @@ function deleteOldMemos() {
 </script>
 
 <footer>
-  © 20260203 ettomio - 舞いカレンダー
+  © 20260205 ettomio - 舞いカレンダー
 </footer>
 
 <div id="calcModal" class="modal">
@@ -411,6 +424,22 @@ function deleteOldMemos() {
   });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(location.search);
+    const from = params.get("from");
+
+    const btn = document.getElementById("keyNButton");
+
+    if (from === "today") {
+        // 今日のカードから来た場合
+        btn.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=today";
+    } else {
+        // index から来た場合
+        btn.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=index";
+    }
+});
+</script>
+
 </body>
 </html>
-
