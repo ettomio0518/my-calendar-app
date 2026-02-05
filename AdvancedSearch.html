@@ -775,13 +775,21 @@
 	    const from = params.get('from');
 
 	    if (from === 'scribbling') {
-	        location.href = 'scribbling.html?from=index';
+	        const origin = params.get('origin');
+
+	        if (origin === 'today') {
+	            location.href = 'scribbling.html?from=today';
+	        } else {
+	            location.href = 'scribbling.html?from=index';
+	        }
+
 	    } else if (from === 'notepad') {
-	        location.href = 'notepad.html?from=index';
+	        location.href = 'notepad.html';
 	    } else {
 	        location.href = 'index.html';
 	    }
 	}
+
 	</script>
         
 </body>
