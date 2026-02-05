@@ -2186,9 +2186,10 @@
 			    hideDialog();
 			};
 
-		    document.getElementById("btnSearch").onclick = () => {
-		        window.location.href = "AdvancedSearch.html";
-		    };
+			document.getElementById("btnSearch").onclick = () => {
+			    window.location.href = "AdvancedSearch.html?from=index";
+			};
+
 
 		    document.getElementById("btnSearch2").onclick = () => {
 		        window.location.href = "notepad.html";
@@ -2306,7 +2307,7 @@
 
 	    <h3>さらに高機能検索</h3>	        
 	    <p class="word-label">このアプリに入力された案件が対象です。</p>
-		<button id="keyNButton3" onclick="location.href='AdvancedSearch.html'">高機能検索に移動</button>
+		<button id="keyNButton3" onclick="location.href='AdvancedSearch.html?from=index'">高機能検索に移動</button>
 	</div>
 	
 		<!-- ボタン 9/29 -->
