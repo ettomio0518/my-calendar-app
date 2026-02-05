@@ -319,7 +319,8 @@
 
 <body>
     <header>
-        <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+        <button class="top-right-button" onclick="goBack()">戻る</button>
+        
         <h1>高機能検索</h1>
     </header>
 
@@ -767,8 +768,22 @@
     </footer>
     
     <div style="height: 80px;"></div>
+    
+	<script>
+	function goBack() {
+	    const params = new URLSearchParams(location.search);
+	    const from = params.get('from');
+
+	    if (from === 'scribbling') {
+	        location.href = 'scribbling.html?from=index';
+	    } else if (from === 'notepad') {
+	        location.href = 'notepad.html?from=index';
+	    } else {
+	        location.href = 'index.html';
+	    }
+	}
+	</script>
         
 </body>
 
 </html>
-
