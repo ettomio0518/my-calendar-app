@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高機能検索</title>
+    <link rel="stylesheet" href="styles.css">
+    
+	<style>    
+	/* 基本のスタイル */
+	body {
+	    font-family: Arial, sans-serif;
+	    font-size: 15px;
+	    margin: 7px;
+	    background-color: #ffffc4;
+	}
+
+	.container {
+	    display: flex;
+	    flex-direction: column;
+	    align-items: center;
+	    padding: 20px;
+	    max-width: 600px;
+	    margin: auto;
+	    background-color: #e1e1ff;
+	}
+
+	header {
+	    background:  #6c6cff;
+	    color: white;
+	    padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+	    text-align: center;
+	    position: relative;
+	}
+	h1 {
+	    font-size: 20px;
+	    margin: 0;
+	}    	 	 	 	 	 	 
+
+	h2 {
+	    font-size: 15px;
+	}    	
+	
+	/* 入力ボックス */
+	input[type="text"] {
+	    all: unset;
+	    display: block;
+	    width: 100%;
+	    height: 40px;
+	    font-size: 16px;
+	    box-sizing: border-box;
+	    background-color: #ffffff; /* 背景を白 */
+	    color: #000000; /* 文字色を黒 */
+	    border: 1px solid #0000ff; /* 青い枠線 */
+	    padding: 5px; /* 内側の余白 */
+	    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 軽い影 */
+	}
+
+	input[type="text"]:focus {
+	    border-color: #ff0000; /* フォーカス時に赤い枠線 */
+	    outline: none; /* アウトライン削除 */
+	}
+
+	/* テーブルのスタイル */
+	.table-container {
+	    width: 100%;
+	    overflow-x: auto;
+	    margin-top: 20px;
+	}
+
+	table {
+	    width: 100%;
+	    border-collapse: collapse;
+	}
+
+	th, td {
+	    border: 1px solid #ddd;
+	    padding: 8px;
+	    text-align: left;
+	    word-wrap: break-word;
+	    white-space: pre-wrap;
+	}
+
+	th.keyword-column, td.keyword-column {
+	    width: 20%;
+	    max-width: 6ch; /* キーワードの文字数制限 */
+	}
+
+	th.content-column, td.content-column {
+	    width: 60%;
+	    max-width: 10ch; /* 内容の文字数制限 */
+	}
+
+	th.actions-column, td.actions-column {
+	    width: 20%;
+	    text-align: center;	 	
+	}
+
+	td.actions-column button {
+	    display: inline-block; /* インラインブロックで中央寄せ */
+	}
+	
+	/* 詳細表示 */
+	#fullContent {
+	    width: 100%;
+	    border: 1px solid #ddd;
+	    padding: 10px;
+	    margin-top: 20px;
+	    background-color: #ffffff; /* 背景を白 */
+	    white-space: pre-wrap;
+	}
+
+	/* ボタン */
+	button {
+	    font-size: 14px;
+	    padding: 5px 10px;
+	    margin: 5px;
+	    border-radius: 5px;
+	    background-color: #ffd5ea;
+	    color: black;
+	    border: 1px solid #0000ff;
+	    cursor: pointer;
+	}
+
+	
+	.closeButton {
+	    font-size: 16px;
+	    padding: 5px 10px;
+	    margin: 5px;
+	    border-radius: 5px;
+	    background-color: #c4ffc4;
+	    color: black;
+	    border: 1px solid #0000ff;
+	    cursor: pointer;
+	}
+    .btn-show-text {  /* 3/15に追加 */
+        font-size: 14px;
+        padding: 0px 2px;
+        padding: 3px 5px; /* ボタンの余白を調整 */
+        background-color: #b9ffff;
+        color: black;
+        border: 1px solid #0000ff;
+        border-radius: 5px;          
+        cursor: pointer;
+        min-width: 60px;   /* 最小幅を設定 */
+        display: inline-block; /* 横並びにする */
+    }
+	/* 詳細コンテナ */
+	.detail-container {
+	    background-color: #f2f2f2;
+	    word-break: break-all;
+	}
+
+	button, a {
+	    cursor: pointer; /* カーソルを手の形に */
+	}
+	#saveButton, #closeButton {
+	    cursor: pointer; /* カーソルを手の形に */
+	}
+
+
+	/* メディアクエリによるスマホ対応 */
+	@media only screen and (max-width: 600px) {
+	    td.keyword-column {
+	        max-width: 6ch; /* キーワード列の幅制限 */
+	    }
+	    td.content-column {
+	        max-width: 10ch; /* 内容列の幅制限 */
+	    }
+	    table, th, td {
+	        font-size: 16px; /* テキストサイズ調整 */
+	    }
+	    #keywordInput {
+	        height: 30px; /* スマホ用の高さ */
+	    }
+	}
+	
+    /* 戻るボタン 5/6 */
+    .top-right-button {
+      width: auto; /* ボタンの幅を自動調整 */
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background-color: #00bf00;
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 14px;
+	  border: 1px solid black; /* 枠線を表示 */	 	 
+      cursor: pointer;
+    }
+    .top-right-button:hover {
+      background-color: #cae4ff;
+    }
+
+	/* 8/11 追加 */	
+	#voiceButton {
+	    color: #4d0000;
+	    background-color: #c8ffe3;
+	    border-radius: 5px;
+	    border: 1px solid #0000ff;
+	}
+
+	@keyframes blink {
+	    0% { opacity: 1; }
+	    50% { opacity: 0.3; }
+	    100% { opacity: 1; }
+	}
+
+	.blinking {
+	    animation: blink 1s infinite;
+	}
+
+	#voiceButton.recording {
+	    color: red !important;
+	    background-color: #ffd0d0 !important;
+	}
+
+	/* カスタムアラート */
+	.custom-alert { 
+	    position: fixed; 
+	    top: 20px; 
+	    left: 50%; 
+	    transform: translateX(-50%); 
+	    background-color: #333; 
+	    color: white; 
+	    padding: 15px 25px; 
+	    border-radius: 5px; 
+	    box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+	    z-index: 1000; 
+	    font-size: 1em; 
+	}
+
+	/* モーダルウィンドウ（ダイアログ）の基本スタイル 10/22 Gemini */
+	.modal {
+	    display: none; /* 初期状態では非表示 */
+	    position: fixed;
+	    z-index: 1000; /* 他の要素より手前に表示 */
+	    left: 0;
+	    top: 0;
+	    width: 100%;
+	    height: 100%;
+	    overflow: auto;
+	    background-color: rgba(0,0,0,0.4); /* 背景を暗くする */
+	}
+
+	/* モーダルの中身 */
+	.modal-content {
+	    background-color: #fefefe;
+	    margin: 15% auto; /* 画面中央に配置 */
+	    padding: 20px;
+	    border: 1px solid #888;
+	    width: 80%;
+	    max-width: 400px;
+	    border-radius: 8px;
+	    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+	    text-align: center;
+	}
+
+	/* 候補ボタンのコンテナ */
+	#alternativeButtons {
+	    margin: 15px 0;
+	}
+
+	/* 候補ボタンのスタイル */
+	#alternativeButtons button {
+	    display: block; /* 縦に並べる */
+	    width: 100%;
+	    padding: 10px;
+	    margin-bottom: 8px;
+	    border: 1px solid #ccc;
+	    background-color: #e9e9e9;
+	    cursor: pointer;
+	    font-size: 16px;
+	    border-radius: 4px;
+	    transition: background-color 0.2s;
+	}
+
+	#alternativeButtons button:hover {
+	    background-color: #d1d1d1;
+	}
+
+	/* キャンセルボタンのスタイル */
+	#closeModalButton {
+	    background-color: #f8887e;
+	    color: white;
+	    padding: 10px 20px;
+	    border: none;
+	    border-radius: 4px;
+	    cursor: pointer;
+	    font-size: 16px;
+	    margin-top: 10px;
+	}
+
+	/* 11/4 Top/Bottomボタン */
+	.bottom-button, .top-button {
+	    position: fixed;
+	    bottom: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	    z-index: 9999;
+	    display: none;
+	}
+	.bottom-button:hover, .top-button:hover {
+	    background: #0056b3;
+	}
+			
+	</style>
+	
+</head>
+
+<body>
+    <header>
+        <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+        <h1>高機能検索</h1>
+    </header>
+
+    <div class="container">
+
+        <div>
+            <label for="keywordInput">キーワード:</label>
+            <button id="voiceButton" onclick="startVoiceInput()">🎤 音声入力</button>
+            <input type="text" id="keywordInput" oninput="searchMemos()" placeholder="検索キーワードを入力">
+        </div>
+
+        <div id="searchResults" class="table-container"></div>
+
+        <div id="fullContent" class="detail-container" contenteditable="true"></div>
+        <button id="saveButton" style="display: none;" onclick="saveChanges()">修正して保存</button>
+        <button id="closeButton" class="closeButton" style="display: none;" onclick="closeFullContent()">詳細を閉じる</button>
+
+
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    <div style="height: 30px;"></div>
+
+
+        <script>
+            // ★★★ 変数宣言をここに統一し、重複を解消します ★★★
+            let recognition = null; // Web Speech API用オブジェクト
+            let isListening = false;
+            let currentKey = null; // 現在表示しているkeyを保持
+            
+            // --- UI/UX 補助関数 ---
+
+            // カスタム通知を表示する関数
+            function showCustomAlert(message) {
+                const alertContainer = document.createElement('div');
+                alertContainer.className = 'custom-alert';
+                alertContainer.textContent = message;
+
+                document.body.appendChild(alertContainer);
+
+                setTimeout(() => {
+                    document.body.removeChild(alertContainer);
+                }, 2000);
+            }
+
+            // ボタン表示を切り替える関数
+            function toggleVoiceButton(isClearMode) {
+                const voiceButton = document.getElementById('voiceButton');
+                if (isClearMode) {
+                    voiceButton.textContent = '❌ クリア';
+                    voiceButton.onclick = clearVoiceInput;
+                    voiceButton.classList.remove("blinking", "recording");
+                } else {
+                    voiceButton.textContent = '🎤 音声入力';
+                    voiceButton.onclick = startVoiceInput;
+                    voiceButton.classList.remove("blinking", "recording");
+                }
+            }
+
+            // キーワードをクリアして全リスト表示に戻す関数
+            function clearVoiceInput() {
+                document.getElementById('keywordInput').value = '';
+                searchMemos();
+                toggleVoiceButton(false); // 「音声入力」ボタンに戻す
+            }
+            
+            // ユーザーが候補を選択したときの処理
+            function selectAlternative(transcript) {
+                document.getElementById('keywordInput').value = transcript;
+                document.getElementById('alternativesModal').style.display = 'none';
+                searchMemos();
+                toggleVoiceButton(true); 
+            }
+
+            // ダイアログのキャンセルボタンの処理
+            function closeAlternativesModal() {
+                document.getElementById('alternativesModal').style.display = 'none';
+            }
+
+            // ------------------------------------------------
+            // ★★★ メイン: 音声認識と環境の切り替えロジック ★★★
+            // ------------------------------------------------
+
+            // ネイティブ側から結果を受け取る関数 (Kotlinから呼ばれる)
+            // WebView(アプリ)環境でのみ使用
+            function receiveNativeAlternatives(alternatives) {
+                const voiceButton = document.getElementById('voiceButton');
+                const alternativesContainer = document.getElementById('alternativeButtons');
+                alternativesContainer.innerHTML = ''; 
+                
+                isListening = false;
+                voiceButton.classList.remove("blinking", "recording");
+
+                if (alternatives.length === 0) {
+                    showCustomAlert('音声認識ができませんでした。');
+                    toggleVoiceButton(false);
+                    return;
+                }
+
+                // 候補をボタンとして作成し、ダイアログを表示
+                alternatives.forEach(transcript => {
+                    const button = document.createElement('button');
+                    button.textContent = transcript;
+                    button.onclick = () => selectAlternative(transcript); 
+                    alternativesContainer.appendChild(button);
+                });
+                
+                document.getElementById('alternativesModal').style.display = 'block';
+            }
+            
+            // Web Speech APIの初期化と実行ロジック (ブラウザ環境でのみ使用)
+            function startWebSpeechAPI() {
+                if (!recognition) {
+                    if ('webkitSpeechRecognition' in window) {
+                        recognition = new webkitSpeechRecognition();
+                    } else if ('SpeechRecognition' in window) {
+                        recognition = new SpeechRecognition();
+                    } else {
+                        recognition = null;
+                        document.getElementById('voiceButton').style.display = "none";
+                        showCustomAlert('このブラウザでは音声入力が使えません。');
+                        return;
+                    }
+
+                    recognition.lang = 'ja-JP';
+                    recognition.interimResults = false;
+                    recognition.maxAlternatives = 3; 
+                    
+                    recognition.onresult = function(event) {
+                        const result = event.results[0];
+                        const alternativesContainer = document.getElementById('alternativeButtons');
+                        alternativesContainer.innerHTML = ''; 
+                        
+                        // Web Speech APIの結果を処理
+                        const alternatives = Array.from(result).map(r => r.transcript);
+
+                        if (alternatives.length === 0) {
+                            recognition.onerror({ error: 'no-speech' });
+                            return;
+                        }
+                        
+                        // 候補をボタンとして作成し、ダイアログを表示
+                        alternatives.forEach(transcript => {
+                            const button = document.createElement('button');
+                            button.textContent = transcript;
+                            button.onclick = () => selectAlternative(transcript);
+                            alternativesContainer.appendChild(button);
+                        });
+                        
+                        document.getElementById('alternativesModal').style.display = 'block';
+                        
+                        // UIリセット
+                        toggleVoiceButton(false);
+                        isListening = false;
+                    };
+
+                    recognition.onerror = function(event) {
+                        // ブラウザ固有のエラーメッセージを分かりやすく
+                        console.error('Web Speech API Error:', event.error);
+                        showCustomAlert('音声認識エラーが発生しました。ブラウザをご確認ください。');
+                        toggleVoiceButton(false);
+                        isListening = false;
+                    };
+                    
+                    recognition.onend = function() {
+                        isListening = false;
+                        document.getElementById('voiceButton').classList.remove("blinking", "recording");
+                    };
+                }
+
+                if (recognition && !isListening) { 
+                    recognition.start();
+                    isListening = true;
+                    document.getElementById('voiceButton').classList.add("blinking", "recording");
+                }
+            }
+
+
+            // 音声入力を開始するメイン関数 (HTMLのonclickから呼ばれる)
+            function startVoiceInput() {
+                const voiceButton = document.getElementById('voiceButton');
+                
+                // 1. 【アプリ環境判定】: Androidインターフェースが存在するか
+                if (typeof Android !== 'undefined' && Android.startVoiceRecognition) {
+                    // ★アプリ(WebView)として実行されている場合: ネイティブコードを呼び出す
+                    Android.startVoiceRecognition();
+                    isListening = true; 
+                    voiceButton.classList.add("blinking", "recording");
+                } 
+                // 2. 【ブラウザ環境判定】: Web Speech APIの機能が使えるか
+                else if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    // ★ブラウザとして実行されている場合: Web Speech APIを使用
+                    startWebSpeechAPI();
+                }
+                // 3. 【非対応環境】
+                else {
+                    voiceButton.style.display = "none";
+                    showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
+                }
+            }
+            
+            // ------------------------------------------------
+            // --- 既存の検索・詳細ロジック ---
+            // ------------------------------------------------
+
+            // URLをリンクに変換する関数
+            function makeUrlsClickable(text) {
+                const urlPattern = /(https?:\/\/[^\s]+)/g;
+                return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+            }
+
+            // 詳細を表示する関数
+            function displayFullContent(content, key) {
+                const fullContentDiv = document.getElementById('fullContent');
+                const saveButton = document.getElementById('saveButton');
+                const closeButton = document.getElementById('closeButton');
+
+                currentKey = key;
+                fullContentDiv.innerHTML = makeUrlsClickable(content);
+                fullContentDiv.contentEditable = true;
+                fullContentDiv.style.display = 'block';
+                saveButton.style.display = 'block';
+                closeButton.style.display = 'block';
+                fullContentDiv.scrollIntoView({ behavior: 'smooth' });
+
+                fullContentDiv.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'A') {
+                        e.preventDefault();
+                        window.open(e.target.href, '_blank', 'noopener,noreferrer');
+                    }
+                });
+            }
+
+            // 詳細を閉じる関数
+            function closeFullContent() {
+                document.getElementById('fullContent').style.display = 'none';
+                document.getElementById('saveButton').style.display = 'none';
+                document.getElementById('closeButton').style.display = 'none';
+                currentKey = null;
+                scrollToTop()
+            }
+
+            // 修正内容を保存する関数
+            function saveChanges() {
+                const fullContentDiv = document.getElementById('fullContent');
+                // HTML要素の内容をそのまま取得し、URLとして保存されないようにテキストのみを格納
+                const newContent = fullContentDiv.innerText;
+
+                if (currentKey) {
+                    localStorage.setItem(currentKey, newContent);
+                    alert('内容を保存しました！');
+                    searchMemos();
+                } else {
+                    alert('保存する内容が見つかりません。');
+                }
+            }
+
+            // メモの検索と表示を行う関数
+            function searchMemos() {
+            	// ★★★ この行を先頭に追加します 11/8 ★★★
+    			closeFullContent();
+    			
+                const keyword = document.getElementById('keywordInput').value;
+                const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword');
+                const searchResults = keys.filter(key => {
+                    const content = localStorage.getItem(key);
+                    return content && content.includes(keyword); // contentがnullでないことを確認
+                });
+
+                searchResults.sort((a, b) => a.localeCompare(b));
+
+                const searchResultsList = document.getElementById('searchResults');
+                searchResultsList.innerHTML = '';
+
+                if (searchResults.length === 0 && keyword.length > 0) {
+                     searchResultsList.innerHTML = '<p style="text-align: center; color: #888;">一致する結果はありませんでした。</p>';
+                     return;
+                }
+
+
+                const table = document.createElement('table');
+                const headerRow = document.createElement('tr');
+                const headers = ['key', '内容', '操作'];
+                const classNames = ['keyword-column', 'content-column', 'actions-column'];
+                
+                headers.forEach((text, index) => {
+                    const th = document.createElement('th');
+                    th.classList.add(classNames[index]);
+                    th.textContent = text;
+                    headerRow.appendChild(th);
+                });
+                table.appendChild(headerRow);
+
+                searchResults.forEach(key => {
+                    const row = document.createElement('tr');
+                    const content = localStorage.getItem(key) || '';
+                    
+                    const keywordCell = document.createElement('td');
+                    keywordCell.classList.add('keyword-column');
+                    keywordCell.textContent = key.slice(0, 10);
+                    
+                    const contentCell = document.createElement('td');
+                    contentCell.classList.add('content-column');
+                    contentCell.textContent = content.slice(0, 30) + (content.length > 30 ? '...' : '');
+
+                    const actionsCell = document.createElement('td');
+                    actionsCell.classList.add('actions-column');
+                    
+                    const viewButton = document.createElement('button');
+                    viewButton.textContent = '表示';
+                    viewButton.classList.add('btn-show-text'); 
+                    viewButton.onclick = () => displayFullContent(content, key);
+
+                    actionsCell.appendChild(viewButton);
+                    row.appendChild(keywordCell);
+                    row.appendChild(contentCell);
+                    row.appendChild(actionsCell);
+                    table.appendChild(row);
+                });
+
+                searchResultsList.appendChild(table);
+            }
+
+            // DOM読み込み後の初期化
+            document.addEventListener('DOMContentLoaded', function () {
+                const voiceButton = document.getElementById('voiceButton');
+                const keywordInput = document.getElementById('keywordInput');
+
+                // モーダルのキャンセルボタンに処理を割り当てる
+                document.getElementById('closeModalButton').onclick = closeAlternativesModal;
+                
+                // 初期の音声入力ボタンの状態を設定
+                if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) && !(typeof Android !== 'undefined' && Android.startVoiceRecognition)) {
+                    voiceButton.style.display = "none";
+                    showCustomAlert('この端末では音声入力が使えません。手動入力をご利用ください。');
+                } else {
+                    toggleVoiceButton(false);
+                }
+
+                // 手動入力が始まったら「❌ クリア」ボタンに切り替え
+                keywordInput.addEventListener('input', function () {
+                    if (this.value.trim() !== '') {
+                        voiceButton.style.display = "inline-block";
+                        toggleVoiceButton(true);
+                    } else {
+                        toggleVoiceButton(false);
+                    }
+                });
+                
+                // ページ読み込み時に初期化検索を実行
+                searchMemos();
+            });
+
+
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+	    // ★ スクロールボタン制御 (Top/Bottom) 11/6
+	function showScrollButtonsIfPageLong() {
+	    const topBtn = document.getElementById("topBtn");
+	    const bottomBtn = document.getElementById("bottomBtn");
+	    
+	    // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
+	    const scrollThreshold = 300;
+	    const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
+
+	    if (!isScrollable) {
+	        hideScrollButtons();
+	        return;
+	    }
+
+	    // ページが長い場合のスクロール位置による制御
+	    const scrollY = window.scrollY;
+	    const docHeight = document.body.scrollHeight;
+	    const viewHeight = window.innerHeight;
+	    const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
+	    
+	    // スクロール位置の判定
+	    if (scrollY > scrollThreshold) {
+	        // [ケース1] ある程度スクロールした -> Topボタンを表示 (Bottomボタンは非表示)
+	        topBtn.style.display = "block";
+	        bottomBtn.style.display = "none";
+	    } else if (scrollY === 0 && bottomMargin > scrollThreshold) {
+	        // [ケース2 - 修正箇所] ページ最上部（scrollY=0）にいる場合 -> Bottomボタンを非表示
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "none"; 
+	    } else if (bottomMargin > scrollThreshold) {
+	        // [ケース3] ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
+	        // ただし、このelse ifに到達するのは scrollY > 0 の時のみ (ケース2で弾かれるため)
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "block";
+	    } else {
+	        // [ケース4] ページの下端近くにいる
+	        topBtn.style.display = "none";
+	        bottomBtn.style.display = "none";
+	    }
+	}
+	
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+        </script>
+        
+    </div>
+
+    <div id="alternativesModal" class="modal">
+        <div class="modal-content">
+            <h2>認識候補を選択してください</h2>
+            <div id="alternativeButtons">
+                </div>
+            <button id="closeModalButton">キャンセル</button>
+        </div>
+    </div>
+
+    <footer style="text-align: center;">
+        <br>
+        © 20251108 ettomio 
+    </footer>
+    
+    <div style="height: 80px;"></div>
+        
+</body>
+
+</html>
