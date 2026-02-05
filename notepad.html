@@ -127,10 +127,6 @@
             padding: 3px 10px;
             background-color: #ffdbed;
         }
-        .button2 {
-            padding: 3px 10px;
-            background-color: #ffffff;
-        }
         
         .close-list-button {
             background-color: #c1ffff;
@@ -221,6 +217,17 @@
 		  }
 		}
 
+    /* 2/5 */
+    #keyNButton {
+        background-color: #c89191;
+        color: white;
+        min-width: 72px;
+        padding: 3px 12px;
+        font-size: 15px;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+    
     </style>
     
 	<script>
@@ -240,7 +247,7 @@
 <body>
 
 <header class="app-header">
-  <h1>📓🔒 ノート notepad</h1>
+  <h1>📝🔒 ノート notepad</h1>
   <button class="top-right-button"
     onclick="window.location.href='index.html'">戻る</button>
 </header>
@@ -265,9 +272,11 @@
          
         <label for="memoContent">ノート内容:</label>
         <textarea id="memoContent" rows="5" class="input-field" style="width: 100%;"></textarea>
-		<button class="button2" onclick="pasteFromClipboard()">クリップボードから貼り付け</button>        
+	<div>	        
         <button class="save-button" onclick="saveMemo()">💾 保存</button>
+		<button id="keyNButton" onclick="location.href='AdvancedSearch.html?from=notepad'">高機能検索</button>      
     </div>
+    
     <button id="toggleMemoList" onclick="toggleMemoList()">ノートの確認</button>
     <div id="memoList" class="table-container"></div>
 	<div class="url-box">
@@ -276,7 +285,7 @@
     </div>
     <button id="closeMemoListBottom" class="close-list-button" style="display: none;" onclick="toggleMemoList()">リストを閉じる</button>
 </div>
-
+</div>
 <script>
     let currentKey = '';
     let isMemoListDisplayed = false;
@@ -295,37 +304,52 @@
         showCustomAlert("一目で分かる10文字程度のキーワードを入れて下さい。本文には重要な内容は書き込まれないことをお勧めします。");
     }
 
-    function saveMemo() {
-        const keyword = document.getElementById('keyword').value.trim();
-        const category = document.getElementById('category').value;
-        const memoContent = document.getElementById('memoContent').value.trim();
+	function saveMemo() {
+	    const keyword = document.getElementById('keyword').value.trim();
+	    const category = document.getElementById('category').value;
 
-        if (keyword.length < 1) {
-            showCustomAlert("一目で分かる10文字程度のキーワードを入れて下さい。本文には重要な内容は書き込まれないことをお勧めします。");
-            return;
-        }
+	    const textarea = document.getElementById('memoContent');
+	    const originalText = textarea.value;
 
-        const newKey = `memo_${category}_${keyword}`;
-        localStorage.setItem(newKey, memoContent);
+	    // 行単位で分解 → 空白行をすべて削除
+	    const lines = originalText.split(/\r?\n/);
+	    const cleanedLines = lines.filter(line => line.trim() !== '');
+	    const cleanedText = cleanedLines.join('\n');
 
-        // 旧キーが存在する場合、削除
-        if (currentKey && currentKey !== newKey) {
-            localStorage.removeItem(currentKey);
-        }
+	    // キーワードチェック
+	    if (keyword.length < 1) {
+	        showCustomAlert(
+	          "一目で分かる10文字程度のキーワードを入れて下さい。本文には重要な内容は書き込まれないことをお勧めします。"
+	        );
+	        return;
+	    }
 
-        // 保存確認処理
-        if (localStorage.getItem(newKey) === memoContent) {
-            showCustomAlert('メモが保存されました。');
-        } else {
-            showCustomAlert('メモの保存に失敗しました。');
-        }
+	    const newKey = `memo_${category}_${keyword}`;
+	    localStorage.setItem(newKey, cleanedText);
 
-        document.getElementById('keyword').value = '';
-        document.getElementById('memoContent').value = '';
-        document.getElementById('category').value = '1';
-        currentKey = '';
-        displayMemos();
-    }
+	    // 旧キー削除
+	    if (currentKey && currentKey !== newKey) {
+	        localStorage.removeItem(currentKey);
+	    }
+
+	    // 保存確認
+	    if (localStorage.getItem(newKey) === cleanedText) {
+	        if (originalText !== cleanedText) {
+	            showCustomAlert('空白行を整理して保存しました。');
+	        } else {
+	            showCustomAlert('メモが保存されました。');
+	        }
+	    } else {
+	        showCustomAlert('メモの保存に失敗しました。');
+	    }
+
+	    // 初期化
+	    document.getElementById('keyword').value = '';
+	    textarea.value = '';
+	    document.getElementById('category').value = '1';
+	    currentKey = '';
+	    displayMemos();
+	}
 
     function displayMemos() {
         const keys = Object.keys(localStorage).filter(key => key.startsWith('memo_'));
@@ -434,24 +458,6 @@
     document.getElementById('memoList').style.display = 'none';
 </script>
 
-<script>
-	async function pasteFromClipboard() {
-	  try {
-	    const text = await navigator.clipboard.readText();
-
-	    // 先頭の改行・空白をすべて削除
-	    const cleaned = text.replace(/^[\s\r\n]+/, '');
-
-	    const textarea = document.getElementById('memoContent');
-	    textarea.value += cleaned;
-
-	    textarea.focus();
-	  } catch (err) {
-	    alert('クリップボードの読み取りに失敗しました');
-	  }
-	}
-</script>
-
 	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
 		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
 	    
@@ -535,7 +541,7 @@
   </script>
     
   <footer>
-    © 20260118 ettomio
+  © 20260205 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
