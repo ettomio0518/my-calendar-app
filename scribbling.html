@@ -79,7 +79,14 @@
 	    white-space: nowrap;
 	    line-height: 1.2;
 	  }
-	  	  
+	  .copy-button {
+	    background: #ffe8e8;
+	    min-width: 72px;
+	    padding: 4px 12px;
+	    font-size: 15px;
+	    white-space: nowrap;
+	    line-height: 1.2;
+	  }	  	  
 	  main {
 	    max-width: 720px;
 	    margin: 0 auto;
@@ -248,6 +255,8 @@
     <button class="save-button" onclick="protectMemo()">🔒 破棄不可</button>
     <button class="button2" onclick="unprotectMemo()">🔓 解除</button>
 	<button id="keyNButton" onclick="location.href='AdvancedSearch.html?from=scribbling'">高機能検索</button>
+	<button class="copy-button" onclick="copyAll()">全選択コピー</button>
+
 
   </div>
 
@@ -290,6 +299,13 @@
     localStorage.setItem(memoKey(dateInput.value), memo.value);
     alert('保存しました');
   }
+
+	function copyAll() {
+	  const text = document.getElementById('memo').value; // テキストエリアのIDが memo の場合
+	  navigator.clipboard.writeText(text).then(() => {
+	    alert('コピーしました。メールアプリや外部アプリに貼り付けてご利用ください。');
+	  });
+	}
 
   function protectMemo() {
     localStorage.setItem(
@@ -387,7 +403,7 @@ function deleteOldMemos() {
 </script>
 
 <footer>
-  © 20260205 ettomio - 舞いカレンダー
+  © 20260206 ettomio - 舞いカレンダー
 </footer>
 
 <div id="calcModal" class="modal">
