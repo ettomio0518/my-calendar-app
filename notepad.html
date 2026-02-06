@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>メモの入力と確認</title>
     <style>
-	    body {
-	      font-family: Arial, sans-serif;
-	      padding: 20px;
-	      max-width: 500px;
-	      margin: auto;
-	      background-color: #ffe6ff;
-	    }
+		body {
+		  font-family: Arial, sans-serif;
+		  font-size: 16px;   /* ← これ追加 */
+		  padding: 20px;
+		  max-width: 500px;
+		  margin: auto;
+		  background-color: #ffe6ff;
+		}
         
 		.app-header {
 		  background: #8080ff;
@@ -64,9 +65,9 @@
 		    margin: 0 0 8px 0;     /* 左右ゼロ */
 		}
 		.input-row textarea {
-		    width: 100%;
-		    min-height: 150px;
-		    max-height: 300px;
+		  width: 100%;
+		  min-height: 180px;   /* ← 150 → 180 */
+		  max-height: 300px;
 		}
 
 		.input-row,
@@ -84,6 +85,10 @@
 		    max-width: 560px;     /* ← 10pxだけ増やす */
 		    margin-left: 8px;     /* ← ラベルと揃う */
 		    margin-right: auto;
+		}
+
+		#memoContent {
+		  font-size: 1rem;
 		}
         
         .table-container {
@@ -127,11 +132,14 @@
             padding: 3px 10px;
             background-color: #ffdbed;
         }
-        
+        .copy-button {
+            padding: 3px 10px;
+            background-color: #ffe8e8;
+        }                     
         .close-list-button {
             background-color: #c1ffff;
         }
-
+	  
         .custom-alert {
             position: fixed;
             top: 10px;
@@ -275,6 +283,8 @@
 	<div>	        
         <button class="save-button" onclick="saveMemo()">💾 保存</button>
 		<button id="keyNButton" onclick="location.href='AdvancedSearch.html?from=notepad'">高機能検索</button>      
+    	<button class="copy-button" onclick="copyNote()">全選択コピー</button>
+    	
     </div>
     
     <button id="toggleMemoList" onclick="toggleMemoList()">ノートの確認</button>
@@ -349,6 +359,14 @@
 	    document.getElementById('category').value = '1';
 	    currentKey = '';
 	    displayMemos();
+	}
+
+	function copyNote() {
+	    const text = document.getElementById('memoContent').value;
+
+	    navigator.clipboard.writeText(text).then(() => {
+	        showCustomAlert('コピーしました。メールアプリや外部アプリに貼り付けてご利用ください。');
+	    });
 	}
 
     function displayMemos() {
@@ -541,7 +559,7 @@
   </script>
     
   <footer>
-  © 20260205 ettomio - 舞いカレンダー
+  © 20260206 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
