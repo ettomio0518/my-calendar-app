@@ -66,7 +66,7 @@
 		}
 		.input-row textarea {
 		  width: 100%;
-		  min-height: 180px;   /* ← 150 → 180 */
+		  min-height: 200px;   /* ← 150 → 180 */
 		  max-height: 300px;
 		}
 
@@ -119,7 +119,7 @@
         button {
             font-size: 15px;
             padding: 3px 7px; /* ボタンの余白を調整 */
-            margin: 5px;
+            margin: 3px;
             border-radius: 5px;
             background-color: #d9ffd9;
             color: black;
@@ -129,11 +129,11 @@
 		    line-height: 1.2;            
         }
         .save-button {
-            padding: 3px 10px;
+            padding: 3px 7px;
             background-color: #ffdbed;
         }
         .copy-button {
-            padding: 3px 10px;
+            padding: 3px 7px;
             background-color: #ffe8e8;
         }                     
         .close-list-button {
@@ -163,6 +163,8 @@
 	    footer {
 	      text-align: center;
 	      padding: 12px;
+          font-size: 15px;	
+          color: #b87272;                
 	    }	
 
 		/* 11/4 Top/Bottomボタン */
@@ -230,7 +232,7 @@
         background-color: #c89191;
         color: white;
         min-width: 72px;
-        padding: 3px 12px;
+        padding: 3px 7px;
         font-size: 15px;
         white-space: nowrap;
         line-height: 1.2;
@@ -287,7 +289,8 @@
     	
     </div>
     
-    <button id="toggleMemoList" onclick="toggleMemoList()">ノートの確認</button>
+    <button id="toggleMemoList" onclick="toggleMemoList()" style="margin-top: 15px;margin-bottom: 8px;"> ノートのリスト </button>
+
     <div id="memoList" class="table-container"></div>
 	<div class="url-box">
         <label for="urlContent" style="color: #800000;">ノート詳細 (クリッカブル対応):</label>
@@ -447,7 +450,7 @@
 
         if (isMemoListDisplayed) {
             memoList.style.display = 'none';
-            toggleButton.textContent = 'ノートの確認';
+            toggleButton.textContent = 'ノートのリスト';
             toggleButton.classList.remove('close-list-button');
             closeButtonBottom.style.display = 'none'; // 追加
             document.getElementById('keyword').value = '';
@@ -559,7 +562,7 @@
   </script>
     
   <footer>
-  © 20260206 ettomio - 舞いカレンダー
+  © 20260207 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
