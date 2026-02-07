@@ -52,6 +52,7 @@
 	      pointer-events: none;
 	    } 
 	    */		
+	    
         .container {
             max-width: 600px; /* 最大幅を600pxに設定 */
             margin: 10px auto; /* 上下20pxの余白と中央揃え */
@@ -2264,49 +2265,67 @@
         // --- 予定管理のスクリプトここまで ---
 	</script>
 
-	<div class="container2">
-	<div class="link-buttons1">
-	    <button class="calendar-button" onclick="location.href='calendar.html'">カレンダー</button>
-	    <button class="clock-button" onclick="location.href='clock.html'">時計</button>
-	<button id="note-button" onclick="
-	  sessionStorage.setItem('fromIndex', 'true');
-	  location.href='today-card.html';
-	">
-	  今日のカード
-	</button>
-	</div>
-	<br>
-	
-        <button class="diary-button" onclick="location.href='shopping.html'">お買い物電卓</button>
-	    <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>        
-        <br><br>
-        <button id="note-button2" onclick="location.href='notepad.html'">ノート</button>
-        
-		<button id="note-button3" onclick="location.href='scribbling.html?from=index'">走り書き</button>
+		<div class="container2">
+		  <div class="link-buttons1">
+		    <button class="calendar-button" onclick="location.href='calendar.html'">カレンダー</button>
+		    <button class="clock-button" onclick="location.href='clock.html'">時計</button>
+		    <button id="note-button" onclick="
+		      sessionStorage.setItem('fromIndex', 'true');
+		      location.href='today-card.html';
+		    ">
+		      今日のカード
+		    </button>
+		  </div>
 
-        <button class="diary-button" onclick="location.href='diary.html'">簡易日記</button>
+		  <br>
+
+		  <button class="diary-button" onclick="location.href='shopping.html'">お買い物電卓</button>
+		  <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>
+
+		  <br>
+
+		  <button id="note-button2" onclick="location.href='notepad.html'">ノート</button>
+		  <button id="note-button3" onclick="location.href='scribbling.html?from=index'">走り書き</button>
+		  <button class="diary-button" onclick="location.href='diary.html'">簡易日記</button>
+
 
 	    <h3>天気予報</h3>
 	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
 	    <br>
-	    <p class="word-label">天気サイトのアドレスを入力して下さい。</p>
-	    <label for="weatherUrl">URL:</label>
-<input type="url" id="weatherUrl" placeholder="例: https://www.weather.com" class="word-input">
+		<div id="calendarHint01" style="font-size: 15px; color: #666; margin-top: 8px;">
+		  天気サイトのアドレスを入力して下さい。
+		</div>	
+		
+		<label for="weatherUrl">URL:</label>
 
-	    <button onclick="navigate()">移動</button>
+		<input type="url" id="weatherUrl"
+		       placeholder="例: https://www.weather.com"
+		       class="word-input"
+		       style="width: 60%; max-width: 260px;">
+
+		<button onclick="navigate()">移動</button>
+
 	    
 	    <button id="updateBtn" onclick="enableEditing()">入力と修正</button>
 	    <button id="saveBtn" onclick="saveNewUrl()" style="display:none;">保存</button>
 
 	    <h3>検索</h3>
 	    <div class="input-row">
-	    <p class="word-label">このアプリに入力された案件が対象です。</p>
+		<div id="calendarHint02" style="font-size: 15px; color: #666; margin-top: 8px;">
+		  このアプリに入力された案件が対象です。
+		</div>	
+		
 	        <label for="searchKeyword">キーワード:</label>
-	        <input type="text" id="searchKeyword" class="word-input2">
+			<input type="text" id="searchKeyword"
+		       class="word-input2"
+		       style="width: 40%; max-width: 260px;">
+
 	        <button id="searchButton" onclick="searchWords()">表示</button>
 
 	    <h3>さらに高機能検索</h3>	        
-	    <p class="word-label">このアプリに入力された案件が対象です。</p>
+	    <div id="calendarHint03" style="font-size: 15px; color: #666; margin-top: 8px;margin-bottom: 8px;">
+		  このアプリに入力された案件が対象です。
+		</div>	
 		<button id="keyNButton3" onclick="location.href='AdvancedSearch.html?from=index'">高機能検索に移動</button>
 	</div>
 	
@@ -2336,7 +2355,7 @@
 		<br>
 		<button onclick="openOCRReader()">簡易版OCR</button>
 		<br>		
-		<div id="calendarHint" style="font-size: 14px; color: #666; margin-top: 8px;">
+		<div id="calendarHint" style="font-size: 14px; color: #666; margin-top: 8px;margin-bottom: 6px;">
 		  🦊 カレンダーが小さく表示された場合は、二本指でふわっと広げてください♪
 		</div>		
 		<button id="keyNButton2" onclick="openTodayCalendar()">簡易版Googleカレンダー</button>
@@ -2421,7 +2440,7 @@
 		    const keyword = document.getElementById('searchKeyword').value.trim();
 		    if (keyword.length > 0) {
 		        localStorage.setItem('searchKeyword', keyword);
-		        location.href = '検索結果.html';
+		        location.href = 'searchresults.html';
 		        document.getElementById('searchKeyword').value = ''; // テキストボックスの内容を消去
 		    }
 		}
@@ -2468,16 +2487,18 @@
 	</div>
 	</div>
 
-    <script type="text/javascript">
-        let clickCount = 0;
+    <!-- 2/7 修正 -->
+	<script type="text/javascript">
+	    let clickCount = 0;
 
-        function handleClick() {
-            clickCount++;
-            if (clickCount === 3) {
-                window.location.href = 'index-NNN.html';
-            }
-        }
-    </script>
+	    function handleClick() {
+	        clickCount++;
+		if (clickCount === 3) {
+		    clickCount = 0; // リセット
+		    window.location.href = 'index-NNN.html';
+		}
+	    }
+	</script>
 
     <button onclick="location.href='introduction.html'">紹介ページ</button>
     
@@ -2699,10 +2720,13 @@
 	    
   </script>
   
-	 <p id="version-number" onclick="handleClick();">  
-		© 2025 ettomio. All rights reserved.
-		Version 19.0 / Updated: 2026-02-06
-	 </p>
+	<p id="version-number"
+	   onclick="handleClick();"
+	   style="color: #b66b6b; font-size: 15px;">
+	    © 2025 ettomio. All rights reserved.
+	    Version 19.2 / Updated: 2026-02-07
+	</p>
+
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
