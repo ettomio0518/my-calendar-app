@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>検索結果</title>
+    <link rel="stylesheet" href="styles.css">
+    
+	<style>
+		body {
+		    font-family: Arial, sans-serif;
+		    font-size: 16px;
+		    margin: 7px;
+		    background-color: #ffffc4;
+		}
+		.container {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    padding: 20px;
+		    max-width: 600px;
+		    margin: auto;
+		    background-color: #cbe4e4;
+		}
+		header {
+		  background: #55aaaa;
+		  color: white;
+		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
+		  text-align: center;
+		  position: relative;
+		}
+		h1 {
+		  font-size: 20px;
+		  margin: 0;
+		}    	            
+
+		.input-row {
+		    display: flex;
+		    flex-direction: row;
+		    align-items: center;
+		    margin-bottom: 10px;
+		    width: 100%;
+		}
+		.input-row label, .input-row input, .input-row button {
+		    margin: 5px;
+		}
+		.input-row input {
+		    flex-grow: 1;
+		    height: 30px;
+		    font-size: 16px;
+		}
+		.table-container {
+		    width: 100%;
+		    overflow-x: auto;
+		    margin-top: 20px;
+		}
+		table {
+		    width: 100%;
+		    border-collapse: collapse;
+		}
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        		
+		th.keyword-column, td.keyword-column {
+		    width: 20%;
+		    max-width: 6ch; /* キーワードの文字数制限 */
+		}
+
+		th.content-column, td.content-column {
+		    width: 60%;
+		    max-width: 10ch; /* 内容の文字数制限 */
+		}
+
+		th.actions-column, td.actions-column {
+		    width: 20%;
+	    	text-align: center;		    
+		}
+		
+		td.actions-column button {
+		    display: inline-block; /* インラインブロックで中央寄せ */
+		}
+			
+		#fullContent {
+		    width: 100%;
+		    border: 1px solid #ddd;
+		    padding: 10px;
+		    margin-top: 20px;
+		    white-space: pre-wrap;
+		    background-color: #ffffff;
+		}
+		button {
+		    font-size: 16px;
+		    padding: 5px 10px;
+		    margin: 5px;
+		    border-radius: 5px;
+		    background-color: #f7eeff;
+		    color: black;
+		    border: 1px solid #0000ff;
+		    cursor: pointer;
+		}
+
+	    .btn-show-text {  /* 3/15に追加 */
+	        font-size: 14px;
+	        padding: 0px 2px;
+	        padding: 3px 5px; /* ボタンの余白を調整 */
+	        background-color: #ffeaf4;
+	        color: black;
+	        border: 1px solid #0000ff;
+	        border-radius: 5px;            
+	        cursor: pointer;
+	        min-width: 60px;   /* 最小幅を設定 */
+	        display: inline-block; /* 横並びにする */
+	    }        
+		.detail-container {
+		    background-color: #f2f2f2;
+		    word-break: break-all; /* 長いURLを強制的に改行 */
+		}
+
+	    footer {
+	      text-align: center;
+	      font-size: 0.85em;
+	      margin: 10px 0 80px;
+	      color: #666;
+	    }
+	    
+		/* 11/4 Top/Bottomボタン */
+		.bottom-button, .top-button {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #007bff;
+		    color: white;
+		    border: none;
+		    border-radius: 20px;
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		    display: none;
+		}
+		.bottom-button:hover, .top-button:hover {
+		    background: #0056b3;
+		}
+
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+	      position: absolute;
+	      top: 5px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+	      font-size: 15px;	
+	      color: #b87272;                
+	    }	
+	    	    		        		
+	</style>
+
+</head>
+
+<body>
+
+  	<header>
+    <!-- Homeに戻るボタン 5/6 -->
+	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	    <h1>✨ 検索結果 💡</h1>
+  	</header>
+
+    <div class="container">
+
+        <div id="searchResults" class="table-container"></div>
+        <div id="fullContent" class="detail-container"></div>
+        <button id="closeButton" style="display: none;" onclick="closeFullContent()">詳細を閉じる</button>
+    </div>
+
+    <script>
+        function makeUrlsClickable(text) {
+            const urlPattern = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+        }
+
+        function displayFullContent(content) {
+            const fullContentDiv = document.getElementById('fullContent');
+            const closeButton = document.getElementById('closeButton');
+            fullContentDiv.innerHTML = makeUrlsClickable(content);
+            fullContentDiv.style.display = 'block';
+            closeButton.style.display = 'block'; // 閉じるボタンを表示
+            fullContentDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeFullContent() {
+            const fullContentDiv = document.getElementById('fullContent');
+            const closeButton = document.getElementById('closeButton');
+            fullContentDiv.style.display = 'none'; // 詳細表示を非表示
+            closeButton.style.display = 'none'; // 閉じるボタンを非表示
+        }
+
+        function searchMemos() {
+            const keyword = localStorage.getItem('searchKeyword');
+            const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword'); // "searchKeyword"を除外
+            const searchResults = keys.filter(key => {
+                const content = localStorage.getItem(key);
+                return content.includes(keyword);
+            });
+
+            // キーを昇順に並べ替え
+            searchResults.sort((a, b) => a.localeCompare(b));
+
+            const searchResultsList = document.getElementById('searchResults');
+            searchResultsList.innerHTML = '';
+
+            const table = document.createElement('table');
+            const headerRow = document.createElement('tr');
+            const keywordHeader = document.createElement('th');
+            keywordHeader.classList.add('keyword-column');
+            keywordHeader.textContent = 'key';
+            const contentHeader = document.createElement('th');
+            contentHeader.classList.add('content-column');
+            contentHeader.textContent = '内容';
+            const actionsHeader = document.createElement('th');
+            actionsHeader.classList.add('actions-column');
+            actionsHeader.textContent = '操作';
+            headerRow.appendChild(keywordHeader);
+            headerRow.appendChild(contentHeader);
+            headerRow.appendChild(actionsHeader);
+            table.appendChild(headerRow);
+
+            searchResults.forEach(key => {
+                const row = document.createElement('tr');
+                const keywordCell = document.createElement('td');
+                keywordCell.classList.add('keyword-column');
+                const contentCell = document.createElement('td');
+                contentCell.classList.add('content-column');
+                const actionsCell = document.createElement('td');
+                actionsCell.classList.add('actions-column');
+                const content = localStorage.getItem(key);
+
+                keywordCell.textContent = key.slice(0, 10); // キーワードの表示を10文字に制限
+                contentCell.textContent = content.slice(0, 30) + '...'; // 内容の一部を表示
+
+                const viewButton = document.createElement('button');
+                viewButton.textContent = '表示';
+				viewButton.classList.add('btn-show-text'); // クラスを追加 
+				
+                viewButton.onclick = () => displayFullContent(content);
+
+                actionsCell.appendChild(viewButton);
+                row.appendChild(keywordCell);
+                row.appendChild(contentCell);
+                row.appendChild(actionsCell);
+                table.appendChild(row);
+            });
+
+            searchResultsList.appendChild(table);
+        }
+
+        window.onload = searchMemos;
+    </script>
+    
+    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+	<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+
+  <script>
+    // ==========================================================
+    // ★ スクロールボタン制御 (Top/Bottom)
+    // ==========================================================
+
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function scrollToBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function hideScrollButtons() {
+        document.getElementById("topBtn").style.display = "none";
+        document.getElementById("bottomBtn").style.display = "none";
+    }
+
+    // ★ スクロールボタン制御 (Top/Bottom) 11/6
+function showScrollButtonsIfPageLong() {
+    const topBtn = document.getElementById("topBtn");
+    const bottomBtn = document.getElementById("bottomBtn");
+    
+    // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
+    const scrollThreshold = 300;
+    const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
+
+    if (!isScrollable) {
+        hideScrollButtons();
+        return;
+    }
+
+    // ページが長い場合のスクロール位置による制御
+    const scrollY = window.scrollY;
+    const docHeight = document.body.scrollHeight;
+    const viewHeight = window.innerHeight;
+    const bottomMargin = docHeight - viewHeight - scrollY; // 画面下端からドキュメント下端までの距離
+    
+    // スクロール位置の判定
+    if (scrollY > scrollThreshold) {
+        // [ケース1] ある程度スクロールした -> Topボタンを表示 (Bottomボタンは非表示)
+        topBtn.style.display = "block";
+        bottomBtn.style.display = "none";
+    } else if (scrollY === 0 && bottomMargin > scrollThreshold) {
+        // [ケース2 - 修正箇所] ページ最上部（scrollY=0）にいる場合 -> Bottomボタンを非表示
+        topBtn.style.display = "none";
+        bottomBtn.style.display = "none"; 
+    } else if (bottomMargin > scrollThreshold) {
+        // [ケース3] ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
+        // ただし、このelse ifに到達するのは scrollY > 0 の時のみ (ケース2で弾かれるため)
+        topBtn.style.display = "none";
+        bottomBtn.style.display = "block";
+    } else {
+        // [ケース4] ページの下端近くにいる
+        topBtn.style.display = "none";
+        bottomBtn.style.display = "none";
+    }
+}
+
+    // スクロール時のボタン表示制御
+    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+    
+    // 初期ロード時にもボタン表示をチェック
+    window.addEventListener("load", showScrollButtonsIfPageLong);
+    
+    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+    // ==========================================================
+    // ★ 初期化
+    // ==========================================================
+    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+    document.addEventListener('DOMContentLoaded', () => {
+        showScrollButtonsIfPageLong();
+    });
+	    
+  </script>
+  
+	  <footer>
+	  © 20260207 ettomio - 舞いカレンダー
+	  </footer>
+	  
+</body>
+
+</html>
