@@ -453,17 +453,20 @@
         #keyNButton {
             background-color: #63b1b1;
             color: white;
+            margin-top: 12px;
         }
  
  	    #keyNButton2 {
 	        background-color: #a6a6ff;
 	        color: white;
+            margin-bottom: 10px;	        
 	    }
 
 		/* 12/22 */
  	    #keyNButton3 {
 	        background-color: #c89191;
 	        color: white;
+	        margin-top: 8px;
 	    }
 	    	           
 		/* 共通の設定（予定内容などはこっちが適用される） 12/23 */
@@ -2276,18 +2279,14 @@
 		      今日のカード
 		    </button>
 		  </div>
-
 		  <br>
 
 		  <button class="diary-button" onclick="location.href='shopping.html'">お買い物電卓</button>
 		  <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>
 
-		  <br>
-
 		  <button id="note-button2" onclick="location.href='notepad.html'">ノート</button>
 		  <button id="note-button3" onclick="location.href='scribbling.html?from=index'">走り書き</button>
 		  <button class="diary-button" onclick="location.href='diary.html'">簡易日記</button>
-
 
 	    <h3>天気予報</h3>
 	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
@@ -2323,12 +2322,12 @@
 	        <button id="searchButton" onclick="searchWords()">表示</button>
 
 	    <h3>さらに高機能検索</h3>	        
-	    <div id="calendarHint03" style="font-size: 15px; color: #666; margin-top: 8px;margin-bottom: 8px;">
+	    <div id="calendarHint03" style="font-size: 15px; color: #666; margin-top: 8px;margin-bottom: 0px;">
 		  このアプリに入力された案件が対象です。
 		</div>	
 		<button id="keyNButton3" onclick="location.href='AdvancedSearch.html?from=index'">高機能検索に移動</button>
 	</div>
-	
+				
 		<!-- ボタン 9/29 -->
 		<button id="keyNButton">データの保存と復元ツール</button>
 		<br><br>
@@ -2359,10 +2358,8 @@
 		  🦊 カレンダーが小さく表示された場合は、二本指でふわっと広げてください♪
 		</div>		
 		<button id="keyNButton2" onclick="openTodayCalendar()">簡易版Googleカレンダー</button>
-
-		<br>				
-        <button id="omikujiButton">おみくじを引く</button>
 		<br>
+        <button id="omikujiButton" style="margin-top: 0px;margin-bottom: 8px;">おみくじを引く</button>
 
 
 		<script>
@@ -2724,7 +2721,7 @@
 	   onclick="handleClick();"
 	   style="color: #b66b6b; font-size: 15px;">
 	    © 2025 ettomio. All rights reserved.
-	    Version 19.2 / Updated: 2026-02-07
+	    Version 19.3 / Updated: 2026-02-08
 	</p>
 
 	  
