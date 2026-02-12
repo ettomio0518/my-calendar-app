@@ -79,6 +79,20 @@
 	    white-space: nowrap;
 	    line-height: 1.2;
 	  }
+	.button4 {
+	  background-color: #666; /* 少し濃いグレー */
+	  color: white;
+	  opacity: 0.6;
+	  border: none;
+	  padding: 4px 12px;
+	  border-radius: 4px;
+	  font-size: 15px;
+	}
+	.button4:enabled {
+	  opacity: 1;
+	  cursor: pointer;
+	}
+	  
 	  .copy-button {
 	    background: #ffe8e8;
 	    min-width: 72px;
@@ -119,7 +133,7 @@
 	    margin-top: 10px;
 	    margin-bottom: 8px;    
 	  }
-	  
+
 	    footer {
 	      text-align: center;
 	      padding: 12px;
@@ -225,10 +239,7 @@
 
 <header class="app-header">
   <h1>✏️ 走り書き scribbling <span id="lockMark"></span></h1>
-  
-	<button class="top-right-button"
-  onclick="window.location.href='today-card.html'">戻る</button>
-
+  <button class="top-right-button">戻る</button>
 </header>
 
 <main>
@@ -240,13 +251,22 @@
     <input type="date" id="dateInput">
   </div>
 
+  <button id="hintToggle" onclick="toggleHint()">❓️予定入力の仕方</button>
+  <div id="hintBox" style="display: none; font-size: 0.9em; color: #974b00; background: #eee; padding: 6px; margin-top: 4px;">
+    走り書きにふと予定を思いついたら、「13時〜15時 テスト」や「13時-15時 テスト」、「13時から15時 テスト」など、時間帯を含めて書いてみてください。<br>
+    指でその部分をなぞると、予定として入力できます。<br>
+    入力された予定は、今日のカードの時間割に反映されます。
+  </div>
+
   <textarea id="memo" placeholder="アイデア・買い物メモなど自由に走り書き"></textarea>
+  <div id="memoDisplay" class="memo-display"></div>
 
   <div class="action-row">
-	<button class="button3" onclick="openOCRReader()">簡易版OCR</button>        
+    <button class="button3" onclick="openOCRReader()">簡易版OCR</button>        
     <button class="save-button" onclick="saveMemo()">💾 保存</button>
     <button class="button2" onclick="deleteMemo()">破棄</button>
     <button class="button2" onclick="deleteOldMemos()">7日以上前を破棄</button>
+    <button id="button4" class="button4" onclick="handleSelection()" disabled>📌 選択を予定に追加</button>
   </div>
 
   <p class="warn">
@@ -256,23 +276,24 @@
   <div class="action-row">
     <button class="save-button" onclick="protectMemo()">🔒 破棄不可</button>
     <button class="button2" onclick="unprotectMemo()">🔓 解除</button>
-	<button id="keyNButton" onclick="location.href='AdvancedSearch.html?from=scribbling'">高機能検索</button>
-	<button class="copy-button" onclick="copyAll()">全選択コピー</button>
-
-
+    <button id="keyNButton">高機能検索</button>
+    <button class="copy-button" onclick="copyAll()">全選択コピー</button>
   </div>
 
-	<div class="calc-btn-wrapper">
-	  <button id="calc-btn" class="calc-btn">🧮 電卓</button>
-	</div>
-  
+  <div class="calc-btn-wrapper">
+    <button id="calc-btn" class="calc-btn">🧮 電卓</button>
+  </div>
+
+  <div id="calcModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeCalcModal()">&times;</span>
+      <iframe src="calculatorapp.html?from=scribbling" class="calc-frame"></iframe>
+    </div>
+  </div>
+
 </main>
 
 <script>
-  const dateInput = document.getElementById('dateInput');
-  const memo = document.getElementById('memo');
-  const lockMark = document.getElementById('lockMark');
-
   function memoKey(date) {
     return 'scribbling_' + date.replace(/-/g, '');
   }
@@ -282,182 +303,255 @@
   }
 
   function isProtected(date) {
-    const meta = JSON.parse(
-      localStorage.getItem(metaKey(date)) || '{}'
-    );
+    const meta = JSON.parse(localStorage.getItem(metaKey(date)) || '{}');
     return meta.protected === true;
   }
 
   function updateLockMark() {
+    const dateInput = document.getElementById('dateInput');
+    const lockMark = document.getElementById('lockMark');
     lockMark.textContent = isProtected(dateInput.value) ? '🔒' : '';
   }
 
   function loadMemo() {
-    memo.value = localStorage.getItem(memoKey(dateInput.value)) || '';
-    updateLockMark();
-  }
+    const dateInput = document.getElementById('dateInput');
+    const memo = document.getElementById('memo');
+    const key = memoKey(dateInput.value);
+    const saved = localStorage.getItem(key);
+    memo.value = saved || '';
 
-  function saveMemo() {
-    localStorage.setItem(memoKey(dateInput.value), memo.value);
-    alert('保存しました');
-  }
-
-	function copyAll() {
-	  const text = document.getElementById('memo').value; // テキストエリアのIDが memo の場合
-	  navigator.clipboard.writeText(text).then(() => {
-	    alert('コピーしました。メールアプリや外部アプリに貼り付けてご利用ください。');
-	  });
-	}
-
-  function protectMemo() {
-    localStorage.setItem(
-      metaKey(dateInput.value),
-      JSON.stringify({ protected: true })
-    );
-    updateLockMark();
-    alert('破棄不可に設定されました。');
-  }
-
-  function unprotectMemo() {
-    localStorage.removeItem(metaKey(dateInput.value));
-    updateLockMark();
-    alert('破棄不可を解除しました。');
-  }
-
-function deleteMemo() {
-  if (isProtected(dateInput.value)) {
-    alert('破棄不可に設定されています。');
-    return;
-  }
-
-  localStorage.removeItem(memoKey(dateInput.value));
-  localStorage.removeItem(metaKey(dateInput.value));
-
-  loadMemo();   // ← これが決定的に重要
-  alert('破棄しました');
-}
-
-
-function deleteOldMemos() {
-  const now = new Date();
-  let deleted = 0;
-  let protectedCount = 0;
-
-  for (let i = localStorage.length - 1; i >= 0; i--) {
-    const key = localStorage.key(i);
-
-    if (!key.startsWith('scribbling_') || key.startsWith('scribbling_meta_')) {
-      continue;
-    }
-
-    const dateStr = key.replace('scribbling_', '');
-    const y = dateStr.slice(0, 4);
-    const m = dateStr.slice(4, 6);
-    const d = dateStr.slice(6, 8);
-
-    const memoDate = new Date(`${y}-${m}-${d}`);
-    const diffDays = (now - memoDate) / (1000 * 60 * 60 * 24);
-
-    if (diffDays >= 7) {
-      const date = `${y}-${m}-${d}`;
-
-      if (isProtected(date)) {
-        protectedCount++;
-      } else {
-        localStorage.removeItem(key);
-        localStorage.removeItem(metaKey(date));
-        deleted++;
-      }
+    const display = document.getElementById('memoDisplay');
+    if (display) {
+      // display.innerHTML = linkify(memo.value); // リンク化しない場合はコメントアウト
     }
   }
-
-  loadMemo(); // ← ★ これを追加 ★
-
-  alert(`${deleted}件の走り書きを破棄しました。${protectedCount}件は破棄できません。`);
-}
 
   function setToday() {
     const now = new Date();
     const y = now.getFullYear();
     const m = String(now.getMonth() + 1).padStart(2, '0');
     const d = String(now.getDate()).padStart(2, '0');
-    dateInput.value = `${y}-${m}-${d}`;
+    document.getElementById('dateInput').value = `${y}-${m}-${d}`;
     loadMemo();
+    updateLockMark();
   }
 
   function moveDate(diff) {
+    const dateInput = document.getElementById('dateInput');
     const parts = dateInput.value.split('-');
     const d = new Date(parts[0], parts[1] - 1, parts[2]);
     d.setDate(d.getDate() + diff);
+    dateInput.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    loadMemo();
+    updateLockMark();
+  }
 
-    dateInput.value =
-      d.getFullYear() + '-' +
-      String(d.getMonth() + 1).padStart(2, '0') + '-' +
-      String(d.getDate()).padStart(2, '0');
+  function saveMemo() {
+    const dateInput = document.getElementById('dateInput');
+    const memo = document.getElementById('memo');
+    localStorage.setItem(memoKey(dateInput.value), memo.value);
+    alert('保存しました');
+  }
+
+  function deleteMemo() {
+    const dateInput = document.getElementById('dateInput');
+    if (isProtected(dateInput.value)) {
+      alert('破棄不可に設定されています。');
+      return;
+    }
+    localStorage.removeItem(memoKey(dateInput.value));
+    localStorage.removeItem(metaKey(dateInput.value));
+    loadMemo();
+    alert('破棄しました');
+  }
+
+  function deleteOldMemos() {
+    const now = new Date();
+    let deleted = 0;
+    let protectedCount = 0;
+
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const key = localStorage.key(i);
+      if (!key.startsWith('scribbling_') || key.startsWith('scribbling_meta_')) continue;
+
+      const dateStr = key.replace('scribbling_', '');
+      const y = dateStr.slice(0, 4);
+      const m = dateStr.slice(4, 6);
+      const d = dateStr.slice(6, 8);
+      const memoDate = new Date(`${y}-${m}-${d}`);
+      const diffDays = (now - memoDate) / (1000 * 60 * 60 * 24);
+
+      if (diffDays >= 7) {
+        const date = `${y}-${m}-${d}`;
+        if (isProtected(date)) {
+          protectedCount++;
+        } else {
+          localStorage.removeItem(key);
+          localStorage.removeItem(metaKey(date));
+          deleted++;
+        }
+      }
+    }
 
     loadMemo();
+    alert(`${deleted}件の走り書きを破棄しました。\n${protectedCount}件は破棄できません。`);
   }
 
-  dateInput.addEventListener('change', loadMemo);
-
-  // 初期表示
-  setToday();
-</script>
-
-<footer>
-  © 20260207 ettomio - 舞いカレンダー
-</footer>
-
-<div id="calcModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeCalcModal()">&times;</span>
-    <iframe src="calculatorapp.html?from=scribbling" class="calc-frame"></iframe>
-  </div>
-</div>
-
-<script>
-  document.getElementById("calc-btn").onclick = openCalcModal;
-
-  function openCalcModal() {
-    document.getElementById("calcModal").style.display = "block";
+  function protectMemo() {
+    const dateInput = document.getElementById('dateInput');
+    localStorage.setItem(metaKey(dateInput.value), JSON.stringify({ protected: true }));
+    updateLockMark();
+    alert('破棄不可に設定されました。');
   }
 
-  function closeCalcModal() {
-    document.getElementById("calcModal").style.display = "none";
+  function unprotectMemo() {
+    const dateInput = document.getElementById('dateInput');
+    localStorage.removeItem(metaKey(dateInput.value));
+    updateLockMark();
+    alert('破棄不可を解除しました。');
   }
-</script>
 
-<script>
-  const params = new URLSearchParams(location.search);
-  const from = params.get("from");
+  function copyAll() {
+    const text = document.getElementById('memo').value;
+    navigator.clipboard.writeText(text).then(() => {
+      alert('コピーしました。メールアプリや外部アプリに貼り付けてご利用ください。');
+    });
+  }
 
+  function toggleHint() {
+    const hint = document.getElementById("hintBox");
+    const button = document.getElementById("hintToggle");
+    const isVisible = hint.style.display === "block";
+    hint.style.display = isVisible ? "none" : "block";
+    button.textContent = isVisible ? "❓️予定入力の仕方" : "✕ 説明を閉じる";
+  }
+
+  function checkSelection() {
+    const textarea = document.getElementById("memo");
+    const button4 = document.getElementById("button4");
+    const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd).trim();
+
+    const sep = '(?:-|−|–|—|〜|～|から)';
+    const time = '(\\d{1,2})(?:[:：](\\d{1,2})|時(?:\\s*(\\d{1,2})分)?)?';
+    const re = new RegExp(time + '\\s*' + sep + '\\s*' + time);
+
+    button4.disabled = !(selectedText && re.test(selectedText));
+  }
+
+  function handleSelection() {
+    const textarea = document.getElementById('memo');
+    const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd).trim();
+    const button4 = document.getElementById("button4");
+
+    if (!selectedText) {
+      alert("テキストを選択してください。");
+      button4.disabled = true;
+      return;
+    }
+
+    const sep = '(?:-|−|–|—|〜|～|から)';
+    const time = '(\\d{1,2})(?:[:：](\\d{1,2})|時(?:\\s*(\\d{1,2})分)?)?';
+    const re = new RegExp(time + '\\s*' + sep + '\\s*' + time);
+
+    if (!re.test(selectedText)) {
+      alert("時間帯が見つかりませんでした。");
+      button4.disabled = true;
+      return;
+    }
+
+    const confirmed = confirm("選択した内容を予定として追加しますか？");
+    if (confirmed) {
+      trySaveScheduleFromTextarea();
+      if (typeof showTodaySchedule === "function") {
+        showTodaySchedule();
+      }
+    }
+
+    button4.disabled = true;
+  }
+
+  function trySaveScheduleFromTextarea() {
+    const textarea = document.getElementById('memo');
+    const selectedText = textarea.value.substring(textarea.selectionStart, textarea.selectionEnd).trim();
+
+    if (!selectedText) {
+      alert("テキストを選択してください。");
+      return;
+    }
+
+    const sep = '(?:-|−|–|—|〜|～|から)';
+    const time = '(\\d{1,2})(?:[:：](\\d{1,2})|時(?:\\s*(\\d{1,2})分)?)?';
+    const re = new RegExp(time + '\\s*' + sep + '\\s*' + time);
+    const match = selectedText.match(re);
+
+    if (!match) {
+      alert("時間帯が見つかりませんでした。");
+      return;
+    }
+
+    const sh = parseInt(match[1], 10);
+    const sm = match[2] ? parseInt(match[2], 10) : (match[3] ? parseInt(match[3], 10) : 0);
+    const eh = parseInt(match[4], 10);
+    const em = match[5] ? parseInt(match[5], 10) : (match[6] ? parseInt(match[6], 10) : 0);
+
+    let title = selectedText.replace(re, '').trim() || '（無題の予定）';
+    title = title.replace(/^(\s*[、,]+)/, '');
+
+    const date = document.getElementById('dateInput').value;
+    const ymd = date.replace(/-/g, '');
+    const mmdd = `${date.slice(5, 7)}/${date.slice(8, 10)}`;
+    const rand = Math.floor(Math.random() * 1000);
+    const key = `ScheduledText${ymd}_${rand}`;
+    const value = `${mmdd} ${sh}時${sm ? sm + '分' : ''}から${eh}時${em ? em + '分' : ''}、${title}`;
+
+    localStorage.setItem(key, value);
+    alert("予定として保存しました");
+  }
+
+  // イベント登録
   document.addEventListener("DOMContentLoaded", () => {
-    const backBtn = document.querySelector(".top-right-button");
+    const textarea = document.getElementById("memo");
 
+    textarea.addEventListener("mouseup", () => setTimeout(checkSelection, 150));
+    textarea.addEventListener("keyup", checkSelection);
+    textarea.addEventListener("touchend", () => setTimeout(checkSelection, 200));
+    textarea.addEventListener("selectionchange", checkSelection);
+
+    // 戻るボタンの遷移先切り替え
+    const params = new URLSearchParams(location.search);
+    const from = params.get("from");
+    const backBtn = document.querySelector(".top-right-button");
     if (from === "index") {
       backBtn.onclick = () => location.href = "index.html";
     } else {
       backBtn.onclick = () => location.href = "today-card.html";
     }
+
+    // 高機能検索ボタンの遷移先切り替え
+    const keyNButton = document.getElementById("keyNButton");
+    if (from === "today") {
+      keyNButton.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=today";
+    } else {
+      keyNButton.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=index";
+    }
+
+    // 電卓モーダル
+    document.getElementById("calc-btn").onclick = () => {
+      document.getElementById("calcModal").style.display = "block";
+    };
+    window.closeCalcModal = () => {
+      document.getElementById("calcModal").style.display = "none";
+    };
+
+    // 初期表示
+    setToday();
   });
 </script>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const params = new URLSearchParams(location.search);
-    const from = params.get("from");
-
-    const btn = document.getElementById("keyNButton");
-
-    if (from === "today") {
-        // 今日のカードから来た場合
-        btn.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=today";
-    } else {
-        // index から来た場合
-        btn.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=index";
-    }
-});
-</script>
-
+  <footer>
+  © 20260212 ettomio - 舞いカレンダー
+  </footer>
+  <div style="height: 50px;"></div>
+  
 </body>
 </html>
