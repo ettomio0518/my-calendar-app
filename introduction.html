@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>音声カレンダー紹介</title>
+  <title>舞いカレンダー紹介</title>
   <style>
     body {
       font-family: "Segoe UI", "Helvetica Neue", sans-serif;
@@ -123,15 +123,44 @@
 	    background: #0056b3;
 	}
 
-    @media (max-width: 480px) {
-      .container {
-        padding: 15px;
-      }
-      .btn {
-        width: 60%;
-        text-align: center;
-      }
-    }
+.note-button {
+  display: block;
+  width: 85%;
+  margin: 6px auto;
+  padding: 12px 16px;
+
+  background: #8a8aff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+
+  font-size: 1em;
+  line-height: 1.4;
+  text-align: center;
+
+  white-space: normal;   /* ← nowrap をやめる */
+  word-break: keep-all;
+}
+
+.note-button:hover {
+  background-color: #6666ff; /* ホバー時に少し濃く */
+}
+
+.note-entry {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 15px;
+  }
+  .btn,
+  .note-button {
+    width: 60%;
+    text-align: center;
+  }
+}
+        
   </style>
 </head>
 <body>
@@ -270,6 +299,45 @@
     </div>
 
     <div class="section">
+      <h2>🌸 活用事例7選</h2>
+	<!-- HTML（各記事リンクに使用） -->
+	<div class="note-entry">
+	  <p>🃏 最強ツール「今日のカード」の実力 ‼️<br>
+	  <a href="https://note.com/ettomio0518/n/n65bed897a46c" class="note-button" target="_blank">記事を読む</a></p>
+	</div>
+
+	<div class="note-entry">
+	  <p>✍️「走り書き」、これは使える‼️ ストレスフリーな情報整理の相棒に <br>
+	  <a href="https://note.com/ettomio0518/n/n6a78ac33706e" class="note-button" target="_blank">記事を読む</a></p>
+	</div>
+
+	<div class="note-entry">
+	  <p>🗓️「舞いカレンダー」の予定入力、かんたんガイド！<br>
+	  <a href="https://note.com/ettomio0518/n/nb5158046b521" class="note-button" target="_blank">記事を読む</a></p>
+	</div>
+
+	<div class="note-entry">
+	  <p>🧮「お買い物電卓」 使用例 <br>
+	  <a href="https://note.com/ettomio0518/n/nd1f143f56b73" class="note-button" target="_blank">記事を読む</a></p>
+	</div>
+
+	<div class="note-entry">
+	  <p>📚「高機能検索」、2200ケのデータを入れてるけど<br>
+	  <a href="https://note.com/ettomio0518/n/n4cf159500498" class="note-button" target="_blank">記事を読む</a></p>
+	</div>
+
+	<div class="note-entry">
+	  <p>📐 度量衡×電卓を組み合わせると、意外なほど便利<br>
+	  <a href="https://note.com/ettomio0518/n/nde58feee639f" class="note-button" target="_blank">記事を読む</a></p>
+	</div>
+
+	<div class="note-entry">
+	  <p>💾「データの保存と復元ツール」の使い方<br>
+	  <a href="https://note.com/ettomio0518/n/n3b5f204167a8" class="note-button" target="_blank">記事を読む</a></p>
+	</div>
+    </div>
+          
+    <div class="section">
       <h2>📌 その他</h2>
       <ul>
         <li>最新の情報はアプリ内のお知らせをご覧ください</li>
@@ -282,14 +350,14 @@
     <div class="section">
       <h2>📺 プロモーション動画</h2>
       <a class="btn" href="https://www.youtube.com/shorts/BuQaFeQsyPg">簡易版紹介動画</a><br>
-      <a class="btn" href="https://www.youtube.com/shorts/pPWS5uicft4">正規版紹介動画</a><br>
+      <a class="btn" href="https://youtu.be/JAgoDmmMUn8">正規版紹介動画</a><br>
       <a class="btn" href="https://www.youtube.com/shorts/X9R4FjDXs6Q">音声入力・出力・検索機能動画</a><br>
         <a class="btn" href="https://youtube.com/shorts/QeUBo5uy608">最新版の紹介動画</a>
     </div>
 
     <div class="section">
       <h2>🌐 案内サイト</h2>
-      <a class="btn" href="https://ettomio.blog.jp/archives/27567409.html">案内サイトへ</a><br>
+      <a class="btn" href="https://note.com/ettomio0518/n/nc64f5506ac74">案内サイトへ</a><br>
       <a class="btn" href="https://play.google.com/store/apps/details?id=com.ettomio.my_calendar_app">Androidアプリ「舞いカレンダー」へ</a><br>
 	<a class="btn" href="https://ettomio0518.github.io/my-calendar-app/index.html">Web版「舞いカレンダー」へ</a>      
     </div>
@@ -379,7 +447,7 @@
   </script>
   
   <footer>
-    © 20251230 ettomio
+    © 20260216 ettomio
   </footer>
 
 
