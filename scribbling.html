@@ -509,47 +509,54 @@
   }
 
   // イベント登録
-  document.addEventListener("DOMContentLoaded", () => {
-    const textarea = document.getElementById("memo");
+	document.addEventListener("DOMContentLoaded", () => {
+	  const textarea = document.getElementById("memo");
 
-    textarea.addEventListener("mouseup", () => setTimeout(checkSelection, 150));
-    textarea.addEventListener("keyup", checkSelection);
-    textarea.addEventListener("touchend", () => setTimeout(checkSelection, 200));
-    textarea.addEventListener("selectionchange", checkSelection);
+	  textarea.addEventListener("mouseup", () => setTimeout(checkSelection, 150));
+	  textarea.addEventListener("keyup", checkSelection);
+	  textarea.addEventListener("touchend", () => setTimeout(checkSelection, 200));
+	  textarea.addEventListener("selectionchange", checkSelection);
 
-    // 戻るボタンの遷移先切り替え
-    const params = new URLSearchParams(location.search);
-    const from = params.get("from");
-    const backBtn = document.querySelector(".top-right-button");
-    if (from === "index") {
-      backBtn.onclick = () => location.href = "index.html";
-    } else {
-      backBtn.onclick = () => location.href = "today-card.html";
-    }
+	  const dateInput = document.getElementById("dateInput");
+	  dateInput.addEventListener("change", () => {
+	    loadMemo();
+	    updateLockMark();
+	  });
 
-    // 高機能検索ボタンの遷移先切り替え
-    const keyNButton = document.getElementById("keyNButton");
-    if (from === "today") {
-      keyNButton.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=today";
-    } else {
-      keyNButton.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=index";
-    }
+	  // 戻るボタンの遷移先切り替え
+	  const params = new URLSearchParams(location.search);
+	  const from = params.get("from");
+	  const backBtn = document.querySelector(".top-right-button");
+	  if (from === "index") {
+	    backBtn.onclick = () => location.href = "index.html";
+	  } else {
+	    backBtn.onclick = () => location.href = "today-card.html";
+	  }
 
-    // 電卓モーダル
-    document.getElementById("calc-btn").onclick = () => {
-      document.getElementById("calcModal").style.display = "block";
-    };
-    window.closeCalcModal = () => {
-      document.getElementById("calcModal").style.display = "none";
-    };
+	  // 高機能検索ボタンの遷移先切り替え
+	  const keyNButton = document.getElementById("keyNButton");
+	  if (from === "today") {
+	    keyNButton.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=today";
+	  } else {
+	    keyNButton.onclick = () => location.href = "AdvancedSearch.html?from=scribbling&origin=index";
+	  }
 
-    // 初期表示
-    setToday();
-  });
+	  // 電卓モーダル
+	  document.getElementById("calc-btn").onclick = () => {
+	    document.getElementById("calcModal").style.display = "block";
+	  };
+	  window.closeCalcModal = () => {
+	    document.getElementById("calcModal").style.display = "none";
+	  };
+
+	  // 初期表示
+	  setToday();
+	});
+
 </script>
 
   <footer>
-  © 20260212 ettomio - 舞いカレンダー
+  © 20260217 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
