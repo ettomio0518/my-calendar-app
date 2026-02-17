@@ -635,12 +635,27 @@
                     const actionsCell = document.createElement('td');
                     actionsCell.classList.add('actions-column');
                     
-                    const viewButton = document.createElement('button');
-                    viewButton.textContent = '表示';
-                    viewButton.classList.add('btn-show-text'); 
-                    viewButton.onclick = () => displayFullContent(content, key);
+					const viewButton = document.createElement('button');
+					viewButton.textContent = '表示';
+					viewButton.classList.add('btn-show-text'); 
+					viewButton.onclick = () => displayFullContent(content, key);
 
-                    actionsCell.appendChild(viewButton);
+					const deleteButton = document.createElement('button');
+					deleteButton.textContent = '消去';
+					deleteButton.classList.add('btn-show-text');
+					deleteButton.onclick = () => {
+					    const confirmed = confirm("この項目を削除しますか？");
+					    if (confirmed) {
+					        localStorage.removeItem(key);
+					        alert("削除しました");
+					        searchMemos(); // 再描画
+					    }
+					};
+
+					actionsCell.appendChild(viewButton);
+					actionsCell.appendChild(document.createElement('br')); // 表示と消去の間に改行
+					actionsCell.appendChild(deleteButton);
+
                     row.appendChild(keywordCell);
                     row.appendChild(contentCell);
                     row.appendChild(actionsCell);
@@ -770,7 +785,7 @@
     </div>
 
 	  <footer>
-	  © 20260207 ettomio - 舞いカレンダー
+	  © 20260217 ettomio - 舞いカレンダー
 	  </footer>
     
     <div style="height: 80px;"></div>
