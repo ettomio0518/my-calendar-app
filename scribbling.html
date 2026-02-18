@@ -45,7 +45,14 @@
 	    background: #e0ffff;
 	    cursor: pointer;
 	  }
-  
+
+        h3 { 
+        	font-size: 17px; 
+        	color: #b87272;  
+			margin-top: 5px;   /* デフォルトより小さく */        	
+			margin-bottom: 7px;   /* デフォルトより小さく */
+        }
+          
 	  button {
 	    margin: 3px;
 	    background-color: #ffffff;
@@ -92,7 +99,7 @@
 	  opacity: 1;
 	  cursor: pointer;
 	}
-	  
+
 	  .copy-button {
 	    background: #ffe8e8;
 	    min-width: 72px;
@@ -100,7 +107,20 @@
 	    font-size: 15px;
 	    white-space: nowrap;
 	    line-height: 1.2;
-	  }	  	  
+	  }	
+	  
+	#toggleHistoryBtn {
+	  background: #ffffff;
+	  min-width: 72px;
+	  padding: 4px 12px;
+	  font-size: 15px;
+	  white-space: nowrap;
+	  line-height: 1.2;
+	  border: 1px solid #00f;
+	  border-radius: 4px;
+	  cursor: pointer;
+	}
+	    	  
 	  main {
 	    max-width: 720px;
 	    margin: 0 auto;
@@ -119,6 +139,10 @@
 	  .date-row button {
 	    padding: 4px 10px;
 	  }
+	.date-row button.active-direction {
+	  background-color: #007bff;
+	  color: white;
+	}
 
 	  textarea {
 	    width: 100%;
@@ -160,52 +184,52 @@
       background-color: #e3e3f0;
     }
 
-.calc-btn-wrapper {
-  text-align: right;
-  margin-top: 10px;
-}
+	.calc-btn-wrapper {
+	  text-align: right;
+	  margin-top: 10px;
+	}
 
-.calc-btn {
-  background: #a74fff;
-  color: white;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-}
+	.calc-btn {
+	  background: #a74fff;
+	  color: white;
+	  padding: 8px 14px;
+	  border: none;
+	  border-radius: 6px;
+	  font-size: 14px;
+	  cursor: pointer;
+	}
 	        
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 99999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.4);
-}
+	.modal {
+	    display: none;
+	    position: fixed;
+	    z-index: 99999;
+	    left: 0;
+	    top: 0;
+	    width: 100%;
+	    height: 100%;
+	    background: rgba(0,0,0,0.4);
+	}
 
-.modal-content {
-    background: white;
-    margin: 10% auto;
-    padding: 10px;
-    width: 90%;
-    max-width: 400px;
-    border-radius: 10px;
-}
+	.modal-content {
+	    background: white;
+	    margin: 10% auto;
+	    padding: 10px;
+	    width: 90%;
+	    max-width: 400px;
+	    border-radius: 10px;
+	}
 
-.calc-frame {
-    width: 100%;
-    height: calc(100vh - 120px);
-    border: none;
-}
+	.calc-frame {
+	    width: 100%;
+	    height: calc(100vh - 120px);
+	    border: none;
+	}
 
-.close {
-    float: right;
-    font-size: 24px;
-    cursor: pointer;
-}
+	.close {
+	    float: right;
+	    font-size: 24px;
+	    cursor: pointer;
+	}
 
     /* 2/5 */
     #keyNButton {
@@ -217,7 +241,87 @@
         white-space: nowrap;
         line-height: 1.2;
     } 
+
+	  /* 既存のスタイルの下に追加 */
+	  #todayButton {
+	    color: gray;
+	    background-color: transparent;
+	    border: 1px solid gray;
+	    transition: all 0.3s ease;
+	  }
+
+	  #todayButton.today-active {
+	    background-color: #007bff; /* 青背景 */
+	    color: white;              /* 白文字 */
+	    border: none;
+	  }
     
+	.history-entry {
+	  display: flex;
+	  justify-content: space-between;
+	  align-items: center;
+	  margin-bottom: 6px;
+	  border-bottom: 1px dashed #ccc;
+	  padding-bottom: 4px;
+	}
+
+	.history-entry span {
+	  flex: 1;
+	  overflow: hidden;
+	  white-space: nowrap;
+	  text-overflow: ellipsis;
+	  margin-right: 8px;
+	}
+
+	.history-entry button {
+	  flex-shrink: 0;
+	  font-size: 0.8em;
+	  padding: 2px 6px;
+      background: #ececec;	  
+	}
+
+    /* Topボタン：最初は非表示にしておき、スクロールで表示 5/5 */
+    .top-button {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 9999;
+      display: none; /* 最初は非表示 */
+    }
+    .top-button:hover {
+      background: #0056b3;
+    }
+
+	/* 11/4 Top/Bottomボタン */
+	.bottom-button, .top-button {
+	    position: fixed;
+	    bottom: 20px;
+	    left: 50%;
+	    transform: translateX(-50%);
+	    background: #007bff;
+	    color: white;
+	    border: none;
+	    border-radius: 20px;
+	    padding: 10px 20px;
+	    font-size: 16px;
+	    cursor: pointer;
+	    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+	    z-index: 9999;
+	    display: none;
+	}
+	.bottom-button:hover, .top-button:hover {
+	    background: #0056b3;
+	}  
+		    
 </style>
 
 	<script>
@@ -232,7 +336,17 @@
 	  }
 	}
 	</script>
-	
+
+	<script>
+	function openQRReader() {
+	  if (typeof Android !== "undefined" && Android.openQrReader) {
+	    Android.openQrReader(); // WebView内ならアプリ側へ
+	  } else {
+	    window.open('https://ettomio0518.github.io/ettomio-qr-reader/', '_blank'); // 通常ブラウザなら直接開く
+	  }
+	}
+	</script>
+		
 </head>
 
 <body>
@@ -246,7 +360,7 @@
 
   <div class="date-row">
     <button onclick="moveDate(-1)">◁</button>
-    <button onclick="setToday()">今日</button>
+    <button id="todayButton" onclick="setToday()">今日</button>
     <button onclick="moveDate(1)">▷</button>
     <input type="date" id="dateInput">
   </div>
@@ -262,6 +376,7 @@
   <div id="memoDisplay" class="memo-display"></div>
 
   <div class="action-row">
+  	<button class="button3" onclick="openQRReader()">QRコードリーダー</button>  
     <button class="button3" onclick="openOCRReader()">簡易版OCR</button>        
     <button class="save-button" onclick="saveMemo()">💾 保存</button>
     <button class="button2" onclick="deleteMemo()">破棄</button>
@@ -291,9 +406,31 @@
     </div>
   </div>
 
+	<button id="toggleHistoryBtn" onclick="toggleHistory()">📜 履歴表示</button>
+
+	<div id="historyPanel" class="history-panel" style="display: none;">
+	  <h3>📜 走り書き一覧</h3>
+	  <div id="historyList"></div>
+	</div>
+
 </main>
 
 <script>
+
+	function updateTodayButtonStyle() {
+	  const todayButton = document.getElementById('todayButton');
+	  const dateInput = document.getElementById('dateInput');
+
+	  const now = new Date();
+	  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+	  if (dateInput.value === todayStr) {
+	    todayButton.classList.add('today-active');
+	  } else {
+	    todayButton.classList.remove('today-active');
+	  }
+	}
+
   function memoKey(date) {
     return 'scribbling_' + date.replace(/-/g, '');
   }
@@ -326,25 +463,35 @@
     }
   }
 
-  function setToday() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = String(now.getMonth() + 1).padStart(2, '0');
-    const d = String(now.getDate()).padStart(2, '0');
-    document.getElementById('dateInput').value = `${y}-${m}-${d}`;
-    loadMemo();
-    updateLockMark();
-  }
+	function setToday() {
+	  const now = new Date();
+	  const y = now.getFullYear();
+	  const m = String(now.getMonth() + 1).padStart(2, '0');
+	  const d = String(now.getDate()).padStart(2, '0');
+	  document.getElementById('dateInput').value = `${y}-${m}-${d}`;
+	  loadMemo();
+	  updateLockMark();
+	  updateTodayButtonStyle(); // ← 追加
+	}
 
-  function moveDate(diff) {
-    const dateInput = document.getElementById('dateInput');
-    const parts = dateInput.value.split('-');
-    const d = new Date(parts[0], parts[1] - 1, parts[2]);
-    d.setDate(d.getDate() + diff);
-    dateInput.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    loadMemo();
-    updateLockMark();
-  }
+	function moveDate(diff) {
+	  const dateInput = document.getElementById('dateInput');
+	  const parts = dateInput.value.split('-');
+	  const d = new Date(parts[0], parts[1] - 1, parts[2]);
+	  d.setDate(d.getDate() + diff);
+	  dateInput.value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+	  loadMemo();
+	  updateLockMark();
+	  updateTodayButtonStyle();
+
+	  // ボタンの強調表示
+	  const leftBtn = document.querySelector('.date-row button:nth-child(1)');
+	  const rightBtn = document.querySelector('.date-row button:nth-child(3)');
+	  const targetBtn = diff < 0 ? leftBtn : rightBtn;
+
+	  targetBtn.classList.add('active-direction');
+	  setTimeout(() => targetBtn.classList.remove('active-direction'), 200); // 0.2秒後に戻す
+	}
 
   function saveMemo() {
     const dateInput = document.getElementById('dateInput');
@@ -508,6 +655,63 @@
     alert("予定として保存しました");
   }
 
+	function toggleHistory() {
+	  const panel = document.getElementById('historyPanel');
+	  const button = document.getElementById('toggleHistoryBtn');
+
+	  const isVisible = panel.style.display === 'block';
+	  panel.style.display = isVisible ? 'none' : 'block';
+	  button.textContent = isVisible ? '📜 履歴表示' : '✕ 履歴を閉じる';
+	}
+
+	function renderHistoryList() {
+	  const historyList = document.getElementById('historyList');
+	  historyList.innerHTML = '';
+
+	  const entries = [];
+
+	  for (let i = 0; i < localStorage.length; i++) {
+	    const key = localStorage.key(i);
+	    if (!key.startsWith('scribbling_') || key.startsWith('scribbling_meta_')) continue;
+
+	    const dateStr = key.replace('scribbling_', '');
+	    const y = dateStr.slice(0, 4);
+	    const m = dateStr.slice(4, 6);
+	    const d = dateStr.slice(6, 8);
+	    const date = `${y}-${m}-${d}`;
+	    const content = localStorage.getItem(key) || '';
+	    const preview = content.split('\n')[0].slice(0, 20); // 先頭行の20文字まで
+
+	    entries.push({ date, preview });
+	  }
+
+	  // 日付で降順ソート
+	  entries.sort((a, b) => b.date.localeCompare(a.date));
+
+	  for (const entry of entries) {
+	    const div = document.createElement('div');
+	    div.className = 'history-entry';
+
+	    const text = document.createElement('span');
+	    text.textContent = `${entry.date}：${entry.preview}`;
+
+	    const btn = document.createElement('button');
+	    btn.textContent = '表示';
+	    btn.onclick = () => {
+	      document.getElementById('dateInput').value = entry.date;
+	      loadMemo();
+	      updateLockMark();
+	      updateTodayButtonStyle();
+	      // 📜 上部へスクロール 
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    };
+
+	    div.appendChild(text);
+	    div.appendChild(btn);
+	    historyList.appendChild(div);
+	  }
+	}
+
   // イベント登録
 	document.addEventListener("DOMContentLoaded", () => {
 	  const textarea = document.getElementById("memo");
@@ -521,6 +725,7 @@
 	  dateInput.addEventListener("change", () => {
 	    loadMemo();
 	    updateLockMark();
+	    updateTodayButtonStyle(); // ← 追加
 	  });
 
 	  // 戻るボタンの遷移先切り替え
@@ -551,12 +756,96 @@
 
 	  // 初期表示
 	  setToday();
+	  
+		// 🔽 ここに追加！ 
+		renderHistoryList();
 	});
 
 </script>
 
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+			// --- Bottomボタンの表示制御 ---
+			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
+			if (
+			    scrollY > scrollThreshold &&
+			    docHeight - viewHeight - scrollY > scrollThreshold
+			) {
+			    bottomBtn.style.display = "block";
+			} else {
+			    bottomBtn.style.display = "none";
+			}
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
+  
   <footer>
-  © 20260217 ettomio - 舞いカレンダー
+  © 20260218 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
