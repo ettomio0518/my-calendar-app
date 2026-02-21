@@ -321,6 +321,22 @@
 	.bottom-button:hover, .top-button:hover {
 	    background: #0056b3;
 	}  
+
+	.hint-icon {
+	  color: #ff0000;
+	  transition: color 0.3s;
+	}
+
+	#hintToggle:hover .hint-icon {
+	  color: #ff6666;
+	}
+
+	#linkList {
+	  margin-top: 10px;
+	  margin-bottom: 10px;
+	  font-size: 0.9em;
+	  color: #004488;
+	}
 		    
 </style>
 
@@ -345,6 +361,7 @@
 	    window.open('https://ettomio0518.github.io/ettomio-qr-reader/', '_blank'); // 通常ブラウザなら直接開く
 	  }
 	}
+	
 	</script>
 		
 </head>
@@ -365,7 +382,10 @@
     <input type="date" id="dateInput">
   </div>
 
-  <button id="hintToggle" onclick="toggleHint()">❓️予定入力の仕方</button>
+	<button id="hintToggle" onclick="toggleHint()">
+	  <span class="hint-icon">?</span> 予定入力の仕方
+	</button>
+
   <div id="hintBox" style="display: none; font-size: 0.9em; color: #974b00; background: #eee; padding: 6px; margin-top: 4px;">
     走り書きにふと予定を思いついたら、「13時〜15時 テスト」や「13時-15時 テスト」、「13時から15時 テスト」など、時間帯を含めて書いてみてください。<br>
     指でその部分をなぞると、予定として入力できます。<br>
@@ -374,6 +394,8 @@
 
   <textarea id="memo" placeholder="アイデア・買い物メモなど自由に走り書き"></textarea>
   <div id="memoDisplay" class="memo-display"></div>
+  
+	<div id="linkList" style="margin-top: 10px; font-size: 0.9em; color: #004488;"></div>
 
   <div class="action-row">
   	<button class="button3" onclick="openQRReader()">QRコードリーダー</button>  
@@ -450,18 +472,39 @@
     lockMark.textContent = isProtected(dateInput.value) ? '🔒' : '';
   }
 
-  function loadMemo() {
-    const dateInput = document.getElementById('dateInput');
-    const memo = document.getElementById('memo');
-    const key = memoKey(dateInput.value);
-    const saved = localStorage.getItem(key);
-    memo.value = saved || '';
 
-    const display = document.getElementById('memoDisplay');
-    if (display) {
-      // display.innerHTML = linkify(memo.value); // リンク化しない場合はコメントアウト
-    }
-  }
+	function extractLinks(text) {
+	  const urlPattern = /(https?:\/\/[^\s]+)/g;
+	  const matches = text.match(urlPattern);
+	  if (!matches) return '';
+
+	  return matches.map(url => 
+	    `<div><a href="#" onclick="window.open('${url}', '_blank', 'noopener'); return false;">${url}</a></div>`
+	  ).join('');
+	}
+
+	function updateLinkList(text) {
+	  const linkList = document.getElementById('linkList');
+	  if (linkList) {
+	    linkList.innerHTML = extractLinks(text);
+	  }
+	}
+
+	function loadMemo() {
+	  const dateInput = document.getElementById('dateInput');
+	  const memo = document.getElementById('memo');
+	  const key = memoKey(dateInput.value);
+	  const saved = localStorage.getItem(key);
+	  memo.value = saved || '';
+
+	  // URLリンク一覧を更新
+	  updateLinkList(memo.value);
+
+	  const display = document.getElementById('memoDisplay');
+	  if (display) {
+	    // display.innerHTML = linkify(memo.value); // リンク化しない場合はコメントアウト
+	  }
+	}
 
 	function setToday() {
 	  const now = new Date();
@@ -493,12 +536,15 @@
 	  setTimeout(() => targetBtn.classList.remove('active-direction'), 200); // 0.2秒後に戻す
 	}
 
-  function saveMemo() {
-    const dateInput = document.getElementById('dateInput');
-    const memo = document.getElementById('memo');
-    localStorage.setItem(memoKey(dateInput.value), memo.value);
-    alert('保存しました');
-  }
+	function saveMemo() {
+	  const dateInput = document.getElementById('dateInput');
+	  const memo = document.getElementById('memo');
+	  localStorage.setItem(memoKey(dateInput.value), memo.value);
+	  alert('保存しました');
+
+	  // URLリンク一覧を更新
+	  updateLinkList(memo.value);
+	}
 
   function deleteMemo() {
     const dateInput = document.getElementById('dateInput');
@@ -565,13 +611,19 @@
     });
   }
 
-  function toggleHint() {
-    const hint = document.getElementById("hintBox");
-    const button = document.getElementById("hintToggle");
-    const isVisible = hint.style.display === "block";
-    hint.style.display = isVisible ? "none" : "block";
-    button.textContent = isVisible ? "❓️予定入力の仕方" : "✕ 説明を閉じる";
-  }
+	function toggleHint() {
+	  const hint = document.getElementById("hintBox");
+	  const button = document.getElementById("hintToggle");
+	  const isVisible = hint.style.display === "block";
+
+	  hint.style.display = isVisible ? "none" : "block";
+
+	  if (isVisible) {
+	    button.innerHTML = '<span class="hint-icon">?</span> 予定入力の仕方';
+	  } else {
+	    button.innerHTML = '✕ 説明を閉じる';
+	  }
+	}
 
   function checkSelection() {
     const textarea = document.getElementById("memo");
@@ -845,7 +897,7 @@
   </script>
   
   <footer>
-  © 20260220 ettomio - 舞いカレンダー
+  © 20260221 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
