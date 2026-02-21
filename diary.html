@@ -15,11 +15,9 @@
 		.app-header {
 		  background: #8080ff;
 		  color: white;
-
 		  display: flex;
 		  align-items: center;        /* ← 縦中央 */
 		  justify-content: space-between;
-
 		  padding: 10px 14px;         /* ← 余白を最小限に */
 		}
 
@@ -61,6 +59,7 @@
             width: 95%;
             min-height: 150px;
             max-height: 300px;
+	    	color: #2d2d2d    /* ← 黒を薄く */             
         }
         .input-row input {
             height: 30px;
@@ -81,6 +80,7 @@
             text-align: left;
             word-wrap: break-word;
             white-space: pre-wrap;
+    	    color: #2d2d2d    /* ← 黒を薄く */
         }
         th.date-column, td.date-column {
 		    width: 20%;
@@ -104,8 +104,8 @@
         }
         button {
             font-size: 14px;
-            padding: 5px 10px; /* ボタンの余白を調整 */
-            background-color: #f7eeff;
+            padding: 3px 10px; /* ボタンの余白を調整 */
+            background-color: #f7eeff; 
             color: black;
             border: 1px solid #0000ff;
             border-radius: 5px;            
@@ -116,8 +116,8 @@
         
 		.nav-button {
 		  min-width: 3em;
-		  padding: 0.25em 0.35em;
-		  border-radius: 6px;
+		  padding: 0.40em 0; /* ← 上下の余白を少し増やす */
+		  text-align: center;
 		  font-size: 15px;
 		  line-height: 1.2;
 		  white-space: nowrap;    /* 超重要 */
@@ -131,8 +131,9 @@
 		  line-height: 1.2;
 		  white-space: nowrap;
 		}   
-        .save-button {
-            padding: 3px 10px;
+		
+		.save-button {
+            /*padding: 3px 10px;*/
             background-color: #ffdbed;
             border-radius: 5px;
             cursor: pointer;            
@@ -140,7 +141,6 @@
 
         .btn-show-text {  /* 3/15に */
             font-size: 14px;
-            padding: 3px 5px; /* ボタンの余白を調整 */
             background-color: #ffe9d2;
             color: black;
             border: 1px solid #0000ff;
@@ -150,7 +150,7 @@
             display: inline-block; /* 横並びにする */
         }
         
-        #closeList {
+        #closeList {        	
             background-color: #acffd6;
         }
         
@@ -179,6 +179,7 @@
 		  align-items: center;
 		  gap: 4px;
 		  flex-wrap: nowrap;
+		  margin-bottom: 0; /* ← これがあると下に隙間ができる */		  
 		}
 
 		#date {
@@ -187,51 +188,31 @@
 		  flex-shrink: 1;
 		}
         
-		/* 11/4 Top/Bottomボタン */
-		.bottom-button, .top-button {
-		    position: fixed;
-		    bottom: 20px;
-		    left: 50%;
-		    transform: translateX(-50%);
-		    background: #a74fff;
-		    color: white;
-		    border: none;
-		    border-radius: 20px;
-		    padding: 10px 20px;
-		    font-size: 16px;
-		    cursor: pointer;
-		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-		    z-index: 9999;
-		    display: none;
-		}
-		.bottom-button:hover, .top-button:hover {
-		    background: #0056b3;
-		}    
-	
 	    /* 戻るボタン 5/6 */
-	    .top-right-button {
-	      width: auto; /* ボタンの幅を自動調整 */
-		  position: static;           /* ← absolute をやめる */
-	      top: 15px;
-	      right: 10px;
-	      background-color: #e1ffff;
-	      color: #400040;
-		  border: 1px solid #ff8000; /* 枠線を表示 */		      
-	      border-radius: 20px;
-	      padding: 4px 12px;
-	      font-size: 14px;
-	      cursor: pointer;
-	    }
+		.top-right-button {
+		  width: auto;
+		  min-width: 0;
+		  padding: 4px 12px;
+		  background-color: #e1ffff;
+		  color: #400040;
+		  border: 1px solid #ff8000;
+		  border-radius: 20px;
+		  font-size: 14px;
+		  cursor: pointer;
+		}
 	    .top-right-button:hover {
 	      background-color: #e3e3f0;
 	    }
-
+	
 	    footer {
 	      text-align: center;
 	      padding: 12px;
+	      font-size: 15px;	
+	      color: #b87272;                
 	    }	   
 
 		.list-title {
+	      color: #5c5c5c; 		
 		  margin: 6px 0 6px;
 		  font-weight: bold;
 		}
@@ -244,15 +225,47 @@
 		  }
 		}
 
+	  /* ◁▷ ナビボタンを押したときに一瞬強調 */
+	  .nav-button2.active-direction {
+	    background-color: #007bff;
+	    color: white;
+	  }
 
+	  /* 今日ボタンの通常スタイル */
+	  #todayButton {
+	    color: gray;
+	    background-color: transparent;
+	    border: 1px solid gray;
+	    transition: all 0.3s ease;
+	  }
+
+	  /* 今日ボタンが「今日の日付」と一致しているときの強調スタイル */
+	  #todayButton.today-active {
+	    background-color: #007bff;
+	    color: white;
+	    border: none;
+	  }
+
+	#diaryContent {
+	  margin-top: -4px; /* ← 必要に応じて調整 */
+	  margin-bottom: 0px; /* ← 必要に応じて調整 */	  
+	}
+
+	 /*.date-row {
+	  border: 1px dashed red;
+	}
+	#diaryContent {
+	  border: 1px dashed blue;
+	}
+	 */
+	  
     </style>
 </head>
 <body>
 
 	<header class="app-header">
-	  <h1>📘 簡易日記 diary</h1>
-	  <button class="top-right-button"
-	   onclick="goBack()">戻る</button>
+	  <h1>📝 簡易日記 diary</h1>
+		<button class="top-right-button" onclick="goBack()">戻る</button>
 	</header>
 
 	<script>
@@ -271,13 +284,12 @@
 
       <!-- 日付操作行 -->
 	<div class="date-row">
-	  <button class="nav-button2" onclick="changeDate(-1)">◁</button>
-	  <button class="nav-button" onclick="setToday()">今日</button>
-	  <button class="nav-button2" onclick="changeDate(1)">▷</button>
+	  <button id="prevBtn" class="nav-button2" onclick="changeDate(-1)">◁</button>
+	  <button id="todayButton" class="nav-button" onclick="setToday()">今日</button>
+	  <button id="nextBtn" class="nav-button2" onclick="changeDate(1)">▷</button>
 
 	  <input type="date" id="date">
 	</div>
-
 
       <!-- 日記入力 -->
       <!-- <label for="diaryContent">日記:</label> -->
@@ -320,14 +332,25 @@
 	  document.getElementById('diaryContent').value = saved ? saved : '';
 	}
 
+	function updateTodayButtonStyle() {
+	  const todayButton = document.getElementById('todayButton');
+	  const dateInput = document.getElementById('date');
+	  const todayStr = getTodayStr();
+
+	  if (dateInput.value === todayStr) {
+	    todayButton.classList.add('today-active');
+	  } else {
+	    todayButton.classList.remove('today-active');
+	  }
+	}
 
     // 今日をセット
 	function setToday() {
 	  const today = getTodayStr();
 	  document.getElementById('date').value = today;
 	  loadDiaryByDate(today);
+	  updateTodayButtonStyle(); // ← 追加
 	}
-
 
     // 前日・翌日へ移動
 	function changeDate(diff) {
@@ -346,13 +369,24 @@
 
 	  dateInput.value = newDate;
 	  loadDiaryByDate(newDate);
+	  updateTodayButtonStyle(); // ← 追加
+
+	  // ◁▷ボタンの一時強調表示
+	  const leftBtn = document.getElementById('prevBtn');
+	  const rightBtn = document.getElementById('nextBtn');
+	  const targetBtn = diff < 0 ? leftBtn : rightBtn;
+
+	  if (targetBtn) {
+	    targetBtn.classList.add('active-direction');
+	    setTimeout(() => targetBtn.classList.remove('active-direction'), 200);
+	  }
 	}
 
-
     // 初期表示は今日
-    window.addEventListener('DOMContentLoaded', () => {
-      setToday();
-    });
+	window.addEventListener('DOMContentLoaded', () => {
+	  setToday();
+	  updateTodayButtonStyle(); // ← 追加
+	});
 
     // カスタム通知
     function showCustomAlert(message) {
@@ -371,6 +405,7 @@
 	  if (!selectedDate) return;
 
 	  loadDiaryByDate(selectedDate);
+	  updateTodayButtonStyle(); // ← 追加
 
 	  const mmdd = selectedDate.slice(5).replace('-', '/');
 	  const diaryContent = document.getElementById('diaryContent');
@@ -378,7 +413,6 @@
 	    diaryContent.value = mmdd + ' ' + diaryContent.value;
 	  }
 	});
-
 
     function saveDiary() {
       const date = document.getElementById('date').value;
@@ -563,12 +597,10 @@
   </script>
   
   <footer>
-    © 20260106 ettomio
+  © 20260221 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
   </body>
 </html>
-
-
 
