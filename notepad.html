@@ -139,7 +139,17 @@
         .close-list-button {
             background-color: #c1ffff;
         }
-	  
+
+		#gmailbutton {
+		background: #f0f0f0;
+		min-width: 72px;
+		padding: 3px 10px;
+		font-size: 14px;
+		white-space: nowrap;
+		line-height: 1.2;
+	    margin-left: 20px;
+		}
+		  
         .custom-alert {
             position: fixed;
             top: 10px;
@@ -279,8 +289,13 @@
 
 		  <button onclick="openOCRReader()">簡易版OCR</button>
 		</div>
-         
+
+		<div>         
         <label for="memoContent">ノート内容:</label>
+        	<button id="gmailbutton" onclick="openGmailInbox()">📬 Gmail送受信</button>
+
+        </div>
+        
         <textarea id="memoContent" rows="5" class="input-field" style="width: 100%;"></textarea>
 	<div>	        
         <button class="save-button" onclick="saveMemo()">💾 保存</button>
@@ -312,6 +327,10 @@
             document.body.removeChild(alertContainer);
         }, 5000);
     }
+
+function openGmailInbox() {
+  window.open('https://mail.google.com/mail/u/0/#inbox', '_blank');
+}
 
     function showKeywordAlert() {
         showCustomAlert("一目で分かる10文字程度のキーワードを入れて下さい。本文には重要な内容は書き込まれないことをお勧めします。");
@@ -562,7 +581,7 @@
   </script>
     
   <footer>
-  © 20260207 ettomio - 舞いカレンダー
+  © 20260222 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
