@@ -54,34 +54,44 @@
 	      pointer-events: none;
 	    } 
 	    */		
-	    
-        .container {
-            max-width: 600px; /* 最大幅を600pxに設定 */
-            margin: 10px auto; /* 上下20pxの余白と中央揃え */
-            padding: 10px; /* 内側余白 */
-            border: 1px solid #ccc; /* 枠の色 */
-            border-radius: 10px; /* 角を丸くする */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* シャドウ効果 */
-			background: linear-gradient(
-			  to bottom,
-			  #f7eeff 0%,
-			  #dbdbff 50%,
-			  #b9ffff 100%
-			);
-        }
-        .container2 { 
-            max-width: 580px;
-            margin: 10px auto;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-			background: linear-gradient(
-			  to bottom,
-			  #b9ffff 0%,
-			  #b7ffdb 50%,
-			  #ffffa6 100%
-			);
-        }
+
+		.container {
+		  max-width: 600px;
+		  margin: 10px auto;
+		  padding: 10px;
+		  border: 1px solid #ccc;
+		  border-radius: 10px;
+		  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		  background: linear-gradient(to bottom, #f7eeff 0%, #dbdbff 50%, #b9ffff 100%);
+		  box-sizing: border-box;
+		}
+
+		.container2 {
+		  max-width: 100%; /* 親に合わせる */
+		  /* 上:10px, 左右:auto, 下:2px */
+  		  margin: 10px auto 2px;
+		  padding: 10px;
+		  border: 1px solid #ccc;
+		  border-radius: 10px;
+		  background: linear-gradient(to bottom, #b9ffff 0%, #b7ffdb 50%, #ffffa6 100%);
+		  box-sizing: border-box;
+		}
+
+		.container3 {
+		  max-width: 100%;
+		  margin: 0 auto;
+		  padding: 10px;
+		  border: none !important; /* 枠線を強制的に消去 */
+		  border-radius: 10px;
+		  display: none;
+		  background: linear-gradient(to bottom, #ffffa6 0%, #b7ffdb 50%, #d0d0ff 100%);
+		  box-sizing: border-box;
+		  outline: none; /* フォーカス時の線も消したい場合 */
+		}
+		/* 開いた状態 */
+		.container3.open {
+		  display: block;
+		}
 
 		header {
 		    background: #ffdcb9;
@@ -182,7 +192,6 @@
     		border: 1px solid black;
             cursor: pointer;
         }
-
 
 		/* 「予定の確認」ボタンのスタイルを設定 */
 		.check-button {
@@ -821,6 +830,17 @@
 		  color: #d60000; /* 元の赤に戻す（好みの赤に変更可） */
 		}
 
+		/* トグルボタンの装飾（お好みで） */
+		#toggleButton2 {
+		  padding: 3px 10px;
+		  cursor: pointer;
+		  border-radius: 5px;
+		  border: 1px solid #ab57ff;
+		  background-color: #ffffff;
+		  transition: 0.3s;
+		  cursor: pointer;
+		}
+		
     </style>
     
 	<script>
@@ -2290,26 +2310,6 @@
 		  <button id="note-button3" onclick="location.href='scribbling.html?from=index'">走り書き</button>
 		  <button class="diary-button" onclick="location.href='diary.html'">簡易日記</button>
 
-	    <h3>天気予報</h3>
-	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
-	    <br>
-		<div id="calendarHint01" style="font-size: 15px; color: #666; margin-top: 8px;">
-		  天気サイトのアドレスを入力して下さい。
-		</div>	
-		
-		<label for="weatherUrl">URL:</label>
-
-		<input type="url" id="weatherUrl"
-		       placeholder="例: https://www.weather.com"
-		       class="word-input"
-		       style="width: 60%; max-width: 260px;">
-
-		<button onclick="navigate()">移動</button>
-
-	    
-	    <button id="updateBtn" onclick="enableEditing()">入力と修正</button>
-	    <button id="saveBtn" onclick="saveNewUrl()" style="display:none;">保存</button>
-
 	    <h3>検索</h3>
 	    <div class="input-row">
 		<div id="calendarHint02" style="font-size: 15px; color: #666; margin-top: 8px;">
@@ -2333,19 +2333,33 @@
 		<!-- ボタン 9/29 -->
 		<button id="keyNButton">データの保存と復元ツール</button>
 		<br><br>
+	<button id="toggleButton2">＋ その他機能</button>
 
-		<!-- モーダルダイアログ 11/12 正規版内にあるため移動
-		<div id="dialogOverlay" class="dialog-overlay" style="display: none;">
-		  <div class="dialog-box">
-		    <h3>どちらのツールを使用しますか？</h3>
-		    <button id="androidBtn">Androidアプリ版ツール</button>
-		    <button id="webBtn">Web版ツール</button>
-		    <button id="keyListBtn">Keyリスト</button>
-		    <button id="closeBtn">閉じる</button>
-		  </div>
-		</div>
-          -->   	        
+    <div id="container3" class="container3">
+    <div style="padding: 10px;">
+		
+	    <h3>天気予報</h3>
+	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
+	    <br>
+		<div id="calendarHint01" style="font-size: 15px; color: #666; margin-top: 8px;">
+		  天気サイトのアドレスを入力して下さい。
+		</div>	
+		
+		<label for="weatherUrl">URL:</label>
 
+		<input type="url" id="weatherUrl"
+		       placeholder="例: https://www.weather.com"
+		       class="word-input"
+		       style="width: 60%; max-width: 260px;">
+
+		<button onclick="navigate()">移動</button>
+
+	    
+	    <button id="updateBtn" onclick="enableEditing()">入力と修正</button>
+	    <button id="saveBtn" onclick="saveNewUrl()" style="display:none;">保存</button>
+
+		<br>
+		<h3>その他の機能</h3>
         <button onclick="location.href='calculatorapp.html'">電卓</button>
         <button onclick="location.href='agecalculation.html'">年齢計算</button>
         <button onclick="location.href='metrology.html'">度量衡</button>
@@ -2363,7 +2377,41 @@
 		<br>
         <button id="omikujiButton" style="margin-top: 0px;margin-bottom: 8px;">おみくじを引く</button>
 
+		</div>
+</div>
+</div>
 
+		<script>
+
+		document.addEventListener('DOMContentLoaded', () => {
+		  const button = document.getElementById('toggleButton2');
+		  const container = document.getElementById('container3');
+
+		  button.addEventListener('click', () => {
+		    container.classList.toggle('open');
+
+		    const isOpen = container.classList.contains('open');
+
+		    button.textContent = isOpen ? '✕ 閉じる' : '＋ その他機能';
+		    button.style.backgroundColor = isOpen ? '#eee' : '#fff';
+		  });
+		});
+
+		//function toggleContainer3(show) {
+		//  const element = document.querySelector('.container3');
+		//  const button = document.getElementById('toggleButton2');
+
+		//  if (element) {
+		//    element.style.display = show ? 'block' : 'none';
+		//    button.textContent = show ? '☓ 閉じる' : 'その他機能';
+
+		    // 次回の切り替えのために、onclickを反転
+		//    button.setAttribute('onclick', `toggleContainer3(${!show})`);
+		//  }
+		//}
+
+		</script>
+		
 		<script>
 		  // ダイアログ表示（keyNButtonを押したとき）9/30
 		  document.getElementById("keyNButton").addEventListener("click", function () {
@@ -2391,7 +2439,6 @@
 		    document.getElementById("dialogOverlay").style.display = "none";
 		  });
 		</script>
-
 		
 	    <script>
 	        document.getElementById('weatherUrl').value = localStorage.getItem("weatherUrl") || '';
@@ -2483,7 +2530,6 @@
         });
     </script>
 
-	</div>
 	</div>
 
     <!-- 2/7 修正 -->
@@ -2723,7 +2769,7 @@
 	   onclick="handleClick();"
 	   style="color: #b66b6b; font-size: 15px;">
 	    © 2025 ettomio. All rights reserved.
-	    Version 20.2 / Updated: 2026-02-22
+	    Version 20.3 / Updated: 2026-02-24
 	</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
@@ -2731,7 +2777,4 @@
 
 </body>
 </html>
-
-
-
 
