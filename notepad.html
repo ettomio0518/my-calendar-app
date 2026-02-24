@@ -293,8 +293,7 @@
 		<div>         
         <label for="memoContent">ノート内容:</label>
         	<button id="gmailbutton" onclick="openGmailInbox()">📬 Gmail送受信</button>
-
-        </div>
+    	</div>
         
         <textarea id="memoContent" rows="5" class="input-field" style="width: 100%;"></textarea>
 	<div>	        
@@ -328,9 +327,16 @@
         }, 5000);
     }
 
-function openGmailInbox() {
-  window.open('https://mail.google.com/mail/u/0/#inbox', '_blank');
-}
+	  // 2/22追加 2/23修正
+	  /** * Gmailを開く前に確認ダイアログを表示する */
+	  function openGmailInbox() {
+	    const isGmailUser = confirm("Gmailをお使いですか?");
+	    if (isGmailUser) {
+	      window.open('https://mail.google.com/mail/u/0/#inbox', '_blank');
+	    } else {
+	      console.log("Gmailは開きませんでした。");
+	    }
+	  }
 
     function showKeywordAlert() {
         showCustomAlert("一目で分かる10文字程度のキーワードを入れて下さい。本文には重要な内容は書き込まれないことをお勧めします。");
@@ -581,7 +587,7 @@ function openGmailInbox() {
   </script>
     
   <footer>
-  © 20260222 ettomio - 舞いカレンダー
+  © 20260223 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
