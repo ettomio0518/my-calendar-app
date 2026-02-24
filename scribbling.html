@@ -451,8 +451,17 @@
 
 <script>
 
-	function openGmailInbox() { window.open('https://mail.google.com/mail/u/0/#inbox', '_blank'); }
-  
+	  // 2/22追加 2/23修正
+	  /** * Gmailを開く前に確認ダイアログを表示する */
+	  function openGmailInbox() {
+	    const isGmailUser = confirm("Gmailをお使いですか?");
+	    if (isGmailUser) {
+	      window.open('https://mail.google.com/mail/u/0/#inbox', '_blank');
+	    } else {
+	      console.log("Gmailは開きませんでした。");
+	    }
+	  }
+
 	function updateTodayButtonStyle() {
 	  const todayButton = document.getElementById('todayButton');
 	  const dateInput = document.getElementById('dateInput');
@@ -911,7 +920,7 @@
   </script>
   
   <footer>
-  © 20260222 ettomio - 舞いカレンダー
+  © 20260223 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
