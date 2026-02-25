@@ -547,15 +547,24 @@
 
 function displayURLs(memoContent) {
     const urlContainer = document.getElementById('urlContent');
-    urlContainer.innerHTML = '';
+    urlContainer.textContent = '';
 
     const urlRegex = /(https?:\/\/[^\s]+)/g;
 
-    const formattedContent = memoContent.replace(urlRegex, (url) =>
-        `<a href="${url}" style="color: blue; text-decoration: underline;">${url}</a>`
-    );
+    const parts = memoContent.split(urlRegex);
 
-    urlContainer.innerHTML = formattedContent.replace(/\n/g, '<br>');
+    parts.forEach(part => {
+        if (urlRegex.test(part)) {
+            const a = document.createElement('a');
+            a.href = part;
+            a.textContent = part;
+            a.style.color = "blue";
+            a.style.textDecoration = "underline";
+            urlContainer.appendChild(a);
+        } else {
+            urlContainer.appendChild(document.createTextNode(part));
+        }
+    });
 }
 
 	window.onload = function () {
