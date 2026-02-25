@@ -545,16 +545,18 @@
         isMemoListDisplayed = !isMemoListDisplayed;
     }
 
-	function displayURLs(memoContent) {
-	    const urlContainer = document.getElementById('urlContent');
-	    urlContainer.innerHTML = ''; // 既存のURLをクリア
+function displayURLs(memoContent) {
+    const urlContainer = document.getElementById('urlContent');
+    urlContainer.innerHTML = '';
 
-	    const urlRegex = /(https?:\/\/[^\s]+)/g;
-	    const formattedContent = memoContent.replace(urlRegex, (url) =>
-  `<a href="${url}" style="color: blue; text-decoration: underline;" target="_blank" rel="noopener noreferrer">${url}</a>`
-);
-	    urlContainer.innerHTML = formattedContent.replace(/\n/g, '<br>');
-	}
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+    const formattedContent = memoContent.replace(urlRegex, (url) =>
+        `<a href="${url}" style="color: blue; text-decoration: underline;">${url}</a>`
+    );
+
+    urlContainer.innerHTML = formattedContent.replace(/\n/g, '<br>');
+}
 
 	window.onload = function () {
 	    document.getElementById('keyword').value = '';
