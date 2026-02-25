@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- 追加 -->
+    <meta http-equiv="Cache-Control" content="no-store">
+
     <title>メモの入力と確認</title>
     <style>
 		body {
@@ -576,6 +580,11 @@ function displayURLs(memoContent) {
 	};
 
 
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        location.reload();
+    }
+});
 
 </script>
 
