@@ -19,7 +19,7 @@
 	    display: flex;
 	    flex-direction: column;
 	    align-items: center;
-	    padding: 20px;
+	    padding: 15px;
 	    max-width: 600px;
 	    margin: auto;
 	    background-color: #e1e1ff;
@@ -114,7 +114,8 @@
 	button {
 	    font-size: 14px;
 	    padding: 5px 10px;
-	    margin: 5px;
+	    margin-top: 5px;
+	    margin-bottom: 3px;	    
 	    border-radius: 5px;
 	    background-color: #ffd5ea;
 	    color: black;
@@ -124,11 +125,11 @@
 
 	
 	.closeButton {
-	    font-size: 16px;
+	    font-size: 14px;
 	    padding: 5px 10px;
-	    margin: 5px;
+	    margin: 0px;
 	    border-radius: 5px;
-	    background-color: #c4ffc4;
+	    background-color: #e5e5e5;
 	    color: black;
 	    border: 1px solid #0000ff;
 	    cursor: pointer;
@@ -137,7 +138,8 @@
         font-size: 14px;
         padding: 0px 2px;
         padding: 3px 5px; /* ボタンの余白を調整 */
-        background-color: #b9ffff;
+	    margin-top: 2px;        
+        background-color: #ffffff;
         color: black;
         border: 1px solid #0000ff;
         border-radius: 5px;          
@@ -158,7 +160,11 @@
 	    cursor: pointer; /* カーソルを手の形に */
 	}
 
-
+	#saveButton {
+	    background-color: #ffe7d9;
+	    margin-top: 10px; 	    
+	}
+	
 	/* メディアクエリによるスマホ対応 */
 	@media only screen and (max-width: 600px) {
 	    td.keyword-column {
@@ -199,6 +205,7 @@
 	    background-color: #c8ffe3;
 	    border-radius: 5px;
 	    border: 1px solid #0000ff;
+	    margin-bottom: 8px; 	    
 	}
 
 	@keyframes blink {
@@ -344,11 +351,6 @@
         <div id="fullContent" class="detail-container" contenteditable="true"></div>
         <button id="saveButton" style="display: none;" onclick="saveChanges()">修正して保存</button>
         <button id="closeButton" class="closeButton" style="display: none;" onclick="closeFullContent()">詳細を閉じる</button>
-
-
-	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
-		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
-	    <div style="height: 30px;"></div>
 
 
         <script>
@@ -695,7 +697,13 @@
                 searchMemos();
             });
 
+		</script>
 
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    <div style="height: 30px;"></div>
+	    
+	    <script>
 	    // ==========================================================
 	    // ★ スクロールボタン制御 (Top/Bottom)
 	    // ==========================================================
@@ -785,10 +793,10 @@
     </div>
 
 	  <footer>
-	  © 20260217 ettomio - 舞いカレンダー
+	  © 20260226 ettomio - 舞いカレンダー
 	  </footer>
     
-    <div style="height: 80px;"></div>
+    <div style="height: 60px;"></div>
     
 	<script>
 	function goBack() {
