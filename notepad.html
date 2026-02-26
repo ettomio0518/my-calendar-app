@@ -3,10 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- 追加 -->
-    <meta http-equiv="Cache-Control" content="no-store">
-
     <title>メモの入力と確認</title>
     <style>
 		body {
@@ -549,27 +545,18 @@
         isMemoListDisplayed = !isMemoListDisplayed;
     }
 
-function displayURLs(memoContent) {
-    const urlContainer = document.getElementById('urlContent');
-    urlContainer.textContent = '';
+	function displayURLs(memoContent) {
+	    const urlContainer = document.getElementById('urlContent');
+	    urlContainer.innerHTML = '';
 
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
+	    const urlRegex = /(https?:\/\/[^\s]+)/g;
 
-    const parts = memoContent.split(urlRegex);
+	    const formattedContent = memoContent.replace(urlRegex, (url) =>
+	        `<a href="${url}" style="color: blue; text-decoration: underline;" target="_blank">${url}</a>`
+	    );
 
-    parts.forEach(part => {
-        if (urlRegex.test(part)) {
-            const a = document.createElement('a');
-            a.href = part;
-            a.textContent = part;
-            a.style.color = "blue";
-            a.style.textDecoration = "underline";
-            urlContainer.appendChild(a);
-        } else {
-            urlContainer.appendChild(document.createTextNode(part));
-        }
-    });
-}
+	    urlContainer.innerHTML = formattedContent.replace(/\n/g, '<br>');
+	}
 
 	window.onload = function () {
 	    document.getElementById('keyword').value = '';
@@ -578,13 +565,6 @@ function displayURLs(memoContent) {
 	    document.getElementById('urlContent').innerHTML = '';
 	    document.getElementById('memoList').style.display = 'none'; // ← ここに移動！
 	};
-
-
-window.addEventListener("pageshow", function (event) {
-    if (event.persisted) {
-        location.reload();
-    }
-});
 
 </script>
 
