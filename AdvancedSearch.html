@@ -44,6 +44,7 @@
 	/* 入力ボックス */
 	input[type="text"] {
 	    all: unset;
+		/* 以下、自分でスタイルを定義 */	    
 	    display: block;
 	    width: 100%;
 	    height: 40px;
@@ -162,13 +163,6 @@
 	.detail-container {
 	    background-color: #f2f2f2;
 	    word-break: break-all;
-	}
-
-	button, a {
-	    cursor: pointer; /* カーソルを手の形に */
-	}
-	#saveButton, #closeButton {
-	    cursor: pointer; /* カーソルを手の形に */
 	}
 
 	/* メディアクエリによるスマホ対応 */
@@ -322,11 +316,17 @@
 	#saveButton {
 	    background-color: #ffe7d9;
 	    color: black;
+	    cursor: pointer; /* カーソルを手の形に */	    
 	}
 
 	#closeButton {
 	    background-color: #e5e5e5;
 	    color: black;
+	}
+
+	.highlight {
+	    color: blue;
+	    font-weight: bold;
 	}
 	    			
 	</style>
@@ -345,8 +345,11 @@
         <div>
             <label for="keywordInput">キーワード:</label>
             <button id="voiceButton" onclick="startVoiceInput()">🎤 音声入力</button>
-            <input type="text" id="keywordInput" oninput="searchMemos()" placeholder="検索キーワードを入力">
         </div>
+        
+ 		<div>
+	    <input type="text" id="keywordInput" oninput="searchMemos()" placeholder="検索キーワードを入力">
+		</div>
 
         <div id="searchResults" class="table-container"></div>
 
@@ -544,27 +547,38 @@
                 return text.replace(urlPattern, '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
             }
 
-            // 詳細を表示する関数
-            function displayFullContent(content, key) {
-                const fullContentDiv = document.getElementById('fullContent');
-                const saveButton = document.getElementById('saveButton');
-                const closeButton = document.getElementById('closeButton');
+			// 詳細を表示する関数（ハイライト付き）
+			function displayFullContent(content, key) {
+			    const fullContentDiv = document.getElementById('fullContent');
+			    const saveButton = document.getElementById('saveButton');
+			    const closeButton = document.getElementById('closeButton');
 
-                currentKey = key;
-                fullContentDiv.innerHTML = makeUrlsClickable(content);
-                fullContentDiv.contentEditable = true;
-                fullContentDiv.style.display = 'block';
-                saveButton.style.display = 'block';
-                closeButton.style.display = 'block';
-                fullContentDiv.scrollIntoView({ behavior: 'smooth' });
+			    currentKey = key;
 
-                fullContentDiv.addEventListener('click', (e) => {
-                    if (e.target.tagName === 'A') {
-                        e.preventDefault();
-                        window.open(e.target.href, '_blank', 'noopener,noreferrer');
-                    }
-                });
-            }
+			    const keyword = document.getElementById('keywordInput').value.trim();
+
+			    // ハイライト処理を加えた上でURLをリンク化
+			    let highlightedContent = content;
+			    if (keyword.length > 0) {
+			        const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			        const regex = new RegExp(escapedKeyword, 'gi');
+			        highlightedContent = content.replace(regex, match => `<span class="highlight">${match}</span>`);
+			    }
+
+			    fullContentDiv.innerHTML = makeUrlsClickable(highlightedContent);
+			    fullContentDiv.contentEditable = true;
+			    fullContentDiv.style.display = 'block';
+			    saveButton.style.display = 'block';
+			    closeButton.style.display = 'block';
+			    fullContentDiv.scrollIntoView({ behavior: 'smooth' });
+
+			    fullContentDiv.addEventListener('click', (e) => {
+			        if (e.target.tagName === 'A') {
+			            e.preventDefault();
+			            window.open(e.target.href, '_blank', 'noopener,noreferrer');
+			        }
+			    });
+			}
 
             // 詳細を閉じる関数
             function closeFullContent() {
@@ -590,86 +604,92 @@
                 }
             }
 
-            // メモの検索と表示を行う関数
-            function searchMemos() {
-            	// ★★★ この行を先頭に追加します 11/8 ★★★
-    			closeFullContent();
-    			
-                const keyword = document.getElementById('keywordInput').value;
-                const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword');
-                const searchResults = keys.filter(key => {
-                    const content = localStorage.getItem(key);
-                    return content && content.includes(keyword); // contentがnullでないことを確認
-                });
+        // メモの検索と表示を行う関数
+		function searchMemos() {
+		    closeFullContent();
 
-                searchResults.sort((a, b) => a.localeCompare(b));
+		    const keyword = document.getElementById('keywordInput').value.trim();
+		    const keys = Object.keys(localStorage).filter(key => key !== 'searchKeyword');
+		    const searchResults = keys.filter(key => {
+		        const content = localStorage.getItem(key);
+		        return content && content.includes(keyword);
+		    });
 
-                const searchResultsList = document.getElementById('searchResults');
-                searchResultsList.innerHTML = '';
+		    searchResults.sort((a, b) => a.localeCompare(b));
 
-                if (searchResults.length === 0 && keyword.length > 0) {
-                     searchResultsList.innerHTML = '<p style="text-align: center; color: #888;">一致する結果はありませんでした。</p>';
-                     return;
-                }
+		    const searchResultsList = document.getElementById('searchResults');
+		    searchResultsList.innerHTML = '';
 
+		    if (searchResults.length === 0 && keyword.length > 0) {
+		        searchResultsList.innerHTML = '<p style="text-align: center; color: #888;">一致する結果はありませんでした。</p>';
+		        return;
+		    }
 
-                const table = document.createElement('table');
-                const headerRow = document.createElement('tr');
-                const headers = ['key', '内容', '操作'];
-                const classNames = ['keyword-column', 'content-column', 'actions-column'];
-                
-                headers.forEach((text, index) => {
-                    const th = document.createElement('th');
-                    th.classList.add(classNames[index]);
-                    th.textContent = text;
-                    headerRow.appendChild(th);
-                });
-                table.appendChild(headerRow);
+		    const table = document.createElement('table');
+		    const headerRow = document.createElement('tr');
+		    const headers = ['key', '内容', '操作'];
+		    const classNames = ['keyword-column', 'content-column', 'actions-column'];
 
-                searchResults.forEach(key => {
-                    const row = document.createElement('tr');
-                    const content = localStorage.getItem(key) || '';
-                    
-                    const keywordCell = document.createElement('td');
-                    keywordCell.classList.add('keyword-column');
-                    keywordCell.textContent = key.slice(0, 10);
-                    
-                    const contentCell = document.createElement('td');
-                    contentCell.classList.add('content-column');
-                    contentCell.textContent = content.slice(0, 30) + (content.length > 30 ? '...' : '');
+		    headers.forEach((text, index) => {
+		        const th = document.createElement('th');
+		        th.classList.add(classNames[index]);
+		        th.textContent = text;
+		        headerRow.appendChild(th);
+		    });
+		    table.appendChild(headerRow);
 
-                    const actionsCell = document.createElement('td');
-                    actionsCell.classList.add('actions-column');
-                    
-					const viewButton = document.createElement('button');
-					viewButton.textContent = '表示';
-					viewButton.classList.add('btn-show-text'); 
-					viewButton.onclick = () => displayFullContent(content, key);
+		    searchResults.forEach(key => {
+		        const row = document.createElement('tr');
+		        const content = localStorage.getItem(key) || '';
 
-					const deleteButton = document.createElement('button');
-					deleteButton.textContent = '消去';
-					deleteButton.classList.add('btn-show-text');
-					deleteButton.onclick = () => {
-					    const confirmed = confirm("この項目を削除しますか？");
-					    if (confirmed) {
-					        localStorage.removeItem(key);
-					        alert("削除しました");
-					        searchMemos(); // 再描画
-					    }
-					};
+		        const keywordCell = document.createElement('td');
+		        keywordCell.classList.add('keyword-column');
+		        keywordCell.textContent = key.slice(0, 10);
 
-					actionsCell.appendChild(viewButton);
-					actionsCell.appendChild(document.createElement('br')); // 表示と消去の間に改行
-					actionsCell.appendChild(deleteButton);
+		        const contentCell = document.createElement('td');
+		        contentCell.classList.add('content-column');
 
-                    row.appendChild(keywordCell);
-                    row.appendChild(contentCell);
-                    row.appendChild(actionsCell);
-                    table.appendChild(row);
-                });
+		        // ハイライト処理
+		        let preview = content.slice(0, 30);
+		        if (keyword.length > 0) {
+		            const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+		            const regex = new RegExp(escapedKeyword, 'gi');
+		            preview = preview.replace(regex, match => `<span class="highlight">${match}</span>`);
+		        }
+		        contentCell.innerHTML = preview + (content.length > 30 ? '...' : '');
 
-                searchResultsList.appendChild(table);
-            }
+		        const actionsCell = document.createElement('td');
+		        actionsCell.classList.add('actions-column');
+
+		        const viewButton = document.createElement('button');
+		        viewButton.textContent = '表示';
+		        viewButton.classList.add('btn-show-text');
+		        viewButton.onclick = () => displayFullContent(content, key);
+
+		        const deleteButton = document.createElement('button');
+		        deleteButton.textContent = '消去';
+		        deleteButton.classList.add('btn-show-text');
+		        deleteButton.onclick = () => {
+		            const confirmed = confirm("この項目を削除しますか？");
+		            if (confirmed) {
+		                localStorage.removeItem(key);
+		                alert("削除しました");
+		                searchMemos(); // 再描画
+		            }
+		        };
+
+		        actionsCell.appendChild(viewButton);
+		        actionsCell.appendChild(document.createElement('br'));
+		        actionsCell.appendChild(deleteButton);
+
+		        row.appendChild(keywordCell);
+		        row.appendChild(contentCell);
+		        row.appendChild(actionsCell);
+		        table.appendChild(row);
+		    });
+
+		    searchResultsList.appendChild(table);
+		}
 
             // DOM読み込み後の初期化
             document.addEventListener('DOMContentLoaded', function () {
@@ -797,7 +817,7 @@
     </div>
 
 	  <footer>
-	  © 20260227 ettomio - 舞いカレンダー
+	  © 20260228 ettomio - 舞いカレンダー
 	  </footer>
     
     <div style="height: 60px;"></div>
