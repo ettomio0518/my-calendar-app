@@ -427,9 +427,7 @@
       }
       const key = `diary_${date.replace(/-/g, '')}`;
       localStorage.setItem(key, diaryContent);
-      showCustomAlert('日記が保存されました。');
-      document.getElementById('date').value = '';
-      document.getElementById('diaryContent').value = '';
+      alert('保存しました'); // カスタムアラートから変更 3/3
     }
 
     function showSelectedMonth() {
@@ -597,7 +595,7 @@
   </script>
   
   <footer>
-  © 20260221 ettomio - 舞いカレンダー
+  © 20260303 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
