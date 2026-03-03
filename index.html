@@ -1516,7 +1516,7 @@
 	    
 	    <button class="save-button" onclick="saveSchedule()">💾 保存</button>
 
-	    <button id="toggleButton" class="check-button" onclick="toggleButtonFunction('check')">予定の確認</button>
+	    <button id="toggleButton" class="check-button" onclick="toggleButtonFunction('check')">予定リストの確認</button>
 
 	    <div id="listContainer">
 	        <button id="closeListButton" onclick="closeList()">予定リストを閉じる</button>
@@ -1935,11 +1935,15 @@
             const toggleButton = document.getElementById('toggleButton');
             outputElement.innerHTML = '';
             document.getElementById('closeListButton').style.display = 'none';
-            toggleButton.textContent = '予定の確認';
+            toggleButton.textContent = '予定リストの確認';
             toggleButton.onclick = () => toggleButtonFunction('check');
             toggleButton.className = 'check-button';
             currentEditingKey = null; // 編集モードを終了
-        }
+			const scheduleInput = document.getElementById('scheduleInput');
+			if (scheduleInput) {
+			    scheduleInput.value = ''; // scheduleInputの内容をクリア
+			}
+		}
 
         function toggleButtonFunction(mode) {
             const button = document.getElementById('toggleButton');
@@ -1950,7 +1954,7 @@
                 button.className = 'output-button';
             } else if (mode === 'output') {
                 displaySchedules(); // 予定を音声出力
-                button.textContent = '予定の確認';
+                button.textContent = '予定リストの確認';
                 button.onclick = () => toggleButtonFunction('check');
                 button.className = 'check-button';
             }
@@ -2769,7 +2773,7 @@
 	   onclick="handleClick();"
 	   style="color: #b66b6b; font-size: 15px;">
 	    © 2025 ettomio. All rights reserved.
-	    Version 20.6 / Updated: 2026-02-28
+	    Version 20.7 / Updated: 2026-03-03
 	</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
@@ -2777,6 +2781,4 @@
 
 </body>
 </html>
-
-
 
