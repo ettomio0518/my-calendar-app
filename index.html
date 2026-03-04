@@ -1929,20 +1929,29 @@
             }
         }
 
-        // --- リスト表示関連 --- (変更なし)
-        function closeList() {
-            const outputElement = document.getElementById('output');
-            const toggleButton = document.getElementById('toggleButton');
-            outputElement.innerHTML = '';
-            document.getElementById('closeListButton').style.display = 'none';
-            toggleButton.textContent = '予定リストの確認';
-            toggleButton.onclick = () => toggleButtonFunction('check');
-            toggleButton.className = 'check-button';
-            currentEditingKey = null; // 編集モードを終了
-			const scheduleInput = document.getElementById('scheduleInput');
-			if (scheduleInput) {
-			    scheduleInput.value = ''; // scheduleInputの内容をクリア
-			}
+        // --- リスト表示関連 --- 
+		function closeList() {
+		    const outputElement = document.getElementById('output');
+		    const toggleButton = document.getElementById('toggleButton');
+		    outputElement.innerHTML = '';
+		    document.getElementById('closeListButton').style.display = 'none';
+		    toggleButton.textContent = '予定リストの確認';
+		    toggleButton.onclick = () => toggleButtonFunction('check');
+		    toggleButton.className = 'check-button';
+		    currentEditingKey = null; // 編集モードを終了
+
+		    clearInputs(); // ← ここで呼び出すだけ！
+		}
+
+		// 入力欄をクリアする関数は別に定義 3/4
+		function clearInputs() {
+		    const scheduleInput = document.getElementById('scheduleInput');
+		    const scheduleDate = document.getElementById('scheduleDate');
+		    const dateInput = document.getElementById('dateInput'); // 必要なら
+
+		    if (scheduleInput) scheduleInput.value = '';
+		    if (scheduleDate) scheduleDate.value = '';
+		    if (dateInput) dateInput.value = '';
 		}
 
         function toggleButtonFunction(mode) {
@@ -2033,6 +2042,8 @@
 		            localStorage.removeItem(key);
 		            displayCheck(); // リストを再表示
 		            applyScheduleColorsToCalendar(); // 削除後にカレンダーの色を更新
+				alert('消去しました');
+					clearInputs(); // ← ここで呼び出すだけ！3/4
 		        };
 		        row.appendChild(deleteButton);
 		        outputElement.appendChild(row);
@@ -2773,7 +2784,7 @@
 	   onclick="handleClick();"
 	   style="color: #b66b6b; font-size: 15px;">
 	    © 2025 ettomio. All rights reserved.
-	    Version 20.8 / Updated: 2026-03-03
+	    Version 20.9 / Updated: 2026-03-04
 	</p>
 	  
 	<!-- HTML末尾にこれを追加 5/5 -->
@@ -2781,5 +2792,4 @@
 
 </body>
 </html>
-
 
