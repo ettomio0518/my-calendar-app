@@ -48,7 +48,25 @@
         border: 1px solid #444;   /* ← 太さを明示 */
 	    border-radius: 5px;
 	}
-		        
+
+	#ai-button {
+	    font-size: 15px; /* フォントサイズを大きく */
+	    padding: 2px 10px; /* ボタン全体の大きさを調整 */
+	    color: #00ffff; 
+	    background-color: #5b5b5b; 
+	    border-radius: 5px;	
+	}
+
+	@keyframes blink { 
+	  0% { opacity: 1; }
+	  50% { opacity: 0.3; }
+	  100% { opacity: 1; }
+	}
+
+	.blinking {
+	  animation: blink 1s infinite;
+	}    
+						        
 	/* 今日のカード */
 	.card {
 	  border: 1px solid #ccc;
@@ -239,10 +257,17 @@
   </style>
 </head>
 <body>
+
 	<button class="top-right-button" onclick="location.href='index.html'">戻る</button>
 
 	<div class="page">
-	  <h2>📅✨ 今日のカード</h2>  
+	  <div class="title-container" style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+	    <h2 style="margin: 0;">📅 今日のカード</h2>
+	    <button id="ai-button" class="blinking" onclick="announceCompass()">
+	      🧭 AI羅針盤
+	    </button>
+	  </div>
+		    	  
 	  <div class="card" id="today-card">
 	    <p id="seireki"></p>
 	    <p id="current-time"></p>
@@ -2623,112 +2648,13 @@ const rokuyoData = [
 
   // 初期化
   updateCard();
-  setInterval(updateCard, 1000);
-
+  // setInterval(updateCard, 1000);
 
 	function openExternal(url) {
 	  // WebView内でも、スマホなら外部ブラウザで開ける
 	  window.open(url, "_blank");
 	}
 
-
-    // 天気アイコン・ラベル・背景クラス
-    const iconOf = code => {
-      const map = {0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",61:"🌧️",71:"❄️",80:"🌧️",95:"⛈️",99:"⛈️"};
-      return map[code] || "🌫️";
-    };
-    const labelOf = code => {
-      const map = {0:"快晴",1:"晴れ",2:"晴れがち",3:"曇り",45:"霧",48:"霧",51:"にわか雨",61:"雨",71:"雪",80:"雨",95:"雷雨",99:"激しい雷雨"};
-      return map[code] || "不明";
-    };
-    const classOf = code => {
-      if ([0,1].includes(code)) return "sunny";
-      if ([2,3,45,48].includes(code)) return "cloudy";
-      if ([51,61,80].includes(code)) return "rainy";
-      if ([71].includes(code)) return "snowy";
-      if ([95,99].includes(code)) return "thunder";
-      return "unknown";
-    };
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-
-      // 地名取得
-      const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-      const geoData = await geoRes.json();
-      const placeName = geoData.address.city || geoData.address.town || geoData.address.village || "現在地";
-      document.getElementById("title").textContent = `${placeName}の天気`;
-
-      // Open-Meteoから今日の天気
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,sunrise,sunset&hourly=weathercode,relativehumidity_2m,precipitation_probability&timezone=Asia%2FTokyo`);
-      const data = await res.json();
-      const days = data.daily;
-      const hourly = data.hourly;
-
-      // 今日のデータ（index 0）
-      const date = new Date(days.time[0]);
-      const code = days.weathercode[0];
-      const icon = iconOf(code);
-      const bg = classOf(code);
-      const max = days.temperature_2m_max[0];
-      const min = days.temperature_2m_min[0];
-      const wind = days.windspeed_10m_max[0];
-      const sunrise = new Date(days.sunrise[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
-      const sunset = new Date(days.sunset[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
-
-      // 午前・午後の代表天気
-      const dayKey = days.time[0];
-      const indices = hourly.time.map((t, idx) => ({t, idx})).filter(o => o.t.startsWith(dayKey));
-      const morning = indices.filter(o => new Date(o.t).getHours() < 12);
-      const afternoon = indices.filter(o => new Date(o.t).getHours() >= 12);
-
-      const mode = arr => {
-        if (!arr.length) return null;
-        const freq = {};
-        arr.forEach(c => freq[c] = (freq[c] || 0) + 1);
-        return +Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
-      };
-
-      const morningCode = mode(morning.map(o => hourly.weathercode[o.idx]));
-      const afternoonCode = mode(afternoon.map(o => hourly.weathercode[o.idx]));
-      const morningLabel = morningCode !== null ? labelOf(morningCode) : "予報準備中";
-      const afternoonLabel = afternoonCode !== null ? labelOf(afternoonCode) : "予報準備中";
-
-      // 湿度（午前・午後平均）
-      const morningHum = morning.length ? Math.round(morning.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
-      const afternoonHum = afternoon.length ? Math.round(afternoon.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
-
-      // 降水確率（午前・午後平均）
-      const morningRain = morning.length ? Math.round(morning.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
-      const afternoonRain = afternoon.length ? Math.round(afternoon.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
-
-      // 今日の天気カード生成
-      const container = document.getElementById("weather-container");
-      const card = document.createElement("div");
-      card.className = `weather-card ${bg}`;
-      card.innerHTML = `
-        <div class="header">
-          <span class="date">${date.toLocaleDateString("ja-JP",{weekday:"short",month:"numeric",day:"numeric"})}</span>
-          <span class="icon">${icon}</span>
-        </div>
-        <div class="grid">
-          <p>午前: ${morningLabel}</p>
-          <p>午後: ${afternoonLabel}</p>
-          <p>最高: ${max}℃</p>
-          <p>最低: ${min}℃</p>
-          <p>湿度(午前): ${morningHum !== "予報準備中" ? morningHum+"%" : morningHum}</p>
-          <p>湿度(午後): ${afternoonHum !== "予報準備中" ? afternoonHum+"%" : afternoonHum}</p>
-          <p>降水確率(午前): ${morningRain !== "予報準備中" ? morningRain+"%" : morningRain}</p>
-          <p>降水確率(午後): ${afternoonRain !== "予報準備中" ? afternoonRain+"%" : afternoonRain}</p>
-          <p>風速: ${wind}m/s</p>
-          <p class="sun-row">日の出: ${sunrise} ／ 日没: ${sunset}</p>
-        </div>
-      `;
-      container.appendChild(card);
-    }, (err) => {
-      document.getElementById("title").textContent = "位置情報が取得できませんでした";
-    });
   </script>
 
 
@@ -3083,8 +3009,8 @@ const rokuyoData = [
 	}
 
 
-	// htmlを開いたときにアラート表示 12/27
-	document.addEventListener("DOMContentLoaded", () => {
+	// --- 起動時モーダルの処理（名前を付けて独立させました） ---
+	function handleStartupModal() {
 	  const modal = document.getElementById("nearest-alert-modal");
 	  const btnNo = document.getElementById("alert-no");
 	  const btnYes = document.getElementById("alert-yes");
@@ -3115,7 +3041,7 @@ const rokuyoData = [
 	      toggleTimeline();
 	    }, 5000);
 	  };
-	});
+	}
 	
 	</script>
 
@@ -3195,14 +3121,281 @@ const rokuyoData = [
 	    // ★ 初期化
 	    // ==========================================================
 	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
-	    document.addEventListener('DOMContentLoaded', () => {
-	        showScrollButtonsIfPageLong();
-	    });
+	    // document.addEventListener('DOMContentLoaded', () => {
+	    //     showScrollButtonsIfPageLong();
+	    // });
 	    
   </script>
 
+	<script>
+
+// --- 🧭 AI羅針盤：入り口 ---
+function announceCompass() {
+    // 2択の案内文を「対話」に変更
+    const mode = confirm("【AI羅針盤】\n\n「OK」：【簡潔】（要点を音声報告）\n「キャンセル」：【対話】（AIと相談・工事中）");
+
+    if (mode) {
+        // OK を押したとき
+        runConciseCompass();
+    } else {
+        // キャンセル を押したとき
+        runDialogueCompass(); // 関数名も対話（Dialogue）へ
+    }
+}
+
+
+// --- 二十四節気を計算する装置 (恒久版) ---
+function get24Sekki(date) {
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+
+    // 二十四節気の簡易計算式（2050年頃まで誤差1日以内で有効）
+    // 太陽の黄経が15度進むごとの日付を略算します
+    const getSekkiDay = (year, base, factor) => {
+        return Math.floor(base + (0.242194 * (year - 1980)) - Math.floor((year - 1980) / 4));
+    };
+
+    const sekkiList = [
+        { name: "小寒", m: 1, d: getSekkiDay(y, 5.41, 0) },
+        { name: "大寒", m: 1, d: getSekkiDay(y, 20.12, 0) },
+        { name: "立春", m: 2, d: getSekkiDay(y, 3.87, 0) },
+        { name: "雨水", m: 2, d: getSekkiDay(y, 18.73, 0) },
+        { name: "啓蟄", m: 3, d: getSekkiDay(y, 5.63, 0) },
+        { name: "春分", m: 3, d: getSekkiDay(y, 20.27, 0) },
+        { name: "清明", m: 4, d: getSekkiDay(y, 4.81, 0) },
+        { name: "穀雨", m: 4, d: getSekkiDay(y, 19.82, 0) },
+        { name: "立夏", m: 5, d: getSekkiDay(y, 5.23, 0) },
+        { name: "小満", m: 5, d: getSekkiDay(y, 20.72, 0) },
+        { name: "芒種", m: 6, d: getSekkiDay(y, 5.24, 0) },
+        { name: "夏至", m: 6, d: getSekkiDay(y, 21.04, 0) },
+        { name: "小暑", m: 7, d: getSekkiDay(y, 7.14, 0) },
+        { name: "大暑", m: 7, d: getSekkiDay(y, 22.48, 0) },
+        { name: "立秋", m: 8, d: getSekkiDay(y, 7.49, 0) },
+        { name: "処暑", m: 8, d: getSekkiDay(y, 22.74, 0) },
+        { name: "白露", m: 9, d: getSekkiDay(y, 7.67, 0) },
+        { name: "秋分", m: 9, d: getSekkiDay(y, 22.64, 0) },
+        { name: "寒露", m: 10, d: getSekkiDay(y, 8.31, 0) },
+        { name: "霜降", m: 10, d: getSekkiDay(y, 23.43, 0) },
+        { name: "立冬", m: 11, d: getSekkiDay(y, 7.38, 0) },
+        { name: "小雪", m: 11, d: getSekkiDay(y, 22.36, 0) },
+        { name: "大雪", m: 12, d: getSekkiDay(y, 7.18, 0) },
+        { name: "冬至", m: 12, d: getSekkiDay(y, 21.65, 0) }
+    ];
+
+    const match = sekkiList.find(s => s.m === m && s.d === d);
+    return match ? `今日は二十四節気の、${match.name}です。` : "";
+}
+
+// --- 月齢・月相を判定する装置 ---
+function getMoonPhase(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    // 簡易月齢計算（中根式）
+    const age = (((year - 2009) % 19) * 11 + month + day) % 30;
+
+    if (age < 1 || age >= 29) return "今夜は、新月です。";
+    if (age >= 7 && age < 9) return "今夜は、上弦の月です。";
+    if (age >= 14 && age < 16) return "今夜は、満月です。";
+    if (age >= 22 && age < 24) return "今夜は、下弦の月です。";
+    return "";
+}
+
+
+async function runConciseCompass() {
+    const now = new Date();
+    let msgParts = ["本日の、ご案内です。"];
+
+    // 1. 祝日・六曜
+    const holiday = document.getElementById("holiday")?.innerText.replace("祝日 : ", "") || "";
+    if (holiday) msgParts.push(`今日は、${holiday}です。`);
+    
+    const rokuyo = document.getElementById("rokuyo")?.innerText.replace("六曜 : ", "") || "";
+    if (rokuyo) msgParts.push(`六曜は、${rokuyo}です。`);
+
+    // 2. 二十四節気 & 月齢 (get24Sekki と getMoonPhase はそのまま活用)
+    const sekki = get24Sekki(now);
+    if (sekki) msgParts.push(sekki);
+
+    const moon = getMoonPhase(now);
+    if (moon) msgParts.push(moon);
+
+    // 3. 天気概況 (Open-Meteo)
+    const weatherCard = document.querySelector(".weather-card");
+    if (weatherCard) {
+        try {
+            const gridTexts = Array.from(weatherCard.querySelectorAll(".grid p")).map(p => p.textContent);
+            const amWeather = gridTexts[0]?.replace("午前: ", "") || "";
+            const pmWeather = gridTexts[1]?.replace("午後: ", "") || "";
+            const maxTemp = gridTexts[2]?.replace("最高: ", "") || "";
+            const minTemp = gridTexts[3]?.replace("最低: ", "") || "";
+
+            msgParts.push(`お天気は、午前は${amWeather}、午後は${pmWeather}。最高気温は${maxTemp}、最低気温は${minTemp}の予想です。`);
+        } catch (e) {
+            msgParts.push("天気情報の、解析に、失敗しました。");
+        }
+    } else {
+        msgParts.push("天気予報は、現在、準備中です。");
+    }
+
+    // 4. 予定 (開始から終了まで)
+    const schedules = buildSchedulesFromLocalStorage();
+    const targets = getNearestSchedules(schedules);
+    if (targets.length > 0) {
+        const s = targets[0];
+        msgParts.push(`直近の予定は、${formatTime(s.start)}から、${formatTime(s.end)}まで、${stripTimeRange(s.text)}です。`);
+    }
+
+    // 5. バッテリー情報のみ残す (iPhone Safari等では自動スキップされます)
+    if (navigator.getBattery) {
+        const battery = await navigator.getBattery();
+        const level = Math.round(battery.level * 100);
+        msgParts.push(`電池残量は、${level}パーセントです。`);
+    }
+
+    // ★ 通信環境(navigator.connection)のセクションは削除しました ★
+
+    // 6. 結び (ひらがなで確実に)
+    const finalMsg = msgParts.join("。") + "。きょうも、よい、いちにちを。";
+
+    showCustomAlert(finalMsg);
+    nativeSpeak(finalMsg);
+}
+
+	
+	// --- 1. 初期化関数 (すべての起動スイッチをここに集約) ---
+	function init() {
+	    updateCard();
+	    setInterval(updateCard, 1000);
+	    getWeather();                  // 天気を呼ぶ
+	    showScrollButtonsIfPageLong(); // ボタン制御を呼ぶ
+	    handleStartupModal();          // モーダルを呼ぶ
+	}
+
+	// --- 2. 天気取得を関数として独立させる ---
+	function getWeather() {
+	    // 天気アイコン・ラベル・背景クラス
+	    const iconOf = code => {
+	      const map = {0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",61:"🌧️",71:"❄️",80:"🌧️",95:"⛈️",99:"⛈️"};
+	      return map[code] || "🌫️";
+	    };
+	    const labelOf = code => {
+	      const map = {0:"快晴",1:"晴れ",2:"晴れがち",3:"曇り",45:"霧",48:"霧",51:"にわか雨",61:"雨",71:"雪",80:"雨",95:"雷雨",99:"激しい雷雨"};
+	      return map[code] || "不明";
+	    };
+	    const classOf = code => {
+	      if ([0,1].includes(code)) return "sunny";
+	      if ([2,3,45,48].includes(code)) return "cloudy";
+	      if ([51,61,80].includes(code)) return "rainy";
+	      if ([71].includes(code)) return "snowy";
+	      if ([95,99].includes(code)) return "thunder";
+	      return "unknown";
+	    };
+
+	    navigator.geolocation.getCurrentPosition(async (pos) => {
+	      const lat = pos.coords.latitude;
+	      const lon = pos.coords.longitude;
+
+	      // 地名取得
+	      const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+	      const geoData = await geoRes.json();
+	      const placeName = geoData.address.city || geoData.address.town || geoData.address.village || "現在地";
+	      document.getElementById("title").textContent = `${placeName}の天気`;
+
+	      // Open-Meteoから今日の天気
+	      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,sunrise,sunset&hourly=weathercode,relativehumidity_2m,precipitation_probability&timezone=Asia%2FTokyo`);
+	      const data = await res.json();
+	      const days = data.daily;
+	      const hourly = data.hourly;
+
+	      const date = new Date(days.time[0]);
+	      const code = days.weathercode[0];
+	      const icon = iconOf(code);
+	      const bg = classOf(code);
+	      const max = days.temperature_2m_max[0];
+	      const min = days.temperature_2m_min[0];
+	      const wind = days.windspeed_10m_max[0];
+	      const sunrise = new Date(days.sunrise[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+	      const sunset = new Date(days.sunset[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+
+	      const mode = arr => {
+	        if (!arr.length) return null;
+	        const freq = {};
+	        arr.forEach(c => freq[c] = (freq[c] || 0) + 1);
+	        return +Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+	      };
+
+	      const dayKey = days.time[0];
+	      const indices = hourly.time.map((t, idx) => ({t, idx})).filter(o => o.t.startsWith(dayKey));
+	      const morning = indices.filter(o => new Date(o.t).getHours() < 12);
+	      const afternoon = indices.filter(o => new Date(o.t).getHours() >= 12);
+
+	      const morningCode = mode(morning.map(o => hourly.weathercode[o.idx]));
+	      const afternoonCode = mode(afternoon.map(o => hourly.weathercode[o.idx]));
+	      const morningLabel = morningCode !== null ? labelOf(morningCode) : "予報準備中";
+	      const afternoonLabel = afternoonCode !== null ? labelOf(afternoonCode) : "予報準備中";
+
+	      const morningHum = morning.length ? Math.round(morning.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
+	      const afternoonHum = afternoon.length ? Math.round(afternoon.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
+
+	      const morningRain = morning.length ? Math.round(morning.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
+	      const afternoonRain = afternoon.length ? Math.round(afternoon.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
+
+	      const container = document.getElementById("weather-container");
+	      container.innerHTML = ""; // 二重表示防止
+	      const card = document.createElement("div");
+	      card.className = `weather-card ${bg}`;
+	      card.innerHTML = `
+	        <div class="header">
+	          <span class="date">${date.toLocaleDateString("ja-JP",{weekday:"short",month:"numeric",day:"numeric"})}</span>
+	          <span class="icon">${icon}</span>
+	        </div>
+	        <div class="grid">
+	          <p>午前: ${morningLabel}</p><p>午後: ${afternoonLabel}</p>
+	          <p>最高: ${max}℃</p><p>最低: ${min}℃</p>
+	          <p>湿度(前): ${morningHum}%</p><p>湿度(後): ${afternoonHum}%</p>
+	          <p>降水(前): ${morningRain}%</p><p>降水(後): ${afternoonRain}%</p>
+	          <p>風速: ${wind}m/s</p>
+	          <p class="sun-row">日の出: ${sunrise} ／ 日没: ${sunset}</p>
+	        </div>
+	      `;
+	      container.appendChild(card);
+	    }, (err) => {
+	      document.getElementById("title").textContent = "位置情報が取得できませんでした";
+	    });
+	}
+
+	// --- 3. 起動時モーダルの処理を独立させる ---
+	function handleStartupModal() {
+	    const modal = document.getElementById("nearest-alert-modal");
+	    const btnNo = document.getElementById("alert-no");
+	    const btnYes = document.getElementById("alert-yes");
+
+	    if (!modal || !btnNo || !btnYes) return;
+
+	    if (sessionStorage.getItem("fromIndex") === "true") {
+	        modal.classList.remove("hidden");
+	        sessionStorage.removeItem("fromIndex");
+	    } else {
+	        return;
+	    }
+
+	    btnNo.onclick = () => modal.classList.add("hidden");
+	    btnYes.onclick = () => {
+	        modal.classList.add("hidden");
+	        toggleTimeline();
+	        announceNearestSchedule();
+	        setTimeout(() => { toggleTimeline(); }, 5000);
+	    };
+	}
+
+	// --- 4. 最後にたった1行、この命令だけを書く ---
+	document.addEventListener("DOMContentLoaded", init);
+	</script>
+	
   <footer>
-    © 20260220 ettomio - 舞いカレンダー
+    © 20260310 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
