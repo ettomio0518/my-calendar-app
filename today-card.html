@@ -3263,6 +3263,12 @@ async function runConciseCompass() {
     nativeSpeak(finalMsg);
 }
 
+// --- B. 【対話】モード ---
+function runDialogueCompass() {
+    const msg = "【対話モード】は現在、ettomioが「相棒」としての振る舞いを設計中です。完成をお楽しみに！";
+    showCustomAlert(msg);
+    nativeSpeak("対話モードは、現在、工事中です。");
+}
 	
 	// --- 1. 初期化関数 (すべての起動スイッチをここに集約) ---
 	function init() {
