@@ -3187,39 +3187,46 @@ function get24Sekki(date) {
     return match ? `今日は二十四節気の、${match.name}です。` : "";
 }
 
-// --- 月齢・月相を判定する装置 ---
+// --- 月齢・月相を判定する装置（すぐる式・1点集中判定） 結局は使用不可---
 function getMoonPhase(date) {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    // 簡易月齢計算（中根式）
-    const age = (((year - 2009) % 19) * 11 + month + day) % 30;
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
 
-    if (age < 1 || age >= 29) return "今夜は、新月です。";
-    if (age >= 7 && age < 9) return "今夜は、上弦の月です。";
-    if (age >= 14 && age < 16) return "今夜は、満月です。";
-    if (age >= 22 && age < 24) return "今夜は、下弦の月です。";
+    // 公式： (年－2000)×11 ＋ 月 ＋ 日 － 8
+    let age = ((y - 2000) * 11) + m + d - 8;
+    
+    // 30より大きい場合は30を引いていく
+    while (age >= 30) {
+        age -= 30;
+    }
+
+    // 2日連続を防ぐため、範囲ではなく「特定の1日」だけを指定します
+    // すぐる式の数値に基づき、最もその月相らしい1日を特定
+    if (age === 0)  return "今夜は、新月です。";
+    if (age === 7)  return "今夜は、上弦の月です。";
+    if (age === 14) return "今夜は、満月です。";
+    if (age === 21) return "今夜は、下弦の月です。";
+    
     return "";
 }
-
 
 async function runConciseCompass() {
     const now = new Date();
     let msgParts = ["本日の、ご案内です。"];
 
-    // 1. 祝日・六曜
+    // 1. 祝日・六曜 (アプリの表示から取得)
     const holiday = document.getElementById("holiday")?.innerText.replace("祝日 : ", "") || "";
     if (holiday) msgParts.push(`今日は、${holiday}です。`);
     
     const rokuyo = document.getElementById("rokuyo")?.innerText.replace("六曜 : ", "") || "";
     if (rokuyo) msgParts.push(`六曜は、${rokuyo}です。`);
 
-    // 2. 二十四節気 & 月齢 (get24Sekki と getMoonPhase はそのまま活用)
+    // 2. 二十四節気 (演算装置：該当日のみ)
     const sekki = get24Sekki(now);
     if (sekki) msgParts.push(sekki);
 
-    const moon = getMoonPhase(now);
-    if (moon) msgParts.push(moon);
+    // ★ 月齢・月相のセクションは削除しました ★
 
     // 3. 天気概況 (Open-Meteo)
     const weatherCard = document.querySelector(".weather-card");
@@ -3235,11 +3242,9 @@ async function runConciseCompass() {
         } catch (e) {
             msgParts.push("天気情報の、解析に、失敗しました。");
         }
-    } else {
-        msgParts.push("天気予報は、現在、準備中です。");
     }
 
-    // 4. 予定 (開始から終了まで)
+    // 4. 直近の予定 (修正済み)
     const schedules = buildSchedulesFromLocalStorage();
     const targets = getNearestSchedules(schedules);
     if (targets.length > 0) {
@@ -3247,17 +3252,15 @@ async function runConciseCompass() {
         msgParts.push(`直近の予定は、${formatTime(s.start)}から、${formatTime(s.end)}まで、${stripTimeRange(s.text)}です。`);
     }
 
-    // 5. バッテリー情報のみ残す (iPhone Safari等では自動スキップされます)
+    // 5. バッテリー情報
     if (navigator.getBattery) {
         const battery = await navigator.getBattery();
         const level = Math.round(battery.level * 100);
         msgParts.push(`電池残量は、${level}パーセントです。`);
     }
 
-    // ★ 通信環境(navigator.connection)のセクションは削除しました ★
-
-    // 6. 結び (ひらがなで確実に)
-    const finalMsg = msgParts.join("。") + "。きょうも、よい、いちにちを。";
+    // 6. 結び
+    const finalMsg = msgParts.join("。") + "。きょうも、いい、いちにちを。";
 
     showCustomAlert(finalMsg);
     nativeSpeak(finalMsg);
@@ -3401,7 +3404,7 @@ function runDialogueCompass() {
 	</script>
 	
   <footer>
-    © 20260310 ettomio - 舞いカレンダー
+    © 20260311 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
