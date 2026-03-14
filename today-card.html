@@ -3336,12 +3336,18 @@ const todayWeather = weatherContainer.innerText;
     // 5. 履歴の管理（トコロテン方式：最大5往復10件）
     let history = JSON.parse(localStorage.getItem(AI_HISTORY_KEY) || "[]");
     
+	// 6 JavaScript側で六曜などを取得・計算した値を代入するようにします
+	const rokuyo = "友引"; // ここに計算結果を入れる
+	const moonPhase = "月齢 24.1 (有明月)"; // ここに計算結果を入れる    
+	
     // 6. AIへのプロンプト（命令文）
 	const systemPrompt = `
 あなたは有能な秘書です。
-【現在の状況】今日は ${todayStr}、山口県平生町。
+【現在の状況】今日は ${todayStr}（${rokuyo}）、山口県平生町。
+【月相】${moonPhase}
 【数日間の予定】${scheduleSummary}
 【本日の天気】${todayWeather}
+【重要】現在の時刻は ${new Date().toLocaleTimeString('ja-JP')} です。
 【予報のヒント】AIはOpen-Meteoの7日間データを把握していると仮定し、ユーザーが「明日」や「週末」の天気を聞いたら、一般的な傾向（今の季節に基づいた予測など）を含めて親切に答えてください。
 【ルール】
 1. 回答にアスタリスク（**）やシャープ（##）などの記号は絶対に含めないでください。
@@ -3349,6 +3355,7 @@ const todayWeather = weatherContainer.innerText;
 3. 天気予報や予定、月相、農業（アール計算など）の質問には正確に答えてください。
 4. 履歴がある場合は、その文脈を考慮して短く答えてください。
 それでは、ユーザーの問いかけに一言二言で答えてください：`;
+
 
     // 履歴をGemini形式に変換
     const contents = history.map(h => ({
