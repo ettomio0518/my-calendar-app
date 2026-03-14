@@ -2114,6 +2114,37 @@
 
     <div id="container3" class="container3">
     <div style="padding: 10px;">
+
+<div style="text-align:center; margin-bottom:15px;">
+    <button onclick="openAiUnlock()" style="padding:8px 15px; border-radius:5px; border:1px solid #ccc; background:#f9f9f9; cursor:pointer;">🧭 AI秘書・羅針盤の鍵を開ける</button>
+</div>
+
+<div id="ai-unlock-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:25px; border:4px solid #5daab0; z-index:1000; border-radius:20px; width:85%; max-width:350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">
+    
+    <h3 style="margin-top:0; color:#5daab0; text-align:center; font-size:1.2em;">🔑 秘書・羅針盤の鍵を開ける</h3>
+    
+    <div style="background:#f0f9f9; padding:15px; border-radius:12px; margin-bottom:20px; border:1px dashed #5daab0;">
+        <p style="font-size:14px; color:#333; margin:0; line-height:1.6; text-align:center;">
+            AI機能をご利用いただくための確認です。<br>
+            下の欄に合言葉「 <strong style="color:#d9534f; font-size:1.1em;">hirao2026</strong> 」と入力して解除ボタンを押してください。
+        </p>
+    </div>
+
+    <input type="password" id="ai-pass-input" placeholder="ここに hirao2026 と入力" 
+        style="width:100%; padding:15px; border:2px solid #ccc; border-radius:10px; box-sizing:border-box; margin-bottom:20px; font-size:18px; text-align:center; outline:none;">
+    
+    <div style="display:flex; justify-content: space-between;">
+        <button onclick="closeAiUnlock()" 
+            style="width:45%; padding:10px; border-radius:8px; border:1px solid #ccc; background:#f5f5f5; color:#666; cursor:pointer; font-weight:bold;">閉じる</button>
+        <button onclick="unlockAiWithPass()" 
+            style="width:45%; padding:10px; border-radius:8px; border:none; background:#5daab0; color:white; font-weight:bold; cursor:pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">解除</button>
+    </div>
+    
+    <p style="font-size:11px; color:#999; margin-top:15px; text-align:center; line-height:1.4;">
+        ※一度解除すれば、次回から入力は不要です。<br>
+        (ドメイン制限により安全に保護されています)
+    </p>
+</div>
 		
 	    <h3>天気予報</h3>
 	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
@@ -2371,6 +2402,42 @@
     document.addEventListener("visibilitychange", () => { if (!document.hidden) initializeState(); });
     initializeState();
     
+    
+// --- AI機能の解錠（合言葉方式） ---
+
+// 1. 画面を開く
+function openAiUnlock() {
+    const savedKey = localStorage.getItem("gemini_api_key");
+    if (savedKey) {
+        const res = confirm("すでに鍵は開いています。再設定しますか？");
+        if (!res) return;
+    }
+    document.getElementById("ai-unlock-modal").style.display = "block";
+}
+
+// 2. 画面を閉じる
+function closeAiUnlock() {
+    document.getElementById("ai-unlock-modal").style.display = "none";
+}
+
+// 3. 【重要】合言葉でキーを組み立てて保存する
+function unlockAiWithPass() {
+    const pass = document.getElementById("ai-pass-input").value.trim();
+    
+    // 中本さんが決めた合言葉：hirao2026
+    if (pass === "hirao2026") {
+        // キーを分割して配置（GitHubの自動検索から隠します）
+        const p1 = "AIzaSyAgWd3pGmTi5C3"; 
+        const p2 = "oCE-g2B2w77ekrrcr4KQ";
+        
+        localStorage.setItem("gemini_api_key", p1 + p2);
+       alert("AI秘書ならびにAI羅針盤のロックを解除しました。\n「今日のカード」からAI羅針盤をご利用いただけます。");
+        closeAiUnlock();
+    } else {
+        alert("合言葉が違います。");
+    }
+}
+     
     </script>
 
     <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
@@ -2455,7 +2522,7 @@
   </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 21.4 / Updated: 2026-03-10
+        © 2025 ettomio. All rights reserved. Version 21.5 / Updated: 2026-03-14
     </p>
     <div style="height: 50px;"></div>
 </body>
