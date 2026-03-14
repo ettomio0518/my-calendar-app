@@ -3338,13 +3338,14 @@ const todayWeather = weatherContainer.innerText;
     
 	// 6 JavaScript側で六曜などを取得・計算した値を代入するようにします
 	const rokuyo = "友引"; // ここに計算結果を入れる
-	const moonPhase = "月齢 24.1 (有明月)"; // ここに計算結果を入れる    
+	const moonPhase = "月齢 24.6"; // 呼び名は入れず、数字だけにする
+	const lastQuarter = "3月11日"; // 直近の大きな節目を教えておく
 	
     // 6. AIへのプロンプト（命令文）
 	const systemPrompt = `
 あなたは有能な秘書です。
 【現在の状況】今日は ${todayStr}（${rokuyo}）、山口県平生町。
-【月相】${moonPhase}
+【月相】${moonPhase} （直近の下弦の月は ${lastQuarter} でした）。
 【数日間の予定】${scheduleSummary}
 【本日の天気】${todayWeather}
 【重要】現在の時刻は ${new Date().toLocaleTimeString('ja-JP')} です。
@@ -3352,7 +3353,8 @@ const todayWeather = weatherContainer.innerText;
 【ルール】
 1. 回答にアスタリスク（**）やシャープ（##）などの記号は絶対に含めないでください。
 2. 簡潔に普通の日本語で答え、よもやま話は控えてください。
-3. 天気予報や予定、月相、農業（アール計算など）の質問には正確に答えてください。
+3. 天気予報や予定、、農業（アール計算など）の質問には正確に答えてください。
+   月相や暦については、上記の【月相】にある正確な情報を優先して答え、推測で日付を言わないでください。
 4. 履歴がある場合は、その文脈を考慮して短く答えてください。
 それでは、ユーザーの問いかけに一言二言で答えてください：`;
 
