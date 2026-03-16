@@ -3283,121 +3283,176 @@ async function runConciseCompass() {
 
 // --- B. 【対話】モード（Gemini連携版 / 履歴・数日予定・天気・位置対応） ---
 
-// 履歴を保存するキー
+// ==========================================
+// 1. 環境判別ロジック
+// ==========================================
+function getAiEnvironment() {
+    // Androidアプリ（apk/aab）環境かどうかを判定
+    const isAndroidApp = window.location.href.includes("android_asset") || 
+                         window.document.URL.includes("android_asset");
+
+    if (isAndroidApp) {
+        return {
+            type: "android",
+            pass: "yamaguchi2026",
+            storageName: "gemini_api_key2",
+            keyPart1: "AIzaSyBAMfC3DmO7zV0b", // アプリ用分割1
+            keyPart2: "51kt7oVcqgAJfi-Peyc"   // アプリ用分割2
+        };
+    } else {
+        return {
+            type: "web",
+            pass: "hirao2026",
+            storageName: "gemini_api_key",
+            keyPart1: "AIzaSyAgWd3pGmTi5C3", // Web用分割1
+            keyPart2: "oCE-g2B2w77ekrrcr4KQ"  // Web用分割2
+        };
+    }
+}
+
+// ==========================================
+// 2. 鍵を開ける（保存）ロジック
+// ==========================================
+function openAiUnlock() {
+    const env = getAiEnvironment();
+    const savedKey = localStorage.getItem(env.storageName);
+    
+    if (savedKey) {
+        const res = confirm("すでに鍵は開いています。再設定しますか？");
+        if (!res) return;
+    }
+
+    const modal = document.getElementById("ai-unlock-modal");
+    const instruction = modal.querySelector("p");
+    const inputField = document.getElementById("ai-pass-input");
+
+    // 環境に合わせて表示を切り替え
+    instruction.innerHTML = `AI機能をご利用いただくための確認です。<br>下の欄に合言葉「 <strong style="color:#d9534f; font-size:1.1em;">${env.pass}</strong> 」と入力してください。`;
+    inputField.placeholder = `ここに ${env.pass} と入力`;
+
+    modal.style.display = "block";
+}
+
+function closeAiUnlock() {
+    document.getElementById("ai-unlock-modal").style.display = "none";
+}
+
+function unlockAiWithPass() {
+    const passInput = document.getElementById("ai-pass-input").value.trim();
+    const env = getAiEnvironment();
+    
+    if (passInput === env.pass) {
+        // 環境に応じたキーをガッチャンコして保存
+        localStorage.setItem(env.storageName, env.keyPart1 + env.keyPart2);
+        
+        const modeName = env.type === "android" ? "Androidアプリ版" : "Web版";
+        alert(`【${modeName}】のロックを解除しました。\n「今日のカード」からAI羅針盤をご利用いただけます。`);
+        closeAiUnlock();
+    } else {
+        alert("合言葉が違います。");
+    }
+}
+
+// ==========================================
+// 3. AI羅針盤の実行（通信）ロジック
+// ==========================================
 const AI_HISTORY_KEY = 'gemini_chat_history';
 
 async function runDialogueCompass(userMessage) {
-    const apiKey = localStorage.getItem('gemini_api_key');
+    // A. 環境からキーを読み出す
+    const env = getAiEnvironment();
+    const apiKey = localStorage.getItem(env.storageName);
+
     if (!apiKey) {
-        showCustomAlert("AI設定でAPIキーを保存してください。");
+        const msg = "まずは、AI秘書の鍵を開けてください。";
+        nativeSpeak(msg);
+        showCustomAlert(msg);
         return;
     }
 
-    // 1. 画面の準備（対話エリア表示、名称変更、スクロール）
+    // B. 画面の準備
     const chatContainer = document.getElementById('ai-interaction-container');
-    chatContainer.style.display = 'block';
-    
-    // ラベルを「AI羅針盤」に書き換え
-    const chatLabel = chatContainer.querySelector('p');
-    if (chatLabel) chatLabel.innerText = "💬 AI羅針盤へのメッセージ：";
+    if (chatContainer) {
+        chatContainer.style.display = 'block';
+        const chatLabel = chatContainer.querySelector('p');
+        if (chatLabel) chatLabel.innerText = "💬 AI羅針盤へのメッセージ：";
+    }
 
-    document.getElementById('bottom-marker').scrollIntoView({ behavior: 'smooth' });
-
-    // 2. データの収集（年月日、時刻、場所）
+    // C. データの収集
     const now = new Date();
     const todayStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
-    const currentTime = `${now.getHours()}時${now.getMinutes()}分`;
-    const location = document.getElementById("title").textContent.replace("の天気", "") || "現在地";
+    const currentTime = now.toLocaleTimeString('ja-JP');
+    const locationNode = document.getElementById("title");
+    const location = locationNode ? locationNode.textContent.replace("の天気", "") : "現在地";
 
-    // 3. 数日分（今日・明日・明後日）の全予定をLocalStorageからスキャン
+    // D. 予定のスキャン
     let allSchedules = [];
     for (let i = 0; i <= 2; i++) {
         const d = new Date();
         d.setDate(d.getDate() + i);
         const prefix = `ScheduledText${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
-        
         const dayLabel = (i === 0) ? "今日" : (i === 1 ? "明日" : "明後日");
-        
-        // 末尾が乱数（_244など）でも全て取得
         const daySchedules = Object.keys(localStorage)
             .filter(k => k.startsWith(prefix))
             .map(k => `${dayLabel}: ${localStorage.getItem(k).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim()}`);
-        
         allSchedules = allSchedules.concat(daySchedules);
     }
     const scheduleSummary = allSchedules.length > 0 ? allSchedules.join("／") : "予定なし";
 
-    // 4. 天気情報の取得（画面上の天気カードからテキストを抽出）
-// --- 天気情報を「1週間分」AIに教え込む ---
-const weatherContainer = document.getElementById("weather-container");
-// 画面に表示されている今日の情報
-const todayWeather = weatherContainer.innerText;
+    // E. 天気・暦（六曜などは現状のまま）
+    const weatherContainer = document.getElementById("weather-container");
+    const todayWeather = weatherContainer ? weatherContainer.innerText : "天気情報取得不可";
+    const rokuyo = "友引"; 
+    const moonPhase = "月齢 24.6"; 
+    const lastQuarter = "3月11日"; 
 
-    // 5. 履歴の管理（トコロテン方式：最大5往復10件）
-    let history = JSON.parse(localStorage.getItem(AI_HISTORY_KEY) || "[]");
-    
-	// 6 JavaScript側で六曜などを取得・計算した値を代入するようにします
-	const rokuyo = "友引"; // ここに計算結果を入れる
-	const moonPhase = "月齢 24.6"; // 呼び名は入れず、数字だけにする
-	const lastQuarter = "3月11日"; // 直近の大きな節目を教えておく
-	
-    // 6. AIへのプロンプト（命令文）
-	const systemPrompt = `
-あなたは有能な秘書です。
+    // F. プロンプト作成
+    const systemPrompt = `あなたは有能な秘書です。
 【現在の状況】今日は ${todayStr}（${rokuyo}）、山口県平生町。
 【月相】${moonPhase} （直近の下弦の月は ${lastQuarter} でした）。
 【数日間の予定】${scheduleSummary}
 【本日の天気】${todayWeather}
-【重要】現在の時刻は ${new Date().toLocaleTimeString('ja-JP')} です。
-【予報のヒント】AIはOpen-Meteoの7日間データを把握していると仮定し、ユーザーが「明日」や「週末」の天気を聞いたら、一般的な傾向（今の季節に基づいた予測など）を含めて親切に答えてください。
+【重要】現在の時刻は ${currentTime} です。
 【ルール】
 1. 回答にアスタリスク（**）やシャープ（##）などの記号は絶対に含めないでください。
 2. 簡潔に普通の日本語で答え、よもやま話は控えてください。
-3. 天気予報や予定、、農業（アール計算など）の質問には正確に答えてください。
-   月相や暦については、上記の【月相】にある正確な情報を優先して答え、推測で日付を言わないでください。
-4. 履歴がある場合は、その文脈を考慮して短く答えてください。
-それでは、ユーザーの問いかけに一言二言で答えてください：`;
+3. 履歴がある場合は、その文脈を考慮して短く答えてください。`;
 
-
-    // 履歴をGemini形式に変換
-    const contents = history.map(h => ({
-        role: h.role,
-        parts: [{ text: h.text }]
-    }));
-    
-    // 今回の質問を追加（systemPromptを頭に付ける）
-    contents.push({
-        role: "user",
-        parts: [{ text: systemPrompt + (userMessage || "本日の状況を教えてください") }]
-    });
+    let history = JSON.parse(localStorage.getItem(AI_HISTORY_KEY) || "[]");
+    const contents = history.map(h => ({ role: h.role, parts: [{ text: h.text }] }));
+    contents.push({ role: "user", parts: [{ text: systemPrompt + (userMessage || "挨拶") }] });
 
     nativeSpeak("考え中です。少々お待ちください。");
 
     try {
-        // 中本さんの環境で安定している 3-flash-preview を使用
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`, {
+        // 通信開始
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ contents: contents })
         });
 
         const data = await response.json();
-        let aiResponse = data.candidates[0].content.parts[0].text;
-        aiResponse = aiResponse.replace(/[*#]/g, ''); // 記号除去
+        
+        // エラー（キー制限等）のチェック
+        if (data.error) throw new Error(data.error.message);
 
-        // 履歴の更新
+        let aiResponse = data.candidates[0].content.parts[0].text;
+        aiResponse = aiResponse.replace(/[*#]/g, '');
+
+        // 履歴更新
         history.push({ role: "user", text: userMessage || "挨拶" });
         history.push({ role: "model", text: aiResponse });
         if (history.length > 10) history = history.slice(-10);
         localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(history));
 
-        // 表示と読み上げ
+        // 表示・発話
         const historyArea = document.getElementById('ai-chat-history');
-        historyArea.style.display = 'block';
-        historyArea.innerText = aiResponse;
-        
+        if (historyArea) {
+            historyArea.style.display = 'block';
+            historyArea.innerText = aiResponse;
+        }
         nativeSpeak(aiResponse);
-        document.getElementById('bottom-marker').scrollIntoView({ behavior: 'smooth' });
 
     } catch (error) {
         console.error("APIエラー:", error);
@@ -3560,7 +3615,7 @@ function startAiVoiceInput() {
 	</script>
 	
   <footer>
-    © 20260315 ettomio - 舞いカレンダー
+    © 20260316 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
