@@ -2408,52 +2408,45 @@
 
 // A. 環境を判定する関数
 function getAiEnvironment() {
-    // Androidアプリ（apk/aab）環境かどうかを判定
     const isAndroidApp = window.location.href.includes("android_asset") || 
-                         window.document.URL.includes("android_asset") ||
-                         navigator.userAgent.includes("AndroidAppContext"); // 独自定義用
+                         window.document.URL.includes("android_asset");
 
     if (isAndroidApp) {
         return {
             type: "android",
-            pass: "yamaguchi2026", // アプリ版の合言葉
-            storageName: "gemini_api_key2", // アプリ版の保存名
-            keyPart1: "AIzaSyBAMfC3DmO7zV0b", // アプリ用キー分割1
-            keyPart2: "51kt7oVcqgAJfi-Peyc"   // アプリ用キー分割2
+            pass: "yamaguchi2026", 
+            // ★URLをハイフンありの正しいものに修正しました
+            webUrl: "https://ettomio0518.github.io/my-calendar-app/today-card.html" 
         };
     } else {
         return {
             type: "web",
-            pass: "hirao2026", // Web版の合言葉
-            storageName: "gemini_api_key", // Web版の保存名
-            keyPart1: "AIzaSyAgWd3pGmTi5C3", // Web用キー分割1
-            keyPart2: "oCE-g2B2w77ekrrcr4KQ"  // Web用キー分割2
+            pass: "hirao2026", 
+            storageName: "gemini_api_key", 
+            keyPart1: "AIzaSyAgWd3pGmTi5C3", 
+            keyPart2: "oCE-g2B2w77ekrrcr4KQ"  
         };
     }
 }
 
-// 1. 画面を開く
+// 1. 画面を開く（変更なし）
 function openAiUnlock() {
     const env = getAiEnvironment();
-    const savedKey = localStorage.getItem(env.storageName); // 環境に合わせた箱を確認
-    
-    if (savedKey) {
-        const res = confirm("すでに鍵は開いています。再設定しますか？");
-        if (!res) return;
+    if (env.type === "web") {
+        const savedKey = localStorage.getItem(env.storageName);
+        if (savedKey) {
+            const res = confirm("すでに鍵は開いています。再設定しますか？");
+            if (!res) return;
+        }
     }
 
-    // 環境に合わせて画面の説明文とヒントを書き換える
     const modal = document.getElementById("ai-unlock-modal");
     const instruction = modal.querySelector("p");
     const inputField = document.getElementById("ai-pass-input");
 
-    if (env.type === "android") {
-        instruction.innerHTML = `AI機能(アプリ版)をご利用いただくための確認です。<br>下の欄に合言葉「 <strong style="color:#d9534f; font-size:1.1em;">${env.pass}</strong> 」と入力してください。`;
-        inputField.placeholder = `ここに ${env.pass} と入力`;
-    } else {
-        instruction.innerHTML = `AI機能をご利用いただくための確認です。<br>下の欄に合言葉「 <strong style="color:#d9534f; font-size:1.1em;">${env.pass}</strong> 」と入力してください。`;
-        inputField.placeholder = `ここに ${env.pass} と入力`;
-    }
+    instruction.innerHTML = `AI機能をご利用いただくための確認です。<br>下の欄に合言葉「 <strong style="color:#d9534f; font-size:1.1em;">${env.pass}</strong> 」と入力してください。`;
+    inputField.placeholder = `ここに ${env.pass} と入力`;
+    inputField.value = ""; 
 
     modal.style.display = "block";
 }
@@ -2463,19 +2456,22 @@ function closeAiUnlock() {
     document.getElementById("ai-unlock-modal").style.display = "none";
 }
 
-// 3. 環境に応じた合言葉で解除し、適切な箱に保存する
+// 3. 解除ボタン：アプリ版なら案内して飛ばす
 function unlockAiWithPass() {
     const passInput = document.getElementById("ai-pass-input").value.trim();
-    const env = getAiEnvironment(); // 現在の環境設定を取得
+    const env = getAiEnvironment();
     
     if (passInput === env.pass) {
-        // 環境に応じたキーを組み立て、環境に応じた箱（storageName）に保存
-        localStorage.setItem(env.storageName, env.keyPart1 + env.keyPart2);
-        
-        const modeName = env.type === "android" ? "Androidアプリ版" : "Web版";
-        alert(`【${modeName}】のロックを解除しました。\n「今日のカード」からAI羅針盤をご利用いただけます。`);
-        
-        closeAiUnlock();
+        if (env.type === "android") {
+            // アプリ版なら正しいURLへ誘導
+            alert("アプリ版の制限を回避するため、AI羅針盤はWeb版(GitHub)で起動します。");
+            window.location.href = env.webUrl;
+        } else {
+            // Web版なら保存
+            localStorage.setItem(env.storageName, env.keyPart1 + env.keyPart2);
+            alert("Web版のロックを解除しました。\n「今日のカード」からAI羅針盤をご利用いただけます。");
+            closeAiUnlock();
+        }
     } else {
         alert("合言葉が違います。");
     }
@@ -2565,7 +2561,7 @@ function unlockAiWithPass() {
   </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 21.6 / Updated: 2026-03-16
+        © 2025 ettomio. All rights reserved. Version 21.8 / Updated: 2026-03-17
     </p>
     <div style="height: 50px;"></div>
 </body>
