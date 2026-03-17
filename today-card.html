@@ -3354,23 +3354,33 @@ function unlockAiWithPass() {
 }
 
 // ==========================================
-// 3. AI羅針盤の実行（通信）ロジック
+// 3. AI羅針盤の実行（通信）ロジック：完全版
 // ==========================================
 const AI_HISTORY_KEY = 'gemini_chat_history';
 
 async function runDialogueCompass(userMessage) {
-    // A. 環境からキーを読み出す
+    // A. 環境チェック：アプリ版(apk)ならGitHubへ飛ばす
     const env = getAiEnvironment();
-    const apiKey = localStorage.getItem(env.storageName);
-
-    if (!apiKey) {
-        const msg = "まずは、AI秘書の鍵を開けてください。";
-        nativeSpeak(msg);
-        showCustomAlert(msg);
+    if (env.type === "android") {
+        const confirmJump = confirm("アプリ版の制限を回避するため、AI羅針盤はWeb版(GitHub)で起動します。移動しますか？");
+        if (confirmJump) {
+            // ★URLを修正：直接「今日のカード」へジャンプさせます
+            window.location.href = "https://ettomio0518.github.io/my-calendar-app/today-card.html";
+        }
         return;
     }
 
-    // B. 画面の準備
+    // B. キーの読み出し（Web版の保存名 gemini_api_key で統一）
+    const apiKey = localStorage.getItem("gemini_api_key");
+
+    if (!apiKey) {
+        const msg = "まずは、AI秘書の鍵を開けてください。";
+        if (typeof nativeSpeak === 'function') nativeSpeak(msg);
+        alert(msg);
+        return;
+    }
+
+    // C. 画面の準備
     const chatContainer = document.getElementById('ai-interaction-container');
     if (chatContainer) {
         chatContainer.style.display = 'block';
@@ -3378,14 +3388,14 @@ async function runDialogueCompass(userMessage) {
         if (chatLabel) chatLabel.innerText = "💬 AI羅針盤へのメッセージ：";
     }
 
-    // C. データの収集
+    // D. データの収集
     const now = new Date();
     const todayStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`;
     const currentTime = now.toLocaleTimeString('ja-JP');
     const locationNode = document.getElementById("title");
     const location = locationNode ? locationNode.textContent.replace("の天気", "") : "現在地";
 
-    // D. 予定のスキャン
+    // E. 予定のスキャン
     let allSchedules = [];
     for (let i = 0; i <= 2; i++) {
         const d = new Date();
@@ -3399,14 +3409,14 @@ async function runDialogueCompass(userMessage) {
     }
     const scheduleSummary = allSchedules.length > 0 ? allSchedules.join("／") : "予定なし";
 
-    // E. 天気・暦（六曜などは現状のまま）
+    // F. 天気・暦（既存の表示から取得）
     const weatherContainer = document.getElementById("weather-container");
     const todayWeather = weatherContainer ? weatherContainer.innerText : "天気情報取得不可";
     const rokuyo = "友引"; 
     const moonPhase = "月齢 24.6"; 
     const lastQuarter = "3月11日"; 
 
-    // F. プロンプト作成
+    // G. プロンプト作成（AIへの指示書）
     const systemPrompt = `あなたは有能な秘書です。
 【現在の状況】今日は ${todayStr}（${rokuyo}）、山口県平生町。
 【月相】${moonPhase} （直近の下弦の月は ${lastQuarter} でした）。
@@ -3422,23 +3432,24 @@ async function runDialogueCompass(userMessage) {
     const contents = history.map(h => ({ role: h.role, parts: [{ text: h.text }] }));
     contents.push({ role: "user", parts: [{ text: systemPrompt + (userMessage || "挨拶") }] });
 
-    nativeSpeak("考え中です。少々お待ちください。");
+    if (typeof nativeSpeak === 'function') nativeSpeak("考え中です。少々お待ちください。");
 
-	try {
-	        // モデル名を「gemini-3-flash-preview」に戻し、URLを確実に組み立てます
-	        const modelName = "gemini-3-flash-preview"; 
-	        const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
+    try {
+        // ★今朝「喋った」時の設定を維持
+        const modelName = "gemini-3-flash-preview"; 
+        const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
 
-	        const response = await fetch(url, {
-	            method: 'POST',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify({ contents: contents })
-	        });
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: contents })
+        });
 
         const data = await response.json();
         
-        // エラー（キー制限等）のチェック
-        if (data.error) throw new Error(data.error.message);
+        if (data.error) {
+            throw new Error(data.error.message);
+        }
 
         let aiResponse = data.candidates[0].content.parts[0].text;
         aiResponse = aiResponse.replace(/[*#]/g, '');
@@ -3455,14 +3466,14 @@ async function runDialogueCompass(userMessage) {
             historyArea.style.display = 'block';
             historyArea.innerText = aiResponse;
         }
-        nativeSpeak(aiResponse);
+        if (typeof nativeSpeak === 'function') nativeSpeak(aiResponse);
 
     } catch (error) {
         console.error("APIエラー:", error);
-        nativeSpeak("通信に失敗しました。");
+        if (typeof nativeSpeak === 'function') nativeSpeak("通信に失敗しました。");
+        alert("通信に失敗しました。Web版の鍵が正しく開いているか確認してください。\n内容: " + error.message);
     }
 }
-
 
 // 送信ボタンが押された時の処理
 function handleAiChat() {
@@ -3618,7 +3629,7 @@ function startAiVoiceInput() {
 	</script>
 	
   <footer>
-    © 20260316 ettomio - 舞いカレンダー
+    © 20260317 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
