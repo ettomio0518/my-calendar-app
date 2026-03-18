@@ -3154,6 +3154,8 @@ function announceCompass() {
     } else {
         // キャンセル を押したとき
         runDialogueCompass(); // 関数名も対話（Dialogue）へ
+        // ★ここに追加！実行した直後に一番下までスクロールさせます
+        window.scrollTo(0, document.body.scrollHeight);
     }
 }
 
