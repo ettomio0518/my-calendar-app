@@ -2403,10 +2403,9 @@
     initializeState();
     
     
-// --- AI機能の解錠（合言葉方式） ---
-// --- AI機能の解錠（環境判別・自動切り替え方式） ---
+// --- AI機能の解錠（環境判別・自動切り替え方式：最終完全版） ---
 
-// A. 環境を判定する関数
+// A. 環境を判定する関数（一つのファイルでアプリかWebかを見分ける）
 function getAiEnvironment() {
     const isAndroidApp = window.location.href.includes("android_asset") || 
                          window.document.URL.includes("android_asset");
@@ -2414,9 +2413,8 @@ function getAiEnvironment() {
     if (isAndroidApp) {
         return {
             type: "android",
-            pass: "yamaguchi2026", 
-            // ★URLをハイフンありの正しいものに修正しました
-            webUrl: "https://ettomio0518.github.io/my-calendar-app/today-card.html" 
+            // ★確定したWeb版のアドレスをセットしました
+            webUrl: "https://ettomio0518.github.io/my-calendar-app/index.html" 
         };
     } else {
         return {
@@ -2429,15 +2427,24 @@ function getAiEnvironment() {
     }
 }
 
-// 1. 画面を開く（変更なし）
+// 1. 画面を開く（アプリ版ならスマートに誘導、Web版なら合言葉入力を表示）
 function openAiUnlock() {
     const env = getAiEnvironment();
-    if (env.type === "web") {
-        const savedKey = localStorage.getItem(env.storageName);
-        if (savedKey) {
-            const res = confirm("すでに鍵は開いています。再設定しますか？");
-            if (!res) return;
+
+    // 【アプリ版(apk)で実行された場合】
+    if (env.type === "android") {
+        const confirmJump = confirm("AI秘書の鍵を開ける設定を行います。\n安全な設定画面（Web版）へ移動してよろしいですか？");
+        if (confirmJump) {
+            window.location.href = env.webUrl;
         }
+        return; 
+    }
+
+    // 【Web版(GitHub)で実行された場合】
+    const savedKey = localStorage.getItem(env.storageName);
+    if (savedKey) {
+        const res = confirm("すでに鍵は開いています。再設定しますか？");
+        if (!res) return;
     }
 
     const modal = document.getElementById("ai-unlock-modal");
@@ -2451,31 +2458,27 @@ function openAiUnlock() {
     modal.style.display = "block";
 }
 
-// 2. 画面を閉じる（変更なし）
+// 2. 画面を閉じる
 function closeAiUnlock() {
     document.getElementById("ai-unlock-modal").style.display = "none";
 }
 
-// 3. 解除ボタン：アプリ版なら案内して飛ばす
+// 3. 解除ボタン
 function unlockAiWithPass() {
     const passInput = document.getElementById("ai-pass-input").value.trim();
     const env = getAiEnvironment();
     
-    if (passInput === env.pass) {
-        if (env.type === "android") {
-            // アプリ版なら正しいURLへ誘導
-            alert("アプリ版の制限を回避するため、AI羅針盤はWeb版(GitHub)で起動します。");
-            window.location.href = env.webUrl;
-        } else {
-            // Web版なら保存
+    if (env.type === "web") {
+        if (passInput === env.pass) {
             localStorage.setItem(env.storageName, env.keyPart1 + env.keyPart2);
-            alert("Web版のロックを解除しました。\n「今日のカード」からAI羅針盤をご利用いただけます。");
+            alert("Web版のロックを解除しました。\n設定を保存しました。");
             closeAiUnlock();
+        } else {
+            alert("合言葉が違います。");
         }
-    } else {
-        alert("合言葉が違います。");
     }
 }
+
      
     </script>
 
@@ -2561,7 +2564,7 @@ function unlockAiWithPass() {
   </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 21.9 / Updated: 2026-03-18
+        © 2025 ettomio. All rights reserved. Version 22.1 / Updated: 2026-03-20
     </p>
     <div style="height: 50px;"></div>
 </body>
