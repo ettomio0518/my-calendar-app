@@ -2976,7 +2976,7 @@ const rokuyoData = [
 	}
 
 
-	  // 12/29 追加
+	  // 走り書き 12/29 追加
 	function getTodayScribbling() {
 	  const now = new Date();
 	  const y = now.getFullYear();
@@ -3509,17 +3509,48 @@ function startAiVoiceInput() {
 	    handleStartupModal();          // モーダルを呼ぶ
 	}
 
-// --- 2. 天気取得を関数として独立させる ---
-function getWeather() {
-  // A. 天気アイコン・ラベル・背景クラスの定義（変更なし）
-  const iconOf = code => {
-    const map = {0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",61:"🌧️",71:"❄️",80:"🌧️",95:"⛈️",99:"⛈️"};
-    return map[code] || "🌫️";
-  };
-  const labelOf = code => {
-    const map = {0:"快晴",1:"晴れ",2:"晴れがち",3:"曇り",45:"霧",48:"霧",51:"にわか雨",61:"雨",71:"雪",80:"雨",95:"雷雨",99:"激しい雷雨"};
-    return map[code] || "不明";
-  };
+// --- 2. 天気取得・地域保存ルーチン（修正版） ---
+async function getWeather() {
+  const STORAGE_KEY = 'saved_location';
+  const savedData = localStorage.getItem(STORAGE_KEY);
+
+  // 【1】保存データがある場合
+  if (savedData) {
+    const location = JSON.parse(savedData);
+    if (confirm(`いつもの地域（${location.name}）を表示しますか？`)) {
+      updateWeather(location.lat, location.lon);
+      return;
+    }
+  }
+
+  // 【2】位置情報を取得する
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+
+    await updateWeather(lat, lon);
+
+    // 地名を取得して保存を確認
+    try {
+      const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+      const geoData = await geoRes.json();
+      const placeName = geoData.address.city || geoData.address.town || geoData.address.village || "現在地";
+
+      if (confirm(`この地域（${placeName}）を保存しますか？`)) {
+        const saveData = { lat: lat, lon: lon, name: placeName };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+        alert("地域を保存しました。");
+      }
+    } catch (e) { console.error(e); }
+  }, (err) => {
+    document.getElementById("title").textContent = "位置情報が取得できませんでした";
+  });
+}
+
+// --- 天気の表示処理（すべての表示項目を復元） ---
+async function updateWeather(lat, lon) {
+  const iconOf = code => ({0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",61:"🌧️",71:"❄️",80:"🌧️",95:"⛈️",99:"⛈️"}[code] || "🌫️");
+  const labelOf = code => ({0:"快晴",1:"晴れ",2:"晴れがち",3:"曇り",45:"霧",48:"霧",51:"にわか雨",61:"雨",71:"雪",80:"雨",95:"雷雨",99:"激しい雷雨"}[code] || "不明");
   const classOf = code => {
     if ([0,1].includes(code)) return "sunny";
     if ([2,3,45,48].includes(code)) return "cloudy";
@@ -3529,93 +3560,66 @@ function getWeather() {
     return "unknown";
   };
 
-  // B. メインの「天気取得と表示」の処理
-  const updateWeather = async (lat, lon) => {
-    try {
-      // 地名取得
-      const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
-      const geoData = await geoRes.json();
-      const placeName = geoData.address.city || geoData.address.town || geoData.address.village || "現在地";
-      document.getElementById("title").textContent = `${placeName}の天気`;
+  try {
+    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+    const geoData = await geoRes.json();
+    const placeName = geoData.address.city || geoData.address.town || geoData.address.village || "現在地";
+    document.getElementById("title").textContent = `${placeName}の天気`;
 
-      // Open-Meteoから今日の天気
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,sunrise,sunset&hourly=weathercode,relativehumidity_2m,precipitation_probability&timezone=Asia%2FTokyo`);
-      const data = await res.json();
-      const days = data.daily;
-      const hourly = data.hourly;
+    const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max,sunrise,sunset&hourly=weathercode,relativehumidity_2m,precipitation_probability&timezone=Asia%2FTokyo`);
+    const data = await res.json();
+    
+    const days = data.daily;
+    const hourly = data.hourly;
+    const code = days.weathercode[0];
+    const icon = iconOf(code);
+    const bg = classOf(code);
+    
+    // 計算ロジック（午前・午後）
+    const mode = arr => {
+      if (!arr.length) return null;
+      const freq = {};
+      arr.forEach(c => freq[c] = (freq[c] || 0) + 1);
+      return +Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
+    };
 
-      const date = new Date(days.time[0]);
-      const code = days.weathercode[0];
-      const icon = iconOf(code);
-      const bg = classOf(code);
-      const max = days.temperature_2m_max[0];
-      const min = days.temperature_2m_min[0];
-      const wind = days.windspeed_10m_max[0];
-      const sunrise = new Date(days.sunrise[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
-      const sunset = new Date(days.sunset[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+    const dayKey = days.time[0];
+    const indices = hourly.time.map((t, idx) => ({t, idx})).filter(o => o.t.startsWith(dayKey));
+    const morning = indices.filter(o => new Date(o.t).getHours() < 12);
+    const afternoon = indices.filter(o => new Date(o.t).getHours() >= 12);
 
-      const mode = arr => {
-        if (!arr.length) return null;
-        const freq = {};
-        arr.forEach(c => freq[c] = (freq[c] || 0) + 1);
-        return +Object.keys(freq).reduce((a, b) => freq[a] > freq[b] ? a : b);
-      };
+    const morningCode = mode(morning.map(o => hourly.weathercode[o.idx]));
+    const afternoonCode = mode(afternoon.map(o => hourly.weathercode[o.idx]));
+    const morningHum = morning.length ? Math.round(morning.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "--";
+    const afternoonHum = afternoon.length ? Math.round(afternoon.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "--";
+    const morningRain = morning.length ? Math.round(morning.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "--";
+    const afternoonRain = afternoon.length ? Math.round(afternoon.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "--";
 
-      const dayKey = days.time[0];
-      const indices = hourly.time.map((t, idx) => ({t, idx})).filter(o => o.t.startsWith(dayKey));
-      const morning = indices.filter(o => new Date(o.t).getHours() < 12);
-      const afternoon = indices.filter(o => new Date(o.t).getHours() >= 12);
+    const sunrise = new Date(days.sunrise[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
+    const sunset = new Date(days.sunset[0]).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"});
 
-      const morningCode = mode(morning.map(o => hourly.weathercode[o.idx]));
-      const afternoonCode = mode(afternoon.map(o => hourly.weathercode[o.idx]));
-      const morningLabel = morningCode !== null ? labelOf(morningCode) : "予報準備中";
-      const afternoonLabel = afternoonCode !== null ? labelOf(afternoonCode) : "予報準備中";
-
-      const morningHum = morning.length ? Math.round(morning.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
-      const afternoonHum = afternoon.length ? Math.round(afternoon.map(o => hourly.relativehumidity_2m[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
-
-      const morningRain = morning.length ? Math.round(morning.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/morning.length) : "予報準備中";
-      const afternoonRain = afternoon.length ? Math.round(afternoon.map(o => hourly.precipitation_probability[o.idx]).reduce((a,b)=>a+b,0)/afternoon.length) : "予報準備中";
-
-      const container = document.getElementById("weather-container");
-      container.innerHTML = ""; // 二重表示防止
-      const card = document.createElement("div");
-      card.className = `weather-card ${bg}`;
-      card.innerHTML = `
-        <div class="header">
-          <span class="date">${date.toLocaleDateString("ja-JP",{weekday:"short",month:"numeric",day:"numeric"})}</span>
-          <span class="icon">${icon}</span>
-        </div>
-        <div class="grid">
-          <p>午前: ${morningLabel}</p><p>午後: ${afternoonLabel}</p>
-          <p>最高: ${max}℃</p><p>最低: ${min}℃</p>
-          <p>湿度(前): ${morningHum}%</p><p>湿度(後): ${afternoonHum}%</p>
-          <p>降水(前): ${morningRain}%</p><p>降水(後): ${afternoonRain}%</p>
-          <p>風速: ${wind}m/s</p>
-          <p class="sun-row">日の出: ${sunrise} ／ 日没: ${sunset}</p>
-        </div>
-      `;
-      container.appendChild(card);
-    } catch (err) {
-      document.getElementById("title").textContent = "天気データの取得に失敗しました";
-    }
-  };
-
-  // C. 【重要】URLから「お土産」があるか確認して実行先を分ける
-  const params = new URLSearchParams(window.location.search);
-  const giftLat = params.get('lat');
-  const giftLon = params.get('lon');
-
-  if (giftLat && giftLon) {
-    // お土産がある（Web版として呼ばれた）なら、即実行！
-    updateWeather(giftLat, giftLon);
-  } else {
-    // お土産がない（アプリのassets版など）なら、今まで通りGPSを探す
-    navigator.geolocation.getCurrentPosition((pos) => {
-      updateWeather(pos.coords.latitude, pos.coords.longitude);
-    }, (err) => {
-      document.getElementById("title").textContent = "位置情報が取得できませんでした";
-    });
+    // HTMLの出力（画像通りの項目をすべて復元）
+    const container = document.getElementById("weather-container");
+    container.innerHTML = ""; 
+    const card = document.createElement("div");
+    card.className = `weather-card ${bg}`;
+    card.innerHTML = `
+      <div class="header">
+        <span class="date">${new Date(days.time[0]).toLocaleDateString("ja-JP",{weekday:"short",month:"numeric",day:"numeric"})}</span>
+        <span class="icon">${icon}</span>
+      </div>
+      <div class="grid">
+        <p>午前: ${labelOf(morningCode)}</p><p>午後: ${labelOf(afternoonCode)}</p>
+        <p>最高: ${days.temperature_2m_max[0]}℃</p><p>最低: ${days.temperature_2m_min[0]}℃</p>
+        <p>湿度(前): ${morningHum}%</p><p>湿度(後): ${afternoonHum}%</p>
+        <p>降水(前): ${morningRain}%</p><p>降水(後): ${afternoonRain}%</p>
+        <p>風速: ${days.windspeed_10m_max[0]}m/s</p>
+        <p class="sun-row" style="grid-column: span 2; text-align: center; margin-top: 5px;">日の出: ${sunrise} ／ 日没: ${sunset}</p>
+      </div>
+    `;
+    container.appendChild(card);
+  } catch (err) {
+    document.getElementById("title").textContent = "天気データの取得に失敗しました";
   }
 }
 
@@ -3645,10 +3649,11 @@ function getWeather() {
 
 	// --- 4. 最後にたった1行、この命令だけを書く ---
 	document.addEventListener("DOMContentLoaded", init);
+	
 	</script>
 	
   <footer>
-    © 20260318 ettomio - 舞いカレンダー
+    © 20260319 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
