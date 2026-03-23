@@ -3483,22 +3483,27 @@ async function runDialogueCompass(userMessage) {
     }
     const scheduleSummary = allSchedules.length > 0 ? allSchedules.join("／") : "予定なし";
 
-    // 【軽量化】今日から90日分だけのデータをAIに渡す
-    const nearData = holidaysData.filter(item => {
+    // 【軽量化】今日から90日分の「行事」と「六曜」を個別に抽出
+    const filter90Days = (data) => data.filter(item => {
         const d = new Date(item[0].split(' ')[0]);
         const diff = (d - now) / (1000 * 60 * 60 * 24);
         return diff >= -1 && diff <= 90;
     });
 
+    const nearHolidays = filter90Days(holidaysData);
+    const nearRokuyo = filter90Days(rokuyoData);
+
 const systemPrompt = `あなたはデータ照合マシンです。
 【鉄の掟】
-1. 挨拶、前置き、場所、天気の案内は【永久に禁止】。
-2. 記号（**や##）は含めない。人名には「さん」を付ける。
-3. ユーザーからの質問がある場合：
-   - 六曜・月相・二十四節気の質問なら、提供された【行事データ】から該当する日付と内容のみを即答せよ。
-   - それ以外の一般の質問なら、データを見に行かず自身の知識で迅速に「です・ます」で答えよ。
-   - いずれの場合も【本日の事実】は無視し、回答のみを返せ。
-4. 入力がない場合（初回起動時）のみ、以下の【本日の事実】を簡潔に述べよ。
+1. 挨拶、前置き、案内は【永久に禁止】。記号（**や##）は含めない。
+2. ユーザーの質問に対し：
+   - 「です・ます」調の丁寧な日本語で答えよ。
+   - 六曜の質問なら【六曜データ】から該当日の内容を即答せよ。
+   - 行事・月相・節気の質問なら【行事データ】から該当日の内容を即答せよ。
+   - それ以外の一般質問ならデータを見ず、自身の知識で迅速に答えよ。
+   - 質問回答時は【本日の事実】を無視し、回答のみを返せ。
+3. データにない日付（90日以降など）を聞かれたら「その日付のデータは現在読み込まれていません」と答えよ。
+4. 入力がない場合のみ【本日の事実】を簡潔に述べよ。
 5. 満月は「まんげつ」と読む。月齢などの数値データは不要。
 
 【本日の事実】
@@ -3506,11 +3511,13 @@ const systemPrompt = `あなたはデータ照合マシンです。
 ・行事: ${todayEvent}
 ・予定: ${scheduleSummary}
 
-【行事データ】
-${JSON.stringify(nearData)}`;
+【六曜データ（90日分）】
+${JSON.stringify(nearRokuyo)}
+
+【行事データ（90日分）】
+${JSON.stringify(nearHolidays)}`;
 
     try {
-        // ★昨日つながったモデル名を一文字も変えず使用
         const modelName = "gemini-3-flash-preview"; 
         const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
 
