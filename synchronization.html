@@ -5,16 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>データ同期ツール (Web版) - My Calendar App</title>
     <style>
-        body { font-family: sans-serif; background-color: #fce4ec; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        h2 { font-size: 1.5rem; color: #000; text-align: center; margin-bottom: 20px; }
-        .instruction { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; width: 100%; max-width: 400px; font-size: 0.9rem; line-height: 1.5; }
-        textarea { width: 100%; max-width: 400px; height: 150px; margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 0.8rem; box-sizing: border-box; }
-        .btn { width: 100%; max-width: 400px; padding: 15px; margin-bottom: 15px; border: none; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px #999; transition: 0.1s; }
-        .btn:active { box-shadow: 0 0 #999; transform: translateY(4px); }
-        .btn-yellow { background-color: #ffc107; color: black; }
-        .btn-green { background-color: #28a745; color: white; }
-        .btn-gray { background-color: #6c757d; color: white; }
-        #status-msg { margin-bottom: 15px; font-weight: bold; text-align: center; }
+        body {
+            font-family: sans-serif;
+            background-color: #fce4ec;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 {
+            font-size: 1.5rem;
+            color: #000;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .instruction {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        textarea {
+            width: 100%;
+            max-width: 400px;
+            height: 150px;
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            box-sizing: border-box;
+        }
+        .btn {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px #999;
+            transition: 0.1s;
+        }
+        .btn:active {
+            box-shadow: 0 0 #999;
+            transform: translateY(4px);
+        }
+        .btn-yellow {
+            background-color: #ffc107;
+            color: black;
+        }
+        .btn-green {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-gray {
+            background-color: #6c757d;
+            color: white;
+        }
+        #status-msg {
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +108,7 @@
                 const text = await navigator.clipboard.readText();
                 if (text) {
                     dataArea.value = text;
-                    statusMsg.innerText = "貼り付け完了。内容を確認してください。";
+                    statusMsg.innerText = "貼り付け完了。";
                     statusMsg.style.color = "#007bff";
                 }
             } catch (err) {
@@ -56,16 +119,12 @@
         function syncToWeb() {
             const jsonText = dataArea.value.trim();
             if (!jsonText) return;
-
             try {
                 const jsonData = JSON.parse(jsonText);
-                
-                // 全てのキーと値をループしてLocalStorageに展開
                 Object.keys(jsonData).forEach(key => {
                     localStorage.setItem(key, jsonData[key]);
                 });
-                
-                statusMsg.innerText = "同期が成功しました。";
+                statusMsg.innerText = "同期成功！";
                 statusMsg.style.color = "#28a745";
                 alert("Web版のデータを更新しました。");
             } catch (e) {
@@ -73,9 +132,9 @@
             }
         }
 
-        // 確実に index.html へ遷移させる
+        // 履歴を2段階戻る（Web同期ツール ➔ 抽出画面 ➔ メイン画面）
         function goBackToApp() {
-            location.href = "index.html";
+            window.history.go(-2);
         }
     </script>
 </body>
