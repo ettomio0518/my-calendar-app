@@ -2145,6 +2145,15 @@
         (ドメイン制限により安全に保護されています)
     </p>
 </div>
+
+
+<div style="text-align:center; margin-bottom:15px;">
+    <button onclick="handleSyncClick()" style="padding:12px 20px; border-radius:10px; border:2px solid #5daab0; background:#e0f2f1; color:#00796b; cursor:pointer; font-weight:bold; width:90%; max-width:300px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        🔄 Web版へ送るデータ抽出
+    </button>
+    <p style="font-size:11px; color:#666; margin-top:5px;">※アプリのデータをWeb版へ送ります</p>
+</div>
+
 		
 	    <h3>天気予報</h3>
 	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
@@ -2563,8 +2572,21 @@ function unlockAiWithPass() {
 	    
   </script>
 
+<script>
+    function handleSyncClick() {
+        // 現在の場所が GitHub（ettomio0518.github.io）かどうかを判定
+        if (window.location.hostname === "ettomio0518.github.io") {
+            // GitHub上の場合は警告を出して何もしない
+            alert("アプリ版のみ有効です。");
+        } else {
+            // アプリ版（ローカル環境）の場合は抽出画面へ移動
+            location.href = 'extraction.html';
+        }
+    }
+</script>
+
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 22.3 / Updated: 2026-03-23
+        © 2025 ettomio. All rights reserved. Version 22.5 / Updated: 2026-03-25
     </p>
     <div style="height: 50px;"></div>
 </body>
