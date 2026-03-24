@@ -131,12 +131,18 @@
         function syncToWeb() {
             const jsonText = dataArea.value.trim();
             if (!jsonText) return;
+
             try {
                 const jsonData = JSON.parse(jsonText);
+                
+                // 一旦すべて消去して、アプリの状態を完全に再現する
+                localStorage.clear();
+                
                 Object.keys(jsonData).forEach(key => {
                     localStorage.setItem(key, jsonData[key]);
                 });
-                statusMsg.innerText = "同期成功！Web版が更新されました。";
+                
+                statusMsg.innerText = "同期成功！アプリと完全に一致しました。";
                 statusMsg.style.color = "#28a745";
                 alert("Web版のデータを更新しました。");
             } catch (e) {
@@ -146,4 +152,3 @@
     </script>
 </body>
 </html>
-
