@@ -69,14 +69,22 @@
             background-color: #28a745;
             color: white;
         }
-        .btn-gray {
-            background-color: #6c757d;
-            color: white;
-        }
         #status-msg {
             margin-bottom: 15px;
             font-weight: bold;
             text-align: center;
+        }
+        .back-guide {
+            margin-top: 30px;
+            padding: 15px;
+            background: #eee;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            color: #555;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -88,7 +96,7 @@
         <strong>操作手順：</strong><br>
         1. 「クリップボードから貼り付け」を押す<br>
         2. データが表示されたら「アプリから同期実行」を押す<br>
-        3. 完了後、「アプリ版に戻る」ボタンで戻る
+        3. 同期完了後、スマホの「戻る」ボタンでアプリへ戻る
     </div>
 
     <div id="status-msg"></div>
@@ -97,7 +105,11 @@
     <button class="btn btn-yellow" onclick="pasteData()">① クリップボードから貼り付け</button>
     <button class="btn btn-green" onclick="syncToWeb()">② アプリから同期実行</button>
 
-    <button class="btn btn-gray" onclick="goBackToApp()">アプリ版(index.html)に戻る</button>
+    <div class="back-guide">
+        同期が終わりましたら、<br>
+        <strong>スマホ本体の「戻る」ボタン</strong>を押し、<br>
+        アプリの画面へ戻ってください。
+    </div>
 
     <script>
         const dataArea = document.getElementById('data-area');
@@ -124,18 +136,14 @@
                 Object.keys(jsonData).forEach(key => {
                     localStorage.setItem(key, jsonData[key]);
                 });
-                statusMsg.innerText = "同期成功！";
+                statusMsg.innerText = "同期成功！Web版が更新されました。";
                 statusMsg.style.color = "#28a745";
                 alert("Web版のデータを更新しました。");
             } catch (e) {
                 alert("データの形式が正しくありません。");
             }
         }
-
-        // 履歴を2段階戻る（Web同期ツール ➔ 抽出画面 ➔ メイン画面）
-        function goBackToApp() {
-            window.history.go(-2);
-        }
     </script>
 </body>
 </html>
+
