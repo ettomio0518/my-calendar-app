@@ -5,71 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>データ同期ツール (Web版) - My Calendar App</title>
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #fce4ec; /* Web版と識別しやすいよう淡いピンク系 */
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        h2 {
-            font-size: 1.5rem;
-            color: #000;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .instruction {
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 400px;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-        textarea {
-            width: 100%;
-            max-width: 400px;
-            height: 150px;
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.8rem;
-            box-sizing: border-box;
-        }
-        .btn {
-            width: 100%;
-            max-width: 400px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px #999;
-            transition: 0.1s;
-        }
-        .btn:active {
-            box-shadow: 0 0 #999;
-            transform: translateY(4px);
-        }
+        /* CSSスタイルは維持 */
+        body { font-family: sans-serif; background-color: #fce4ec; color: #333; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h2 { font-size: 1.5rem; color: #000; text-align: center; margin-bottom: 20px; }
+        .instruction { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; width: 100%; max-width: 400px; font-size: 0.9rem; line-height: 1.5; }
+        textarea { width: 100%; max-width: 400px; height: 150px; margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; font-size: 0.8rem; box-sizing: border-box; }
+        .btn { width: 100%; max-width: 400px; padding: 15px; margin-bottom: 15px; border: none; border-radius: 30px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px #999; transition: 0.1s; }
+        .btn:active { box-shadow: 0 0 #999; transform: translateY(4px); }
         .btn-yellow { background-color: #ffc107; color: black; }
         .btn-green { background-color: #28a745; color: white; }
         .btn-gray { background-color: #6c757d; color: white; }
-
-        #status-msg {
-            margin-bottom: 15px;
-            font-weight: bold;
-            text-align: center;
-        }
+        #status-msg { margin-bottom: 15px; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
@@ -84,21 +30,16 @@
     </div>
 
     <div id="status-msg"></div>
-
     <textarea id="data-area" placeholder="ここにアプリのデータが貼り付けられます"></textarea>
 
     <button class="btn btn-yellow" onclick="pasteData()">① クリップボードから貼り付け</button>
-    
     <button class="btn btn-green" onclick="syncToWeb()">② アプリから同期実行</button>
-
     <button class="btn btn-gray" onclick="goBackToApp()">アプリ版に戻る</button>
 
     <script>
-        const STORAGE_KEY = 'holidaysData';
         const dataArea = document.getElementById('data-area');
         const statusMsg = document.getElementById('status-msg');
 
-        // 1. クリップボードからテキストを取得
         async function pasteData() {
             try {
                 const text = await navigator.clipboard.readText();
@@ -106,48 +47,34 @@
                     dataArea.value = text;
                     statusMsg.innerText = "貼り付け完了。内容を確認してください。";
                     statusMsg.style.color = "#007bff";
-                } else {
-                    statusMsg.innerText = "クリップボードが空、または許可がありません。";
                 }
             } catch (err) {
                 alert("自動貼り付けに失敗しました。枠内を長押しして『貼り付け』してください。");
             }
         }
 
-        // 2. Web版のLocalStorageを上書き更新
         function syncToWeb() {
             const jsonText = dataArea.value.trim();
-            if (!jsonText) {
-                alert("貼り付けるデータがありません。");
-                return;
-            }
+            if (!jsonText) return;
 
             try {
-                // 正しいJSON形式かチェック
-                JSON.parse(jsonText);
+                const jsonData = JSON.parse(jsonText);
                 
-                // 上書き保存
-                localStorage.setItem(STORAGE_KEY, jsonText);
+                // 全てのキーと値をループしてLocalStorageに復元
+                Object.keys(jsonData).forEach(key => {
+                    localStorage.setItem(key, jsonData[key]);
+                });
                 
                 statusMsg.innerText = "同期が成功しました！Web版が最新です。";
                 statusMsg.style.color = "#28a745";
                 alert("Web版のデータを更新しました。");
             } catch (e) {
-                alert("データの形式が正しくありません。コピーをやり直してください。");
-                statusMsg.innerText = "エラー: 正しいデータではありません。";
-                statusMsg.style.color = "#d9534f";
+                alert("データの形式が正しくありません。");
             }
         }
 
-        // 3. アプリ版へ戻る
         function goBackToApp() {
-            // 履歴があれば戻り、なければ自前で指定する（念のための対策）
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                // アプリ側のURL（ローカルパスは環境によるため、基本はbackで戻る）
-                alert("履歴が見つかりません。アプリの画面から再度開いてください。");
-            }
+            window.history.back();
         }
     </script>
 </body>
