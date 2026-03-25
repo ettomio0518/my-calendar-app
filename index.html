@@ -2573,13 +2573,22 @@ function unlockAiWithPass() {
   </script>
 
 <script>
-    function handleSyncClick() {
-        // 現在の場所が GitHub（ettomio0518.github.io）かどうかを判定
+    // 1. ページ読み込み時に「色」をチェックして変える
+    window.addEventListener('DOMContentLoaded', function() {
         if (window.location.hostname === "ettomio0518.github.io") {
-            // GitHub上の場合は警告を出して何もしない
+            const headerElement = document.querySelector('header');
+            if (headerElement) {
+                // GitHub版なら背景色を上書き
+                headerElement.style.background = "#baba74";
+            }
+        }
+    });
+
+    // 2. ボタンクリック時に「動作」をチェックして制限する
+    function handleSyncClick() {
+        if (window.location.hostname === "ettomio0518.github.io") {
             alert("アプリ版のみ有効です。");
         } else {
-            // アプリ版（ローカル環境）の場合は抽出画面へ移動
             location.href = 'extraction.html';
         }
     }
