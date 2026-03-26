@@ -2147,11 +2147,16 @@
 </div>
 
 
-<div style="text-align:center; margin-bottom:15px;">
-    <button onclick="handleSyncClick()" style="padding:12px 20px; border-radius:10px; border:2px solid #5daab0; background:#e0f2f1; color:#00796b; cursor:pointer; font-weight:bold; width:90%; max-width:300px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+<div id="sync-section" style="text-align:center; margin-bottom:20px; padding:10px; border:1px solid #eee; border-radius:15px; background:#fafafa;">
+    
+    <button onclick="handleSyncClick()" id="syncBtn" style="padding:15px 20px; border-radius:10px; border:2px solid #5daab0; background:#e0f2f1; color:#00796b; cursor:pointer; font-weight:bold; width:90%; max-width:320px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom:12px; display:inline-block;">
         🔄 Web版へ送るデータ抽出
     </button>
-    <p style="font-size:11px; color:#666; margin-top:5px;">※アプリのデータをWeb版へ送ります</p>
+    
+    <button onclick="handleImportClick()" id="importBtn" style="padding:15px 20px; border-radius:10px; border:2px solid #f44336; background:#ffebee; color:#c62828; cursor:pointer; font-weight:bold; width:90%; max-width:320px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display:inline-block;">
+        📥 Web版のデータを取り込む
+    </button>
+
 </div>
 
 		
@@ -2573,29 +2578,56 @@ function unlockAiWithPass() {
   </script>
 
 <script>
-    // 1. ページ読み込み時に「色」をチェックして変える
     window.addEventListener('DOMContentLoaded', function() {
-        if (window.location.hostname === "ettomio0518.github.io") {
-            const headerElement = document.querySelector('header');
-            if (headerElement) {
-                // GitHub版なら背景色を上書き
-                headerElement.style.background = "#baba74";
+        const hostname = window.location.hostname;
+        const syncBtn = document.getElementById('syncBtn');
+        const importBtn = document.getElementById('importBtn');
+        const headerElement = document.querySelector('header');
+
+        if (hostname === "ettomio0518.github.io") {
+            // GitHub版：ヘッダー色変更
+            if (headerElement) headerElement.style.background = "#baba74";
+
+            // GitHub版：抽出ボタンの文字を「アプリへ戻す」に変更
+            if (syncBtn) syncBtn.innerHTML = "🔄 アプリ版へ戻すデータ抽出";
+
+            // GitHub版：取込ボタンを無効化（アプリ専用であることを明示）
+            if (importBtn) {
+                importBtn.innerHTML = "🚫 取り込み（アプリ専用）";
+                importBtn.style.opacity = "0.5";
+                importBtn.style.cursor = "not-allowed";
+                importBtn.style.background = "#eee";
+                importBtn.style.color = "#999";
+                importBtn.style.border = "2px solid #ccc";
             }
         }
     });
 
-    // 2. ボタンクリック時に「動作」をチェックして制限する
     function handleSyncClick() {
         if (window.location.hostname === "ettomio0518.github.io") {
-            alert("アプリ版のみ有効です。");
+            location.href = 'reverse_sync_guide.html';
         } else {
             location.href = 'extraction.html';
         }
     }
+
+    function handleImportClick() {
+        if (window.location.hostname === "ettomio0518.github.io") {
+            alert("この機能はアプリ版専用です。\nスマホアプリを起動して操作してください。");
+        } else {
+            const isReady = confirm(
+                "【同期の確認】\n先にWeb版（GitHub）で「データ抽出」と「コピー」は完了していますか？\n\nOKを押すと、貼り付け画面へ進みます。"
+            );
+            if (isReady) {
+                location.href = 'import.html';
+            }
+        }
+    }
 </script>
 
+
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 22.5 / Updated: 2026-03-25
+        © 2025 ettomio. All rights reserved. Version 22.6 / Updated: 2026-03-26
     </p>
     <div style="height: 50px;"></div>
 </body>
