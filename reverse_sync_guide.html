@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アプリ版へ戻す同期ガイド</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            color: #baba74; /* GitHub版のテーマカラー */
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .guide-box {
+            background: #fffef0;
+            border: 1px solid #e6e6af;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .guide-box b {
+            color: #d32f2f;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            font-family: monospace;
+            box-sizing: border-box;
+        }
+
+        .btn-group {
+            text-align: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            transition: 0.3s;
+        }
+
+        .extract-btn {
+            background-color: #baba74;
+            color: white;
+        }
+
+        .copy-btn {
+            background-color: #5daab0;
+            color: white;
+        }
+
+        .back-btn {
+            background-color: #9e9e9e;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🔄 アプリへの同期ガイド</h2>
+
+    <div class="guide-box">
+        <b>【手順】</b><br>
+        1. 下の「データ抽出」ボタンを押します。<br>
+        2. 表示された内容を「コピー」します。<br>
+        3. スマホの<b>アプリ版カレンダー</b>を起動します。<br>
+        4. 設定（またはインポート）画面で貼り付けて保存してください。
+    </div>
+
+    <textarea id="jsonOutput" placeholder="ここにデータが書き出されます..."></textarea>
+
+    <div class="btn-group">
+        <button class="extract-btn" onclick="extractData()">① データを抽出する</button>
+        <button class="copy-btn" onclick="copyData()">② コピーする</button>
+    </div>
+
+    <div style="margin-top: 30px; text-align: center;">
+        <a href="index.html" class="back-btn">← 戻る</a>
+    </div>
+</div>
+
+<script>
+    // データをLocalStorageから抽出する関数
+    function extractData() {
+        const allData = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            allData[key] = localStorage.getItem(key);
+        }
+        
+        const jsonStr = JSON.stringify(allData, null, 2);
+        document.getElementById('jsonOutput').value = jsonStr;
+        
+        if (jsonStr === "{}") {
+            alert("データが見つかりませんでした。");
+        }
+    }
+
+    // 抽出されたテキストをクリップボードにコピーする関数
+    function copyData() {
+        const textarea = document.getElementById('jsonOutput');
+        textarea.select();
+        document.execCommand('copy');
+        alert("コピーしました！アプリ版に貼り付けてください。");
+    }
+</script>
+
+</body>
+</html>
