@@ -2611,23 +2611,29 @@ function unlockAiWithPass() {
         }
     }
 
-    function handleImportClick() {
+function handleImportClick() {
+        // hostname は中本さんの環境に合わせて適宜修正してください
         if (window.location.hostname === "ettomio0518.github.io") {
             alert("この機能はアプリ版専用です。\nスマホアプリを起動して操作してください。");
         } else {
             const isReady = confirm(
-                "【同期の確認】\n先にWeb版（GitHub）で「データ抽出」と「コピー」は完了していますか？\n\nOKを押すと、貼り付け画面へ進みます。"
+                "【同期の確認】\nWeb版（GitHub）で「データの抽出」と「コピー」は完了していますか？\n\n[OK] 貼り付け画面（import.html）へ進む\n[キャンセル] Web版を開いてコピーしに行く"
             );
+            
             if (isReady) {
                 location.href = 'import.html';
+            } else {
+                // キャンセル：ブラウザを起動して抽出画面へ
+                location.href = 'https://ettomio0518.github.io/my-calendar-app/reverse_sync_guide.html';
             }
         }
     }
+    
 </script>
 
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 22.6 / Updated: 2026-03-26
+        © 2025 ettomio. All rights reserved. Version 22.7 / Updated: 2026-03-28
     </p>
     <div style="height: 50px;"></div>
 </body>
