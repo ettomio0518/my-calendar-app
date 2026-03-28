@@ -229,64 +229,39 @@ footer {
     100% { opacity: 1; }
 }
 
-/* ===============================
-   AI羅針盤（スマホ対応）
-   =============================== */
-/* 横幅が狭い画面（スマホなど）向けの調整 */
+/* AI羅針盤（スマホ横幅最適化） */
 @media screen and (max-width: 480px) {
-    /* メッセージエリア全体 */
     #ai-interaction-container {
-        margin: 15px; /* 余白を少し詰める */
-        padding: 10px;
+        margin: 10px; /* 外側の余白を最小限に */
+        padding: 10px; /* 内側の余白を詰める */
     }
 
-    /* メッセージエリアのタイトル */
-    #ai-interaction-container p {
-        font-size: 0.8em; /* 文字を少し小さく */
-        margin-bottom: 8px;
+    /* フレックスコンテナの調整 */
+    #ai-interaction-container > div {
+        display: flex;
+        align-items: center; /* 垂直方向を中央に */
+        gap: 5px; /* 要素間の隙間を最小限に */
     }
 
-    /* 入力エリアを囲むdivを縦並び（flex-direction: column）にする */
-    #ai-interaction-container > div[style*="display: flex"] {
-        flex-direction: column;
-        gap: 12px; /* 縦の隙間を広げる */
-    }
-
-    /* 入力欄（「何かお手伝いしますか？」） */
+    /* 入力欄：他の要素の幅を引いた残り全幅を使う */
     #ai-user-input {
-        width: 100%; /* 横幅いっぱい */
-        box-sizing: border-box; /* パディングを含めて100% */
-        font-size: 15px;
+        flex: 1; 
+        min-width: 0; /* 横幅が突き抜けるのを防ぐ */
+        padding: 8px;
+        font-size: 14px;
     }
 
-    /* マイクボタンと送信ボタンを並べるエリア */
-    /* これらを横並びにするための追加クラス */
+    /* ボタン類：幅を固定せず内容に合わせる */
     #ai-button-group {
         display: flex;
-        gap: 10px;
-        width: 100%;
+        gap: 5px;
+        flex-shrink: 0; /* ボタンが潰れないように固定 */
     }
 
-    /* マイクボタン（🎤）と送信ボタンの共通設定 */
-    #ai-interaction-container button {
-        height: 44px; /* タップしやすい高さ */
-        flex: 1; /* 横幅を均等に */
-        border-radius: 8px;
-    }
-
-    /* マイクボタン（🎤） */
-    #ai-interaction-container button[onclick*="startAiVoiceInput"] {
-        background: #fdfcf7; /* 背景色（和風） */
-        border: 1px solid #c8c2b4;
-        font-size: 1.3rem; /* アイコンを大きく */
-    }
-
-    /* 送信ボタン */
-    #ai-interaction-container button[onclick*="handleAiChat"] {
-        background: #5daab0; /* 濃い浅葱色 */
-        color: white;
-        font-size: 16px;
-        border: none;
+    #ai-button-group button {
+        padding: 8px 10px;
+        font-size: 14px;
+        white-space: nowrap; /* テキストの改行を防ぐ */
     }
 }
 	
@@ -307,12 +282,16 @@ footer {
 <main id="converter-root">
     </main>
 
-<div style="display: flex; gap: 8px;">
-    <input type="text" id="ai-user-input" placeholder="何かお手伝いしますか？" style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-size: 16px;">
-    <div id="ai-button-group">
-        <button onclick="startAiVoiceInput()" style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 10px; padding: 5px 10px; font-size: 1.2rem;">🎤</button>
-        <button onclick="handleAiChat()" style="background: #5daab0; color: white; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold;">送信</button>
+<div id="ai-interaction-container" style="display:none;">
+    <p style="margin: 0 0 8px 0; font-weight: bold; color: #333; font-size: 0.85em;">💬 AI秘書へのメッセージ：</p>
+    <div style="display: flex; gap: 5px; align-items: center;">
+        <input type="text" id="ai-user-input" placeholder="何かお手伝いしますか？" style="border-radius: 10px; border: 1px solid #ccc;">
+        <div id="ai-button-group" style="display: flex; gap: 5px;">
+            <button onclick="startAiVoiceInput()" style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 10px;">🎤</button>
+            <button onclick="handleAiChat()" style="background: #5daab0; color: white; border: none; border-radius: 10px; font-weight: bold;">送信</button>
+        </div>
     </div>
+    <div id="ai-chat-history" style="display: none;"></div>
 </div>
 
 <script>
