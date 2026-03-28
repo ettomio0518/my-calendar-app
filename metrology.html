@@ -501,20 +501,22 @@ window.addEventListener("load", showCalcButtonOnScroll);
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. GitHub版の判定と背景色変更
+    // 1. GitHub版なら背景色を変える
     if (window.location.hostname.includes('github.io')) {
         document.body.classList.add('github-version');
     }
 
-    // 2. 重複ヘッダーの削除（後から動的に追加されるものへの対策）
-    const headers = document.querySelectorAll('.wf-header');
-    if (headers.length > 1) {
-        // 2つ目以降のヘッダーを削除する
-        for (let i = 1; i < headers.length; i++) {
-            headers[i].style.display = 'none';
+    // 2. ★追加：もしURLに「?mode=ai」が付いていれば、最初からAI羅針盤を表示する
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'ai') {
+        const container = document.getElementById('ai-interaction-container');
+        if (container) {
+            container.style.display = 'block';
+            container.scrollIntoView({ behavior: 'smooth' });
         }
     }
 });
+
 
 function announceCompass() {
     // 1. 現在の環境を判定
@@ -534,7 +536,8 @@ function announceCompass() {
     } else {
         // ローカル版の場合：GitHub版へ移動するか確認
         if (confirm("AI羅針盤（GitHub Web版）へ移動しますか？")) {
-            window.location.href = 'https://ettomio0518.github.io/my-calendar-app/metrology.html';
+           window.location.href = 'https://ettomio0518.github.io/my-calendar-app/metrology.html?mode=ai';
+
         }
     }
 }
