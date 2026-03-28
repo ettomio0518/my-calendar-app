@@ -3223,14 +3223,14 @@ function announceCompass() {
 
     if (isAndroidApp) {
         if (confirm("【AI羅針盤】\nアプリ版では制限があるため、Web版(GitHub)へ移動しますか？")) {
-            // ここでWeb版のアドレスに飛ばす
-            location.href = 'https://ettomio0518.github.io/my-calendar-app/today-card.html'; 
+            // ★末尾に「?mode=ai」を付け加えることで、移動先で自動起動させます
+            location.href = 'https://ettomio0518.github.io/my-calendar-app/today-card.html?mode=ai'; 
             return;
         }
         return;
     }
 
-    // 以下はWeb版で実行された時のみ動く（今朝喋ったロジックを維持）
+    // 以下はWeb版で直接ボタンを押した時の挙動
     const mode = confirm("【AI羅針盤】\n\n「OK」：【簡潔】（要点を音声報告）\n「キャンセル」：【対話】（AIと相談・チャット形式）");
 
     if (mode) {
@@ -3240,6 +3240,25 @@ function announceCompass() {
         window.scrollTo(0, document.body.scrollHeight);
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. GitHub版なら背景色を変える
+    if (window.location.hostname.includes('github.io')) {
+        document.body.classList.add('github-version');
+    }
+
+    // 2. ★自動起動：URLに「?mode=ai」が付いていれば、最初から対話パネルを表示する
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'ai') {
+        const container = document.getElementById('ai-interaction-container');
+        if (container) {
+            container.style.display = 'block';
+            // 対話形式（runDialogueCompassの役割）を自動で呼び出すか、
+            // 単にパネルを表示して最下部へスクロールさせます
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+});
 
 // --- 二十四節気を計算する装置 (恒久版) ---
 function get24Sekki(date) {
@@ -3734,7 +3753,7 @@ async function updateWeather(lat, lon) {
 </script>	
 	
   <footer>
-    © 20260325 ettomio - 舞いカレンダー
+    © 20260328 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
