@@ -3739,21 +3739,38 @@ async function updateWeather(lat, lon) {
 	</script>
 	
 <script>
-    // ページが読み込まれたら実行
+    // ページが完全に読み込まれたら実行
     window.addEventListener('DOMContentLoaded', function() {
-        // GitHub上で開いているか判定
+        // 1. GitHub版の背景色判定
         if (window.location.hostname === "ettomio0518.github.io") {
-            // 背景色を #cdcd9a（黄土色系）に変更
             const body = document.querySelector('body');
             if (body) {
                 body.style.background = "#cdcd9a";
             }
         }
+
+        // 2. ★自動起動の修正（800ミリ秒の「間」を置く）
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'ai') {
+            setTimeout(() => {
+                const container = document.getElementById('ai-interaction-container');
+                if (container) {
+                    // パネルを表示
+                    container.style.display = 'block';
+                    container.scrollIntoView({ behavior: 'smooth' });
+
+                    // 3. AIに「考え中です...」と喋り出させる（重要！）
+                    if (typeof announceCompass === "function") {
+                        announceCompass(); 
+                    }
+                }
+            }, 800); // 0.8秒待ってから実行
+        }
     });
-</script>	
+</script>
 	
   <footer>
-    © 20260328 ettomio - 舞いカレンダー
+    © 20260329 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
