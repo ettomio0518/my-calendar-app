@@ -3217,18 +3217,18 @@ const rokuyoData = [
 
 // --- 🧭 AI羅針盤：入り口 ---
 function announceCompass() {
-    // 【最優先：アプリ版（android_asset）ならGitHub版へ飛ばす】
     const isAndroidApp = window.location.href.includes("android_asset") || 
                          window.document.URL.includes("android_asset");
 
     if (isAndroidApp) {
         if (confirm("【AI羅針盤】\nアプリ版では制限があるため、Web版(GitHub)へ移動しますか？")) {
-            // ★末尾に「?mode=ai」を付け加えることで、移動先で自動起動させます
-            location.href = 'https://ettomio0518.github.io/my-calendar-app/today-card.html?mode=ai'; 
+            // ★ ?mode=ai を削除した、元のシンプルなアドレスに戻します
+            location.href = 'https://ettomio0518.github.io/my-calendar-app/today-card.html'; 
             return;
         }
         return;
     }
+    
 
     // 以下はWeb版で直接ボタンを押した時の挙動
     const mode = confirm("【AI羅針盤】\n\n「OK」：【簡潔】（要点を音声報告）\n「キャンセル」：【対話】（AIと相談・チャット形式）");
