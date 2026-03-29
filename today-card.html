@@ -3739,35 +3739,34 @@ async function updateWeather(lat, lon) {
 	</script>
 	
 <script>
-    // ページが完全に読み込まれたら実行
     window.addEventListener('DOMContentLoaded', function() {
         // 1. GitHub版の背景色判定
-        if (window.location.hostname === "ettomio0518.github.io") {
+        if (window.location.hostname.includes("github.io")) {
             const body = document.querySelector('body');
-            if (body) {
-                body.style.background = "#cdcd9a";
-            }
+            if (body) { body.style.background = "#cdcd9a"; }
         }
 
-        // 2. ★自動起動の修正（800ミリ秒の「間」を置く）
+        // 2. 自動起動（?mode=ai がある場合）
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('mode') === 'ai') {
             setTimeout(() => {
                 const container = document.getElementById('ai-interaction-container');
                 if (container) {
-                    // パネルを表示
+                    // まずパネルをスッと表示させる
                     container.style.display = 'block';
                     container.scrollIntoView({ behavior: 'smooth' });
 
-                    // 3. AIに「考え中です...」と喋り出させる（重要！）
+                    // 3. ★ここで「選択肢（OK/キャンセル）」を出す関数を実行
+                    // これにより、ユーザーがクリックした瞬間に音声が許可されます
                     if (typeof announceCompass === "function") {
                         announceCompass(); 
                     }
                 }
-            }, 800); // 0.8秒待ってから実行
+            }, 1000); // 念のため1秒（1000ms）に延ばして確実に準備
         }
     });
 </script>
+
 	
   <footer>
     © 20260329 ettomio - 舞いカレンダー
