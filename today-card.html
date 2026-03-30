@@ -3217,20 +3217,20 @@ const rokuyoData = [
 
 // --- 🧭 AI羅針盤：入り口 ---
 function announceCompass() {
+    // 【最優先：アプリ版（android_asset）ならGitHub版へ飛ばす】
     const isAndroidApp = window.location.href.includes("android_asset") || 
                          window.document.URL.includes("android_asset");
 
     if (isAndroidApp) {
         if (confirm("【AI羅針盤】\nアプリ版では制限があるため、Web版(GitHub)へ移動しますか？")) {
-            // ★ ?mode=ai を削除した、元のシンプルなアドレスに戻します
+            // ここでWeb版のアドレスに飛ばす
             location.href = 'https://ettomio0518.github.io/my-calendar-app/today-card.html'; 
             return;
         }
         return;
     }
-    
 
-    // 以下はWeb版で直接ボタンを押した時の挙動
+    // 以下はWeb版で実行された時のみ動く（今朝喋ったロジックを維持）
     const mode = confirm("【AI羅針盤】\n\n「OK」：【簡潔】（要点を音声報告）\n「キャンセル」：【対話】（AIと相談・チャット形式）");
 
     if (mode) {
@@ -3240,25 +3240,6 @@ function announceCompass() {
         window.scrollTo(0, document.body.scrollHeight);
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. GitHub版なら背景色を変える
-    if (window.location.hostname.includes('github.io')) {
-        document.body.classList.add('github-version');
-    }
-
-    // 2. ★自動起動：URLに「?mode=ai」が付いていれば、最初から対話パネルを表示する
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('mode') === 'ai') {
-        const container = document.getElementById('ai-interaction-container');
-        if (container) {
-            container.style.display = 'block';
-            // 対話形式（runDialogueCompassの役割）を自動で呼び出すか、
-            // 単にパネルを表示して最下部へスクロールさせます
-            container.scrollIntoView({ behavior: 'smooth' });
-        }
-    }
-});
 
 // --- 二十四節気を計算する装置 (恒久版) ---
 function get24Sekki(date) {
@@ -3590,9 +3571,21 @@ function startAiVoiceInput() {
 	function init() {
 	    updateCard();
 	    setInterval(updateCard, 1000);
-	    getWeather();                  // 天気を呼ぶ
-	    showScrollButtonsIfPageLong(); // ボタン制御を呼ぶ
-	    handleStartupModal();          // モーダルを呼ぶ
+	    getWeather();
+	    showScrollButtonsIfPageLong();
+	    handleStartupModal();
+
+        // 🧭 AI羅針盤ボタンの表示制御を追加
+        const isAndroidApp = window.location.href.includes("android_asset") || 
+                             window.document.URL.includes("android_asset");
+        const aiBtn = document.getElementById("ai-button");
+        if (aiBtn) {
+            if (isAndroidApp) {
+                aiBtn.style.display = "none";
+            } else {
+                aiBtn.style.display = "inline-block";
+            }
+        }
 	}
 
 // --- 2. 天気取得・地域保存ルーチン（修正版） ---
@@ -3739,21 +3732,20 @@ async function updateWeather(lat, lon) {
 	</script>
 	
 <script>
-    // ページが読み込まれたら実行（シンプルに戻す）
+    // ページが読み込まれたら実行
     window.addEventListener('DOMContentLoaded', function() {
-        // 1. GitHub版の背景色判定だけ残す
         if (window.location.hostname === "ettomio0518.github.io") {
             const body = document.querySelector('body');
             if (body) {
                 body.style.background = "#cdcd9a";
             }
         }
-        // ★ 自動起動（setTimeoutなど）のコードはここに書かない
     });
-</script>
+
+</script>	
 	
   <footer>
-    © 20260329 ettomio - 舞いカレンダー
+    © 20260331 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
