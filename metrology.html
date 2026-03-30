@@ -283,12 +283,12 @@ footer {
     </main>
 
 <div id="ai-interaction-container" style="display:none;">
-    <p style="margin: 0 0 8px 10px; font-weight: bold; color: #333; font-size: 0.9em;">💬 AI秘書へのメッセージ：</p>
-    <div style="display: flex; gap: 8px; align-items: center;">
-        <input type="text" id="ai-user-input" placeholder="何かお手伝いしますか？">
-        <div id="ai-button-group">
-            <button onclick="startAiVoiceInput()" style="background: #f0f0f0; border: 1px solid #ccc;">🎤</button>
-            <button onclick="handleAiChat()" style="background: #5daab0; color: white; border: none; font-weight: bold;">送信</button>
+    <p style="margin: 0 0 8px 0; font-weight: bold; color: #333; font-size: 0.85em;">💬 AI秘書へのメッセージ：</p>
+    <div style="display: flex; gap: 5px; align-items: center;">
+        <input type="text" id="ai-user-input" placeholder="何かお手伝いしますか？" style="border-radius: 10px; border: 1px solid #ccc;">
+        <div id="ai-button-group" style="display: flex; gap: 5px;">
+            <button onclick="startAiVoiceInput()" style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 10px;">🎤</button>
+            <button onclick="handleAiChat()" style="background: #5daab0; color: white; border: none; border-radius: 10px; font-weight: bold;">送信</button>
         </div>
     </div>
     <div id="ai-chat-history" style="display: none;"></div>
@@ -501,37 +501,45 @@ window.addEventListener("load", showCalcButtonOnScroll);
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. GitHub版なら背景色を変更（これは残す）
-    if (window.location.hostname.includes('github.io')) {
+    const isGitHub = window.location.hostname.includes('github.io');
+    const isAndroidApp = window.location.href.includes("android_asset");
+    const aiBtn = document.getElementById("ai-button");
+
+    // 1. 背景色の切り替え（GitHub版）
+    if (isGitHub) {
         document.body.classList.add('github-version');
     }
 
-    // 2. ★自動で開く処理（urlParams...）を削除し、
-    //    最初は必ず display: 'none' の状態から始まるようにします。
+    // 2. AI羅針盤ボタンの表示制御
+    if (aiBtn) {
+        if (isAndroidApp) {
+            aiBtn.style.display = "none"; // アプリ版は非表示
+        } else {
+            aiBtn.style.display = "inline-block"; // Web版・ローカル版は表示
+        }
+    }
+
+    // 3. URLパラメータ（?mode=ai）の処理
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'ai') {
+        const container = document.getElementById('ai-interaction-container');
+        if (container) {
+            container.style.display = 'block';
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
 });
 
-
 function announceCompass() {
-    // 1. 現在の環境を判定
-    const isGitHub = window.location.hostname.includes('github.io');
     const container = document.getElementById('ai-interaction-container');
+    if (!container) return;
 
-    if (isGitHub) {
-        // GitHub版（Web版）の場合：入力欄の表示/非表示を切り替え
-        if (container) {
-            if (container.style.display === 'none') {
-                container.style.display = 'block';
-                container.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                container.style.display = 'none';
-            }
-        }
+    // ローカル版でも確認なしでそのまま表示を切り替える（GitHub版と同様の動作）
+    if (container.style.display === 'none' || container.style.display === '') {
+        container.style.display = 'block';
+        container.scrollIntoView({ behavior: 'smooth' });
     } else {
-        // ローカル版の場合：GitHub版へ移動するか確認
-        if (confirm("AI羅針盤（GitHub Web版）へ移動しますか？")) {
-           window.location.href = 'https://ettomio0518.github.io/my-calendar-app/metrology.html';
-
-        }
+        container.style.display = 'none';
     }
 }
 
@@ -554,7 +562,7 @@ function handleAiChat() {
 </script>
 
 <footer>
-    © 20260328 ettomio - 舞いカレンダー
+    © 20260331 ettomio - 舞いカレンダー
 </footer>
 
 	<!-- HTML末尾にこれを追加 5/5 -->
