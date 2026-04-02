@@ -561,8 +561,126 @@ function handleAiChat() {
 
 </script>
 
+
+<script>
+// ==========================================
+// 3. AI羅針盤の実行（通信）ロジック：度量衡版
+// ==========================================
+const AI_HISTORY_KEY = 'gemini_doryoko_history';
+
+// 起動時の挨拶とスクロール
+function announceCompass() {
+    const chatContainer = document.getElementById('ai-interaction-container');
+    if (chatContainer) {
+        chatContainer.style.display = 'block';
+        // 最下段へスクロール
+        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    
+    const msg = "何かお手伝いしましょうか？";
+    speakText(msg);
+    
+    // 入力欄にフォーカスを当てる
+    const inputField = document.getElementById('ai-user-input');
+    if (inputField) inputField.focus();
+}
+
+// 音声出力（度量衡用：nativeSpeakがない場合を考慮）
+function speakText(text) {
+    if (typeof nativeSpeak === 'function') {
+        nativeSpeak(text);
+    } else {
+        const uttr = new SpeechSynthesisUtterance(text);
+        uttr.lang = "ja-JP";
+        window.speechSynthesis.speak(uttr);
+    }
+}
+
+async function runDialogueCompass(userMessage) {
+    speakText("考え中です。");
+
+    const apiKey = localStorage.getItem("gemini_api_key"); 
+
+    if (!apiKey) {
+        const msg = "まずは、AI秘書の鍵を開けてください。";
+        speakText(msg);
+        alert(msg);
+        return;
+    }
+
+    const chatContainer = document.getElementById('ai-interaction-container');
+    if (chatContainer) {
+        chatContainer.style.display = 'block';
+    }
+
+    const systemPrompt = `あなたは度量衡（単位換算・計算）の専門家です。
+【鉄の掟】
+1. 挨拶、前置き、案内は【永久に禁止】。記号（**や##）は含めない。
+2. ユーザーの質問に対し：
+   - 「です・ます」調の丁寧な日本語で答えよ。
+   - 度量衡、単位換算、物理計算の質問（例：ノットから日数、エーカーから反など）には、論理的かつ正確に即答せよ。
+   - 六曜、行事、予定、天気の質問をされたら「データを備えておりません。今日のカード（ https://ettomio0518.github.io/my-calendar-app/today-card.html ）ではお答えできるかもしれません。」と回答せよ。
+   - それ以外の一般質問には、AIとしての知識で誠実に答えよ。
+3. 数値は分かりやすく、必要に応じて計算過程も簡潔に示せ。`;
+
+    try {
+        const modelName = "gemini-3-flash-preview"; 
+        const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: systemPrompt + (userMessage || "") }] }] })
+        });
+
+        const data = await response.json();
+        let aiResponse = data.candidates[0].content.parts[0].text.replace(/[*#]/g, '');
+
+        const historyArea = document.getElementById('ai-chat-history');
+        if (historyArea) {
+            historyArea.style.display = 'block';
+            historyArea.innerText = aiResponse;
+            // 回答表示後も最下段を維持
+            historyArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+        speakText(aiResponse);
+
+    } catch (error) {
+        console.error("APIエラー:", error);
+        speakText("通信に失敗しました。");
+    }
+}
+
+// 送信ボタンが押された時の処理
+function handleAiChat() {
+    const inputField = document.getElementById('ai-user-input');
+    const message = inputField.value.trim();
+    if (message) {
+        runDialogueCompass(message);
+        inputField.value = ""; 
+    }
+}
+
+// 音声入力の開始
+function startAiVoiceInput() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("お使いのブラウザは音声入力に対応していません。");
+        return;
+    }
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'ja-JP';
+    recognition.start();
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('ai-user-input').value = transcript;
+        handleAiChat(); 
+    };
+}
+
+</script>
+
 <footer>
-    © 20260331 ettomio - 舞いカレンダー
+    © 20260403 ettomio - 舞いカレンダー
 </footer>
 
 	<!-- HTML末尾にこれを追加 5/5 -->
