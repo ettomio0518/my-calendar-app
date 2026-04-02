@@ -616,12 +616,18 @@ async function runDialogueCompass(userMessage) {
     const systemPrompt = `あなたは度量衡（単位換算・計算）の専門家です。
 【鉄の掟】
 1. 挨拶、前置き、案内は【永久に禁止】。記号（**や##）は含めない。
-2. ユーザーの質問に対し：
+2. 読み上げ対策：
+   - 単位の読みを正確にせよ（例：尺は「しゃく」、反は「たん」、歩は「ぶ」、畝は「せ」）。
+   - URL（https://...）は絶対に読み上げない。回答に含める際も、音声出力用テキストからは除外せよ。
+3. ユーザーの質問に対し：
    - 「です・ます」調の丁寧な日本語で答えよ。
-   - 度量衡、単位換算、物理計算の質問（例：ノットから日数、エーカーから反など）には、論理的かつ正確に即答せよ。
-   - 六曜、行事、予定、天気の質問をされたら「データを備えておりません。今日のカード（ https://ettomio0518.github.io/my-calendar-app/today-card.html ）ではお答えできるかもしれません。」と回答せよ。
-   - それ以外の一般質問には、AIとしての知識で誠実に答えよ。
-3. 数値は分かりやすく、必要に応じて計算過程も簡潔に示せ。`;
+   - 度量衡、単位換算、計算質問には、論理的かつ正確に即答せよ。
+   - 六曜、行事、予定、天気の質問をされたら「そのデータはここにはありません。今日のカードを確認してください。」とだけ短く答え、URLは表示のみに留めよ。
+   - それ以外の一般質問には、自身の知識で答えよ。
+4. 数値は分かりやすく、計算過程も簡潔に示せ。
+
+【参考URL（表示用）】
+今日のカード：https://ettomio0518.github.io/my-calendar-app/today-card.html`;
 
     try {
         const modelName = "gemini-3-flash-preview"; 
@@ -636,14 +642,17 @@ async function runDialogueCompass(userMessage) {
         const data = await response.json();
         let aiResponse = data.candidates[0].content.parts[0].text.replace(/[*#]/g, '');
 
+        // 表示用からURLを消さずに、読み上げ用からURLを除去する処理
         const historyArea = document.getElementById('ai-chat-history');
         if (historyArea) {
             historyArea.style.display = 'block';
             historyArea.innerText = aiResponse;
-            // 回答表示後も最下段を維持
             historyArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
-        speakText(aiResponse);
+
+        // 読み上げ用テキスト：URL（httpから始まる文字列）を空文字に置換して読み上げないようにする
+        const speechText = aiResponse.replace(/https?:\/\/[\w/:%#\$&\?\(\)~\.=\+\-]+/g, '');
+        speakText(speechText);
 
     } catch (error) {
         console.error("APIエラー:", error);
