@@ -5,61 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>お買い物計算</title>
     <style>
-	    body {
-	      font-family: Arial, sans-serif;
-		  margin: 0;
-		  padding: 0;              /* ← ここも 0 に */
-	      background-color: #ffe6ff;
-	    }
+        body {
+          font-family: Arial, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #ffe6ff;
+        }
+        
+        /* GitHub版（Web版）の背景色 */
+        body.github-version {
+            background: #e1e1c4;
+        }
 
-		.app {
-		  width: 100%;
-		  max-width: 500px;
-		  margin: 0 auto;          /* ← ここで中央寄せ */
-		  padding: 16px;
-		  box-sizing: border-box;
-		}
+        .app {
+          width: 100%;
+          max-width: 500px;
+          margin: 0 auto;
+          padding: 16px;
+          box-sizing: border-box;
+        }
 
-		.app-header {
-		  background: #8080ff;
-		  color: white;
+        .app-header {
+          background: #8080ff;
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 14px;
+        }
 
-		  display: flex;
-		  align-items: center;        /* ← 縦中央 */
-		  justify-content: space-between;
+        .app-header h4 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: normal;
+          margin-left: 30px;
+        }
 
-		  padding: 10px 14px;         /* ← 余白を最小限に */
-		}
-
-		.app-header h4 {
-		  margin: 0;                  /* ← これ超重要 */
-		  font-size: 18px;
-		  font-weight: normal;
-		  margin-left: 30px; /* ← 左に30pxの余白 */  		  
-		}
-
-		section{
-		  background:#e3ffff; 
-		  margin: 14px 0;   /* ← 縦だけ余白 */
-		  padding:14px;
-		  border-radius:14px; 
-		  box-shadow:0 2px 6px rgba(0,0,0,0.08);
-		}
+        section{
+          background:#e3ffff; 
+          margin: 14px 0;
+          padding:14px;
+          border-radius:14px; 
+          box-shadow:0 2px 6px rgba(0,0,0,0.08);
+        }
         table {
             width: 100%;
             margin-bottom: 20px;
         }
         input[type="number"], input[type="text"] {
-            width: 70px; /* 幅を少し広げました */
-            height: 30px; /* 縦幅を調整 */
+            width: 70px;
+            height: 30px;
             box-sizing: border-box;
         }
-	    h1 {
-	      text-align: center;
-	      font-size: 20px;
-	      margin-bottom: 10px;
-	    }
-	    
+        h1 {
+          text-align: center;
+          font-size: 20px;
+          margin-bottom: 10px;
+        }
+        
         h2 {
             font-size: 16px;
             color: #0000ff;
@@ -70,21 +73,21 @@
             margin-bottom: 10px;
         } 
         
-		button{
-		    border: 1px solid #000; /* 枠の色 */ 
-            border-radius: 5px; /* 角を丸くする */
-		    padding:2px 10px;
-		}	                                      
+        button{
+            border: 1px solid #000;
+            border-radius: 5px;
+            padding:2px 10px;
+        }                                           
         .tax-button {
-		    border: 1px solid #000; /* 枠の色 */ 
-		    border-radius:5px; 
-  			width: 100%;
-  			max-width: 60px;   /* ボタンとしての上限 */
+            border: 1px solid #000;
+            border-radius:5px; 
+            width: 100%;
+            max-width: 60px;
             padding: 3px;
-            margin: 1.5px; /* 周囲の余白 */
+            margin: 1.5px;
             font-size: 13px;
-  			min-height: 24px;   /* 高さを固定しない */
-  			line-height: 1.2;
+            min-height: 24px;
+            line-height: 1.2;
             background-color: lightgray;
         }
         .tax-button.active {
@@ -94,147 +97,203 @@
             margin-bottom: 20px;
         }
         .add-button {
-            padding: 3px 10px; /* 内側余白 */
-            margin: 3px; /* 周囲の余白 */
-            border: 1px solid #000; /* 枠の色 */
-            border-radius: 5px; /* 角を丸くする */
-            cursor: pointer; /* カーソルをポインタに変更 */
+            padding: 3px 10px;
+            margin: 3px;
+            border: 1px solid #000;
+            border-radius: 5px;
+            cursor: pointer;
         }       
         .total-button {
-            background-color: #c4ffe1; /* 背景色 */
-            padding: 3px 10px; /* 内側余白 */
-            margin: 3px; /* 周囲の余白 */
-            border-radius: 5px; /* 角を丸くする */
-            cursor: pointer; /* カーソルをポインタに変更 */
+            background-color: #c4ffe1;
+            padding: 3px 10px;
+            margin: 3px;
+            border-radius: 5px;
+            cursor: pointer;
         }
         .save-button {
-            background-color: #ffffbd; /* 背景色 */
-            padding: 3px 10px; /* 内側余白 */
-            margin: 3px; /* 周囲の余白 */
-            border-radius: 5px; /* 角を丸くする */
-            cursor: pointer; /* カーソルをポインタに変更 */
+            background-color: #ffffbd;
+            padding: 3px 10px;
+            margin: 3px;
+            border-radius: 5px;
+            cursor: pointer;
         }
   
-		.custom-alert {
-		    position: fixed;
-		    top: 10px;
-		    left: 50%;
-		    transform: translateX(-50%);
-		    background-color: #ffcccb;
-		    color: black;
-		    padding: 10px 20px;
-		    border: 1px solid red;
-		    border-radius: 5px;
-		    font-size: 16px;
-		    z-index: 1000;
-		}
+        .custom-alert {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffcccb;
+            color: black;
+            padding: 10px 20px;
+            border: 1px solid red;
+            border-radius: 5px;
+            font-size: 16px;
+            z-index: 1000;
+        }
 
-		/* 11/4 Top/Bottomボタン */
-		.bottom-button, .top-button {
-		    position: fixed;
-		    bottom: 20px;
-		    left: 50%;
-		    transform: translateX(-50%);
-		    background: #007bff;
-		    color: white;
-		    border: none;
-		    border-radius: 20px;
-		    padding: 10px 20px;
-		    font-size: 16px;
-		    cursor: pointer;
-		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-		    z-index: 9999;
-		    display: none;
-		}
-		.bottom-button:hover, .top-button:hover {
-		    background: #0056b3;
-		}    
-	    
-	    footer {
-	      text-align: center;
-	      padding: 12px;
-	    }	
+        .bottom-button, .top-button {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 9999;
+            display: none;
+        }
+        .bottom-button:hover, .top-button:hover {
+            background: #0056b3;
+        }    
+        
+        footer {
+          text-align: center;
+          padding: 12px;
+        }   
 
-		/* スマホ */
-		@media (max-width: 480px) {
-		  .app {
-		    padding: 10px;   /* ← ここが効きます */
-		  }
-		}
+        @media (max-width: 480px) {
+          .app {
+            padding: 10px;
+          }
+        }
 
-	.calc-float-btn {
-	    position: fixed;
-	    bottom: 20px;
-	    right: 20px;
-	    background: #a74fff;
-	    color: white;
-	    padding: 10px 16px;
-	    border-radius: 20px;
-	    font-size: 16px;
-	    text-decoration: none;
-	    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-	    z-index: 9999;
+    .calc-float-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #a74fff;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 20px;
+        font-size: 16px;
+        text-decoration: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+    }
+    .calc-float-btn.visible {
+        opacity: 0.85;
+    }
+    .calc-float-btn:hover {
+        opacity: 1;
+        background: #0056b3;
+    }
+    
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 99999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.4);
+    }
 
-	    opacity: 0;              /* 最初は透明 */
-	    transition: opacity 0.6s ease;  /* ふわっと表示 */
-	}
-	.calc-float-btn.visible {
-	    opacity: 0.85;           /* 半透明で存在感を抑える 0.75から0.85に変更 */
-	}
-	.calc-float-btn:hover {
-	    opacity: 1;              /* ホバー時だけ100%表示 */
-	    background: #0056b3;
-	}
-	
-	/* ▼▼▼ モーダル電卓 ▼▼▼ */
-	.modal {
-	    display: none;
-	    position: fixed;
-	    z-index: 99999;
-	    left: 0;
-	    top: 0;
-	    width: 100%;
-	    height: 100%;
-	    background: rgba(0,0,0,0.4);
-	}
+    .modal-content {
+        background: white;
+        margin: 10% auto;
+        padding: 10px;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 10px;
+    }
 
-	.modal-content {
-	    background: white;
-	    margin: 10% auto;
-	    padding: 10px;
-	    width: 90%;
-	    max-width: 400px;
-	    border-radius: 10px;
-	}
+    .calc-frame {
+        width: 100%;
+        height: calc(100vh - 120px);
+        border: none;
+    }
 
-	.calc-frame {
-	    width: 100%;
-	    height: calc(100vh - 120px); /* 画面の高さから余白を引く */
-	    border: none;
-	}
+    .close {
+        float: right;
+        font-size: 24px;
+        cursor: pointer;
+        user-select: none;
+    }
+    
+#ai-button {
+    font-size: 15px;
+    padding: 2px 10px;
+    color: #00ffff; 
+    background-color: #5b5b5b; 
+    border-radius: 5px; 
+    margin-top: 15px;
+    margin-left: 35px;              
+}
 
-	.close {
-	    float: right;
-	    font-size: 24px;
-	    cursor: pointer;
-	    user-select: none;
-	}
-	/* ▲▲▲ モーダル電卓 ▲▲▲ */
-	        
+.blinking {
+    animation: blink 1.0s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* AI羅針盤（お買い物版スタイル追加） */
+#ai-interaction-container {
+    background: #fdfdfd;
+    border: 2px solid #5daab0;
+    border-radius: 15px;
+    margin: 20px 10px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#ai-chat-history {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f0f9fa;
+    border-radius: 8px;
+    font-size: 0.95em;
+    line-height: 1.5;
+    color: #333;
+    border-left: 4px solid #5daab0;
+}
+
+@media screen and (max-width: 480px) {
+    #ai-interaction-container > div {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    #ai-user-input {
+        flex: 1; min-width: 0; padding: 8px; font-size: 14px;
+    }
+    #ai-button-group {
+        display: flex; gap: 5px; flex-shrink: 0;
+    }
+    #ai-button-group button {
+        padding: 8px 10px; font-size: 14px; white-space: nowrap;
+    }
+}   
+                
     </style>
 </head>
 
 <body>
   <div class="app">
-	<header class="app-header">
-	  <h4>🧮 お買い物電卓 calculator</h4>
-	  <button class="top-right-button"
-	    onclick="window.location.href='index.html'">戻る</button>
-	</header>
+    <header class="app-header">
+      <h4>🧮 お買い物電卓 calculator</h4>
+      <button class="top-right-button"
+        onclick="window.location.href='index.html'">戻る</button>
+    </header>
+
+<button id="ai-button" class="blinking" onclick="announceCompass()">
+    🧭 AI羅針盤
+</button>
 
 
 <section>
-    <!-- 割引計算行 -->
 <h2>🏷 割引計算</h2>    
         <div class="discount-row">
         <table>
@@ -271,17 +330,17 @@
 </section>    
     
 <section>    
-	<div id="extraFields">
-		<h2>📅 今月の買い物記録に転記</h2>
-	    <label for="purchaseDate">購入日:</label>
-	    <input type="date" id="purchaseDate">
-	    <br><br>
-	    <button class="add-button" onclick="showAlert()">アラート</button>
-	    <div id="alertMessage" style="display:none;">買い物を2回、3回とされるとその合計金額を入力して下さい。</div>
-	    <label for="totalAmount">合計金額:</label>
-	    <input type="number" id="totalAmount">
-	    <button class="save-button" onclick="saveTotalAmount()">保存</button>
-	</div>
+    <div id="extraFields">
+        <h2>📅 今月の買い物記録に転記</h2>
+        <label for="purchaseDate">購入日:</label>
+        <input type="date" id="purchaseDate">
+        <br><br>
+        <button class="add-button" onclick="showAlert()">アラート</button>
+        <div id="alertMessage" style="display:none;">買い物を2回、3回とされるとその合計金額を入力して下さい。</div>
+        <label for="totalAmount">合計金額:</label>
+        <input type="number" id="totalAmount">
+        <button class="save-button" onclick="saveTotalAmount()">保存</button>
+    </div>
     <br>
 
     <button class="total-button" onclick="window.location.href='receipt.html'">今月の買い物記録</button>
@@ -298,13 +357,27 @@
 </section>
   </div>
       
+      
+<div id="ai-interaction-container" style="display:none;">
+    <p style="margin: 0 0 8px 0; font-weight: bold; color: #333; font-size: 0.85em;">💬 AI秘書（お買い物計算）：</p>
+    <div style="display: flex; gap: 5px; align-items: center;">
+        <input type="text" id="ai-user-input" placeholder="例：3980円の3割引、税10%を覚えて" style="border-radius: 10px; border: 1px solid #ccc;">
+        <div id="ai-button-group" style="display: flex; gap: 5px;">
+            <button onclick="startAiVoiceInput()" style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 10px;">🎤</button>
+            <button onclick="handleAiChat()" style="background: #5daab0; color: white; border: none; border-radius: 10px; font-weight: bold;">送信</button>
+        </div>
+    </div>
+    <div id="ai-chat-history" style="display: none;"></div>
+</div>
+
+      
     <script>
         let itemIndex = 0;
 
         function addItemRow() {
             if (itemIndex >= 20) {
-			showCustomAlert("申し訳ございません。計算はここまでです。");
-            nativeSpeak("申し訳ございません。計算はここまでです。");			
+            showCustomAlert("申し訳ございません。計算はここまでです。");
+            nativeSpeak("申し訳ございません。計算はここまでです。");            
                 return;
             }
             
@@ -351,9 +424,9 @@
 
         function clearRow(index) {
             document.getElementById(`price${index}`).value = '';
-            document.getElementById(`quantity${index}`).value = '1'; // 個数を1に戻す
+            document.getElementById(`quantity${index}`).value = '1';
             document.getElementById(`subtotal${index}`).value = '';
-            setTaxRate(index, 8); // Reset tax rate to 8% and update button color
+            setTaxRate(index, 8);
         }
 
         function increaseQuantity(index) {
@@ -374,8 +447,8 @@
                 totalBasePrice += price * quantity;
                 total += subtotal;
             }
-            totalBasePrice = Math.round(totalBasePrice * 100) / 100; // 小数点以下2桁に丸める
-            total = Math.round(total * 100) / 100; // 小数点以下2桁に丸める
+            totalBasePrice = Math.round(totalBasePrice * 100) / 100;
+            total = Math.round(total * 100) / 100;
             document.getElementById('totalPrice').innerHTML =
   `定価合計は${totalBasePrice}円、<strong>税込み合計は${total.toFixed(2)}円です。</strong>`;
             document.getElementById('extraFields').style.display = 'block';
@@ -391,38 +464,30 @@
             document.getElementById('discountedPrice').value = discountedPrice.toFixed(2);
         }
 
-		function transferDiscount() {
-		    if (itemIndex >= 20) {
-		        showCustomAlert("申し訳ございません。計算はここまでです。");
-		        nativeSpeak("申し訳ございません。計算はここまでです。");
-		        return; // 転送を防ぐ
-		    }
-
-		    const discountedPrice = parseFloat(document.getElementById('discountedPrice').value) || 0;
-
-		    let emptyRowIndex = -1;
-		    for (let i = 0; i < itemIndex; i++) {
-		        const priceCell = document.getElementById(`price${i}`);
-		        if (priceCell && !priceCell.value) {
-		            emptyRowIndex = i;
-		            break;
-		        }
-		    }
-
-		    if (emptyRowIndex === -1) {
-		        addItemRow();
-		        emptyRowIndex = itemIndex - 1;
-		    }
-
-		    // 割引後の価格を空いている行に転送
-		    document.getElementById(`price${emptyRowIndex}`).value = discountedPrice.toFixed(2);
-		    updateSubtotal(emptyRowIndex);
-		    checkAndAddRow(emptyRowIndex);
-
-		    // 割引計算をクリア
-		    clearDiscount();
-		}
-
+        function transferDiscount() {
+            if (itemIndex >= 20) {
+                showCustomAlert("申し訳ございません。計算はここまでです。");
+                nativeSpeak("申し訳ございません。計算はここまでです。");
+                return;
+            }
+            const discountedPrice = parseFloat(document.getElementById('discountedPrice').value) || 0;
+            let emptyRowIndex = -1;
+            for (let i = 0; i < itemIndex; i++) {
+                const priceCell = document.getElementById(`price${i}`);
+                if (priceCell && !priceCell.value) {
+                    emptyRowIndex = i;
+                    break;
+                }
+            }
+            if (emptyRowIndex === -1) {
+                addItemRow();
+                emptyRowIndex = itemIndex - 1;
+            }
+            document.getElementById(`price${emptyRowIndex}`).value = discountedPrice.toFixed(2);
+            updateSubtotal(emptyRowIndex);
+            checkAndAddRow(emptyRowIndex);
+            clearDiscount();
+        }
         
         function clearDiscount() {
             document.getElementById('discountPrice').value = '';
@@ -449,186 +514,207 @@
             }
         }
 
-        // 初期表示時に1行目を追加
+        // ==========================================
+        // 🧭 AI羅針盤：お買い物計算版ロジック
+        // ==========================================
+        const AI_HISTORY_KEY = 'gemini_shopping_history';
+
+        function announceCompass() {
+            const chatContainer = document.getElementById('ai-interaction-container');
+            if (chatContainer) {
+                chatContainer.style.display = 'block';
+                chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+            const msg = "お買い物の記憶と計算、うけたまわります。何から覚えましょうか？";
+            nativeSpeak(msg);
+            const inputField = document.getElementById('ai-user-input');
+            if (inputField) inputField.focus();
+        }
+
+        async function runDialogueCompass(userMessage) {
+            nativeSpeak("考え中です。");
+            const apiKey = localStorage.getItem("gemini_api_key"); 
+            if (!apiKey) {
+                const msg = "まずは、AI秘書の鍵を開けてください。";
+                nativeSpeak(msg);
+                alert(msg);
+                return;
+            }
+
+            const systemPrompt = `あなたは優秀な「お買い物計算秘書」です。
+【鉄の掟】
+1. 挨拶、前置きは【永久に禁止】。記号（**や##）は含めない。
+2. ユーザーの「覚えておいて」という依頼に対し：
+   - 商品名、単価、割引、税率を正確に整理して記憶せよ。
+   - 税率は「惣菜・食料品＝8%」「衣類・日用品＝10%」を基本とするが、ユーザー指定を最優先せよ。
+   - 依頼のたびに「〇〇をカゴに入れました。現在の合計は△△円です」と進捗を答えよ。
+3. 「総計は？」「会計して」と言われたら：
+   - 記憶している全商品の内訳（単価・個数・税率・小計）を一覧で出し、最後に総計を提示せよ。
+4. 丁寧な日本語で、計算過程を明確に示せ。
+5. URLや外部案内は不要。この場での計算に集中せよ。`;
+
+            try {
+                const modelName = "gemini-3-flash-preview"; 
+                const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
+                
+                // 簡易履歴（直前の文脈維持用：必要に応じて拡張）
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: systemPrompt + (userMessage || "") }] }] })
+                });
+
+                const data = await response.json();
+                let aiResponse = data.candidates[0].content.parts[0].text.replace(/[*#]/g, '');
+
+                const historyArea = document.getElementById('ai-chat-history');
+                if (historyArea) {
+                    historyArea.style.display = 'block';
+                    historyArea.innerText = aiResponse;
+                    historyArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+                nativeSpeak(aiResponse);
+            } catch (error) {
+                console.error("APIエラー:", error);
+                nativeSpeak("通信に失敗しました。");
+            }
+        }
+
+        function handleAiChat() {
+            const inputField = document.getElementById('ai-user-input');
+            const message = inputField.value.trim();
+            if (message) {
+                runDialogueCompass(message);
+                inputField.value = ""; 
+            }
+        }
+
+        function startAiVoiceInput() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'ja-JP';
+            recognition.start();
+            recognition.onresult = (event) => {
+                document.getElementById('ai-user-input').value = event.results[0][0].transcript;
+                handleAiChat(); 
+            };
+        }
+
+        // 背景色の設定と初期化
         window.onload = function() {
             addItemRow();
+            // GitHub (Web版) かどうかの判定
+            if (window.location.hostname.includes("github.io")) {
+                document.body.classList.add("github-version");
+            }
         };
         
-        
-		// カスタム通知を表示する関数
-		function showCustomAlert(message) {
-		    const alertContainer = document.createElement('div');
-		    alertContainer.className = 'custom-alert';
-		    alertContainer.textContent = message;
+        function showCustomAlert(message) {
+            const alertContainer = document.createElement('div');
+            alertContainer.className = 'custom-alert';
+            alertContainer.textContent = message;
+            document.body.appendChild(alertContainer);
+            setTimeout(() => {
+                if (alertContainer.parentNode) document.body.removeChild(alertContainer);
+            }, 5000);
+        }
 
-		    document.body.appendChild(alertContainer);
+        function speakText(text) {
+           if ('speechSynthesis' in window) {
+               const utterance = new SpeechSynthesisUtterance(text);
+               utterance.lang = "ja-JP";
+               window.speechSynthesis.speak(utterance);
+           }
+        }
 
-	    // 5秒後に通知を自動的に消去
-	    setTimeout(() => {
-	        document.body.removeChild(alertContainer);
-	    }, 5000);
-	}
+        function nativeSpeak(text) {
+           if (typeof Android !== 'undefined' && Android.speak) {
+               Android.speak(text);
+           } else {
+               speakText(text);
+           }
+        }
 
-
-		// 既存の音声再生関数
-		function speakText(text) {
-		   if ('speechSynthesis' in window) {
-		       const utterance = new SpeechSynthesisUtterance(text);
-		       window.speechSynthesis.speak(utterance);
-		   } else {
-		       alert("音声合成がサポートされていません");
-		   }
-		}
-
-		// 新しい音声合成関数
-		function nativeSpeak(text) {
-		   if (typeof Android !== 'undefined' && Android.speak) {
-		       Android.speak(text);
-		   } else {
-		       speakText(text); // Android.speakが使用できない場合はブラウザの音声合成を使用
-		   }
-		}
-
-    
         function calculatePrice() {
             const ricePrice = parseFloat(document.getElementById("ricePrice").value);
             if (isNaN(ricePrice) || ricePrice <= 0) {
                 alert("正しい価格を入力してください");
                 return;
             }
-            const totalServings = 5000 / 65; // 5Kgあたり77杯
+            const totalServings = 5000 / 65;
             const pricePerServing = ricePrice / totalServings;
-            const roundedPrice = Math.floor(pricePerServing); // 小数点以下切り捨て
-            const roundedPrice2 = Math.round(pricePerServing * 10) / 10; // 小数第二位で四捨五入
+            const roundedPrice = Math.floor(pricePerServing);
+            const roundedPrice2 = Math.round(pricePerServing * 10) / 10;
             const message2 = `あなたのご飯一膳はほぼ${roundedPrice}円になります`;
             showCustomAlert(message2);
             nativeSpeak(message2);
             document.getElementById("result").textContent = `一膳の価格: ${roundedPrice2} 円`;
-            //const utterance = new SpeechSynthesisUtterance(message);
-            //speechSynthesis.speak(utterance);
-        }        
+        }           
     </script>
 
-	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
-		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
-	    
+    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+    <button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+        
 
-  <script>
-	    // ==========================================================
-	    // ★ スクロールボタン制御 (Top/Bottom)
-	    // ==========================================================
+ <script>
+    function scrollToTop() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function scrollToBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+    function showScrollButtonsIfPageLong() {
+        const topBtn = document.getElementById("topBtn");
+        const bottomBtn = document.getElementById("bottomBtn");
+        const docHeight = document.body.scrollHeight;
+        const viewHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+        const scrollThreshold = 100;
+        if (docHeight <= viewHeight + scrollThreshold) {
+            topBtn.style.display = "none";
+            bottomBtn.style.display = "none";
+            return;
+        }
+        topBtn.style.display = (scrollY > scrollThreshold) ? "block" : "none";
+        bottomBtn.style.display = (scrollY > scrollThreshold && docHeight - viewHeight - scrollY > scrollThreshold) ? "block" : "none";
+    }
+    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+    window.addEventListener("load", showScrollButtonsIfPageLong);
+    window.addEventListener("resize", showScrollButtonsIfPageLong);
 
-	    function scrollToTop() {
-	      window.scrollTo({ top: 0, behavior: 'smooth' });
-	    }
+    window.addEventListener("scroll", () => {
+        const btn = document.querySelector(".calc-float-btn");
+        if (window.scrollY > 100) {
+            btn.classList.add("visible");
+        } else {
+            btn.classList.remove("visible");
+        }
+    });
+</script>
 
-	    function scrollToBottom() {
-	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-	    }
+    <footer>
+      © 20260403 ettomio
+    </footer>
 
-	    function hideScrollButtons() {
-	        document.getElementById("topBtn").style.display = "none";
-	        document.getElementById("bottomBtn").style.display = "none";
-	    }
+    <div style="height: 50px;"></div>
 
-		// ==========================================================
-		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
-		// ==========================================================
-		function showScrollButtonsIfPageLong() {
-		    const topBtn = document.getElementById("topBtn");
-		    const bottomBtn = document.getElementById("bottomBtn");
-		    
-		    const docHeight = document.body.scrollHeight;
-		    const viewHeight = window.innerHeight;
-		    const scrollY = window.scrollY;
-		    
-		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
-		    
-		    // ページがスクロール可能でなければ両方非表示
-		    if (docHeight <= viewHeight + scrollThreshold) {
-		        topBtn.style.display = "none";
-		        bottomBtn.style.display = "none";
-		        return;
-		    }
+    <div id="calcModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeCalcModal()">&times;</span>
+        <iframe src="calculatorapp.html?from=shopping" class="calc-frame"></iframe>
+      </div>
+    </div>
 
-		    // --- Topボタンの表示制御 ---
-		    // 100px以上スクロールしたらTopボタンを表示
-		    if (scrollY > scrollThreshold) {
-		        topBtn.style.display = "block";
-		    } else {
-		        topBtn.style.display = "none";
-		    }
+    <a class="calc-float-btn" onclick="openCalcModal()">🧮 電卓</a>
 
-			// --- Bottomボタンの表示制御 ---
-			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
-			if (
-			    scrollY > scrollThreshold &&
-			    docHeight - viewHeight - scrollY > scrollThreshold
-			) {
-			    bottomBtn.style.display = "block";
-			} else {
-			    bottomBtn.style.display = "none";
-			}
-		}
-
-	    // スクロール時のボタン表示制御
-	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
-	    
-	    // 初期ロード時にもボタン表示をチェック
-	    window.addEventListener("load", showScrollButtonsIfPageLong);
-	    
-	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
-	    window.addEventListener("resize", showScrollButtonsIfPageLong);
-
-
-	    // ==========================================================
-	    // ★ 初期化
-	    // ==========================================================
-	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
-	    document.addEventListener('DOMContentLoaded', () => {
-	        showScrollButtonsIfPageLong();
-	    });
-
-		window.addEventListener("scroll", () => {
-		    const btn = document.querySelector(".calc-float-btn");
-		    if (window.scrollY > 100) {
-		        btn.classList.add("visible");
-		    } else {
-		        btn.classList.remove("visible");
-		    }
-		});
-	    
-	</script>
-
-	<footer>
-	  © 20260202 ettomio
-	</footer>
-
-	<div style="height: 50px;"></div>
-
-	<!-- 🧮 電卓モーダル -->
-	<div id="calcModal" class="modal">
-	  <div class="modal-content">
-	    <span class="close" onclick="closeCalcModal()">&times;</span>
-	    <iframe src="calculatorapp.html?from=shopping" class="calc-frame"></iframe>
-	  </div>
-	</div>
-
-	<!-- 🧮 モーダル起動ボタン（右下） -->
-	<a class="calc-float-btn" onclick="openCalcModal()">🧮 電卓</a>
-
-	<script>
-	function openCalcModal() {
-	    document.getElementById("calcModal").style.display = "block";
-	}
-
-	function closeCalcModal() {
-	    document.getElementById("calcModal").style.display = "none";
-	}
-
-	</script>
+    <script>
+    function openCalcModal() {
+        document.getElementById("calcModal").style.display = "block";
+    }
+    function closeCalcModal() {
+        document.getElementById("calcModal").style.display = "none";
+    }
+    </script>
 
 </body>
 </html>
-
 
