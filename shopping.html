@@ -514,71 +514,91 @@
             }
         }
 
-        // ==========================================
-        // 🧭 AI羅針盤：お買い物計算版ロジック
-        // ==========================================
-        const AI_HISTORY_KEY = 'gemini_shopping_history';
+// ==========================================
+// 🧭 AI羅針盤：お買い物・超軽量版（能書き排除）
+// ==========================================
+const AI_HISTORY_KEY = 'shopping_chat_history';
 
-        function announceCompass() {
-            const chatContainer = document.getElementById('ai-interaction-container');
-            if (chatContainer) {
-                chatContainer.style.display = 'block';
-                chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-            const msg = "お買い物の記憶と計算、うけたまわります。何から覚えましょうか？";
-            nativeSpeak(msg);
-            const inputField = document.getElementById('ai-user-input');
-            if (inputField) inputField.focus();
-        }
+// 履歴を読み込む関数
+function getChatHistory() {
+    const history = localStorage.getItem(AI_HISTORY_KEY);
+    return history ? JSON.parse(history) : [];
+}
 
-        async function runDialogueCompass(userMessage) {
-            nativeSpeak("考え中です。");
-            const apiKey = localStorage.getItem("gemini_api_key"); 
-            if (!apiKey) {
-                const msg = "まずは、AI秘書の鍵を開けてください。";
-                nativeSpeak(msg);
-                alert(msg);
-                return;
-            }
+// 履歴を保存する関数（直近10往復分に制限）
+function saveChatHistory(history) {
+    if (history.length > 20) history = history.slice(-20);
+    localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(history));
+}
 
-            const systemPrompt = `あなたは優秀な「お買い物計算秘書」です。
+async function runDialogueCompass(userMessage) {
+    nativeSpeak("考え中です。");
+    const apiKey = localStorage.getItem("gemini_api_key"); 
+    if (!apiKey) return;
+
+    let history = getChatHistory();
+    history.push({ role: "user", parts: [{ text: userMessage }] });
+
+    const systemPrompt = `あなたは無口な計算マシンです。
 【鉄の掟】
-1. 挨拶、前置きは【永久に禁止】。記号（**や##）は含めない。
-2. ユーザーの「覚えておいて」という依頼に対し：
-   - 商品名、単価、割引、税率を正確に整理して記憶せよ。
-   - 税率は「惣菜・食料品＝8%」「衣類・日用品＝10%」を基本とするが、ユーザー指定を最優先せよ。
-   - 依頼のたびに「〇〇をカゴに入れました。現在の合計は△△円です」と進捗を答えよ。
-3. 「総計は？」「会計して」と言われたら：
-   - 記憶している全商品の内訳（単価・個数・税率・小計）を一覧で出し、最後に総計を提示せよ。
-4. 丁寧な日本語で、計算過程を明確に示せ。
-5. URLや外部案内は不要。この場での計算に集中せよ。`;
+1. 挨拶、前置き、計算過程、丁寧な解説は【永久に禁止】。
+2. ユーザーが商品を追加したら「（商品名）を追加しました。現在の合計は（金額）円です。」とだけ答えよ。
+3. 税率は指定がなければ食料8%、他10%で自動計算せよ。
+4. 履歴を読み、過去の商品との合算を常に維持せよ。
+5. 「会計」「総計」と言われたら、合計金額のみを即答せよ。
+6. 余計な記号（*や#）は使わない。`;
 
-            try {
-                const modelName = "gemini-3-flash-preview"; 
-                const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
-                
-                // 簡易履歴（直前の文脈維持用：必要に応じて拡張）
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: systemPrompt + (userMessage || "") }] }] })
-                });
+    try {
+        const modelName = "gemini-3-flash-preview"; 
+        const url = "https://generativelanguage.googleapis.com/v1beta/models/" + modelName + ":generateContent?key=" + apiKey;
 
-                const data = await response.json();
-                let aiResponse = data.candidates[0].content.parts[0].text.replace(/[*#]/g, '');
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: systemPrompt }] }, ...history] })
+        });
 
-                const historyArea = document.getElementById('ai-chat-history');
-                if (historyArea) {
-                    historyArea.style.display = 'block';
-                    historyArea.innerText = aiResponse;
-                    historyArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
-                }
-                nativeSpeak(aiResponse);
-            } catch (error) {
-                console.error("APIエラー:", error);
-                nativeSpeak("通信に失敗しました。");
-            }
+        const data = await response.json();
+        let aiResponse = data.candidates[0].content.parts[0].text.replace(/[*#]/g, '').trim();
+
+        // 履歴にAIの回答を追加
+        history.push({ role: "model", parts: [{ text: aiResponse }] });
+        saveChatHistory(history);
+
+        const historyArea = document.getElementById('ai-chat-history');
+        if (historyArea) {
+            historyArea.style.display = 'block';
+            historyArea.innerText = aiResponse;
+            historyArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
+        nativeSpeak(aiResponse);
+
+    } catch (error) {
+        nativeSpeak("通信エラーです。");
+    }
+}
+
+// 音声入力：喋り終わるまで待機する設定
+function startAiVoiceInput() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'ja-JP';
+    recognition.continuous = false; // 一回ごとに区切る
+    recognition.interimResults = false; // 途中の結果で送信しない
+    
+    recognition.start();
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('ai-user-input').value = transcript;
+        // 認識結果が確定してから送信
+        handleAiChat(); 
+    };
+    
+    recognition.onerror = () => {
+        nativeSpeak("聞き取れませんでした。");
+    };
+}
+
 
         function handleAiChat() {
             const inputField = document.getElementById('ai-user-input');
