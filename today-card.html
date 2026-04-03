@@ -3310,20 +3310,32 @@ function getMoonPhase(date) {
 
 async function runConciseCompass() {
     const now = new Date();
+    // 日付を "2026/04/04" の形式に整形
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${y}/${m}/${d}`;
+
     let msgParts = ["本日の、ご案内です。"];
 
-    // 1. 祝日・六曜 (アプリの表示から取得)
-    const holiday = document.getElementById("holiday")?.innerText.replace("祝日 : ", "") || "";
-    if (holiday) msgParts.push(`今日は、${holiday}です。`);
-    
+    // 1. 祝日・行事・二十四節気 (holidaysData から直接取得)
+    // holidaysData の中から今日の日付が含まれるものを探す
+    const matchData = holidaysData.find(item => item[0].startsWith(todayStr));
+    if (matchData) {
+        const eventName = matchData[1];
+        // 「清明 (二十四節気)」などの表記から、読み上げやすい形に整える
+        const cleanName = eventName.replace(" (二十四節気)", "");
+        
+        if (eventName.includes("二十四節気")) {
+            msgParts.push(`今日は二十四節気の、${cleanName}です。`);
+        } else {
+            msgParts.push(`今日は、${cleanName}です。`);
+        }
+    }
+
+    // 2. 六曜 (既存の要素から取得)
     const rokuyo = document.getElementById("rokuyo")?.innerText.replace("六曜 : ", "") || "";
     if (rokuyo) msgParts.push(`六曜は、${rokuyo}です。`);
-
-    // 2. 二十四節気 (演算装置：該当日のみ)
-    const sekki = get24Sekki(now);
-    if (sekki) msgParts.push(sekki);
-
-    // ★ 月齢・月相のセクションは削除しました ★
 
     // 3. 天気概況 (Open-Meteo)
     const weatherCard = document.querySelector(".weather-card");
@@ -3341,7 +3353,7 @@ async function runConciseCompass() {
         }
     }
 
-    // 4. 直近の予定 (修正済み)
+    // 4. 直近の予定
     const schedules = buildSchedulesFromLocalStorage();
     const targets = getNearestSchedules(schedules);
     if (targets.length > 0) {
@@ -3362,7 +3374,6 @@ async function runConciseCompass() {
     showCustomAlert(finalMsg);
     nativeSpeak(finalMsg);
 }
-
 
 // --- B. 【対話】モード（Gemini連携版 / 履歴・数日予定・天気・位置対応） ---
 
@@ -3745,7 +3756,7 @@ async function updateWeather(lat, lon) {
 </script>	
 	
   <footer>
-    © 20260331 ettomio - 舞いカレンダー
+    © 20260404 ettomio - 舞いカレンダー
   </footer>
 
   <div style="height: 60px;"></div>
