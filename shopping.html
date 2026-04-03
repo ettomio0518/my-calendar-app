@@ -515,38 +515,59 @@
         }
 
 // ==========================================
-// 🧭 AI羅針盤：お買い物・超軽量版（能書き排除）
+// 🧭 AI羅針盤：お買い物・完全起動版
 // ==========================================
 const AI_HISTORY_KEY = 'shopping_chat_history';
 
-// 履歴を読み込む関数
+// 1. 起動スイッチ（表示とスクロール）
+function announceCompass() {
+    const chatContainer = document.getElementById('ai-interaction-container');
+    if (chatContainer) {
+        chatContainer.style.display = 'block';
+        // 最下段の交信窓口へスムーズにスクロール
+        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    
+    const msg = "お買い物の記憶と計算、うけたまわります。何から覚えましょうか？";
+    nativeSpeak(msg);
+    
+    const inputField = document.getElementById('ai-user-input');
+    if (inputField) inputField.focus();
+}
+
+// 2. 履歴管理（忘れないための処理）
 function getChatHistory() {
     const history = localStorage.getItem(AI_HISTORY_KEY);
     return history ? JSON.parse(history) : [];
 }
 
-// 履歴を保存する関数（直近10往復分に制限）
 function saveChatHistory(history) {
-    if (history.length > 20) history = history.slice(-20);
+    if (history.length > 20) history = history.slice(-20); // 直近10往復
     localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(history));
 }
 
+// 3. 通信ロジック（能書き排除・履歴参照）
 async function runDialogueCompass(userMessage) {
     nativeSpeak("考え中です。");
     const apiKey = localStorage.getItem("gemini_api_key"); 
-    if (!apiKey) return;
+    if (!apiKey) {
+        const msg = "まずは、AI秘書の鍵を開けてください。";
+        nativeSpeak(msg);
+        alert(msg);
+        return;
+    }
 
     let history = getChatHistory();
     history.push({ role: "user", parts: [{ text: userMessage }] });
 
     const systemPrompt = `あなたは無口な計算マシンです。
 【鉄の掟】
-1. 挨拶、前置き、計算過程、丁寧な解説は【永久に禁止】。
-2. ユーザーが商品を追加したら「（商品名）を追加しました。現在の合計は（金額）円です。」とだけ答えよ。
-3. 税率は指定がなければ食料8%、他10%で自動計算せよ。
-4. 履歴を読み、過去の商品との合算を常に維持せよ。
-5. 「会計」「総計」と言われたら、合計金額のみを即答せよ。
-6. 余計な記号（*や#）は使わない。`;
+1. 挨拶、前置き、計算過程、解説は【永久に禁止】。
+2. 追加時：「（商品名）を追加。合計（金額）円。」と短く即答せよ。
+3. 税率：食料8%、他10%で自動計算（指定優先）。
+4. 履歴を読み、過去の商品との合算を維持せよ。
+5. 会計時：合計金額のみ提示せよ。
+6. 記号（*や#）は含めない。`;
 
     try {
         const modelName = "gemini-3-flash-preview"; 
@@ -561,7 +582,7 @@ async function runDialogueCompass(userMessage) {
         const data = await response.json();
         let aiResponse = data.candidates[0].content.parts[0].text.replace(/[*#]/g, '').trim();
 
-        // 履歴にAIの回答を追加
+        // 履歴保存
         history.push({ role: "model", parts: [{ text: aiResponse }] });
         saveChatHistory(history);
 
@@ -578,24 +599,33 @@ async function runDialogueCompass(userMessage) {
     }
 }
 
-// 音声入力：喋り終わるまで待機する設定
+// 4. 送信処理
+function handleAiChat() {
+    const inputField = document.getElementById('ai-user-input');
+    const message = inputField.value.trim();
+    if (message) {
+        runDialogueCompass(message);
+        inputField.value = ""; 
+    }
+}
+
+// 5. 音声入力（割り込み防止：確定まで待つ）
 function startAiVoiceInput() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("音声入力非対応です。");
+        return;
+    }
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ja-JP';
-    recognition.continuous = false; // 一回ごとに区切る
-    recognition.interimResults = false; // 途中の結果で送信しない
-    
+    recognition.interimResults = false; // 途中の言葉で勝手に送信しない
+    recognition.continuous = false;
+
     recognition.start();
 
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         document.getElementById('ai-user-input').value = transcript;
-        // 認識結果が確定してから送信
-        handleAiChat(); 
-    };
-    
-    recognition.onerror = () => {
-        nativeSpeak("聞き取れませんでした。");
+        handleAiChat(); // 確定したら送信
     };
 }
 
