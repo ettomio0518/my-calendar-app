@@ -650,14 +650,24 @@ function startAiVoiceInput() {
             };
         }
 
-        // 背景色の設定と初期化
-        window.onload = function() {
-            addItemRow();
-            // GitHub (Web版) かどうかの判定
-            if (window.location.hostname.includes("github.io")) {
-                document.body.classList.add("github-version");
-            }
-        };
+		window.onload = function() {
+		    // 1. 最初の一行（既存の入力欄追加）を実行
+		    addItemRow();
+
+		    // 2. AIボタンを取得
+		    const aiButton = document.getElementById('ai-button');
+
+		    // 3. GitHub (Web版) かどうかの判定
+		    if (window.location.hostname.includes("github.io")) {
+		        // --- Web版（GitHub Pages）の場合 ---
+		        document.body.classList.add("github-version"); // 背景色を変える
+		        if (aiButton) aiButton.style.display = 'block'; // AIボタンを表示する
+		    } else {
+		        // --- アプリ版（WebView / ローカル）の場合 ---
+		        if (aiButton) aiButton.style.display = 'none';  // AIボタンを隠す
+		    }
+		};
+
         
         function showCustomAlert(message) {
             const alertContainer = document.createElement('div');
@@ -743,7 +753,7 @@ function startAiVoiceInput() {
 </script>
 
     <footer>
-      © 20260403 ettomio
+      © 20260404 ettomio
     </footer>
 
     <div style="height: 50px;"></div>
