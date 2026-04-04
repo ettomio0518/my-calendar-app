@@ -840,6 +840,65 @@
 		  transition: 0.3s;
 		  cursor: pointer;
 		}
+
+#ai-button {
+    font-size: 15px;
+    padding: 2px 10px;
+    color: #00ffff; 
+    background-color: #5b5b5b; 
+    border-radius: 5px; 
+    margin-top: 15px;
+    /* margin-left: 35px;   */   
+	display: none; /* これを追加：最初は隠しておく */             
+}
+
+.blinking {
+    animation: blink 1.0s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* AI羅針盤（お買い物版スタイル追加） */
+#ai-interaction-container {
+    background: #fdfdfd;
+    border: 2px solid #5daab0;
+    border-radius: 15px;
+    margin: 20px 10px;
+    padding: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+#ai-chat-history {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f0f9fa;
+    border-radius: 8px;
+    font-size: 0.95em;
+    line-height: 1.5;
+    color: #333;
+    border-left: 4px solid #5daab0;
+}
+
+@media screen and (max-width: 480px) {
+    #ai-interaction-container > div {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    #ai-user-input {
+        flex: 1; min-width: 0; padding: 8px; font-size: 14px;
+    }
+    #ai-button-group {
+        display: flex; gap: 5px; flex-shrink: 0;
+    }
+    #ai-button-group button {
+        padding: 8px 10px; font-size: 14px; white-space: nowrap;
+    }
+}   
 		
     </style>
     
@@ -2109,6 +2168,13 @@
 				
 		<!-- ボタン 9/29 -->
 		<button id="keyNButton">データの保存と復元ツール</button>
+		<br>
+		
+		<!-- AIボタン 4/04 -->
+<button id="ai-button" class="blinking" onclick="announceCompass()">
+    💡 AI秘書
+</button>
+		
 		<br><br>
 	<button id="toggleButton2">＋ その他機能</button>
 
@@ -2606,30 +2672,35 @@ function unlockAiWithPass() {
   </script>
 
 <script>
-    window.addEventListener('DOMContentLoaded', function() {
-        const hostname = window.location.hostname;
-        const syncBtn = document.getElementById('syncBtn');
-        const importBtn = document.getElementById('importBtn');
-        const headerElement = document.querySelector('header');
+window.addEventListener('DOMContentLoaded', function() {
+    const hostname = window.location.hostname;
+    const syncBtn = document.getElementById('syncBtn');
+    const importBtn = document.getElementById('importBtn');
+    const headerElement = document.querySelector('header');
+    const aiButton = document.getElementById('ai-button');
 
-        if (hostname === "ettomio0518.github.io") {
-            // GitHub版：ヘッダー色変更
-            if (headerElement) headerElement.style.background = "#baba74";
+    if (hostname === "ettomio0518.github.io") {
+        // GitHub版：ヘッダー色変更
+        if (headerElement) headerElement.style.background = "#baba74";
 
-            // GitHub版：抽出ボタンの文字を「アプリへ戻す」に変更
-            if (syncBtn) syncBtn.innerHTML = "🔄 アプリ版へ戻すデータ抽出";
+        // GitHub版：AI秘書ボタンを表示
+        if (aiButton) aiButton.style.display = "inline-block";
 
-            // GitHub版：取込ボタンを無効化（アプリ専用であることを明示）
-            if (importBtn) {
-                importBtn.innerHTML = "🚫 取り込み（アプリ専用）";
-                importBtn.style.opacity = "0.5";
-                importBtn.style.cursor = "not-allowed";
-                importBtn.style.background = "#eee";
-                importBtn.style.color = "#999";
-                importBtn.style.border = "2px solid #ccc";
-            }
+        // GitHub版：抽出ボタンの文字を「アプリへ戻す」に変更
+        if (syncBtn) syncBtn.innerHTML = "🔄 アプリ版へ戻すデータ抽出";
+
+        // GitHub版：取込ボタンを無効化（アプリ専用であることを明示）
+        if (importBtn) {
+            importBtn.innerHTML = "🚫 取り込み（アプリ専用）";
+            importBtn.style.opacity = "0.5";
+            importBtn.style.cursor = "not-allowed";
+            importBtn.style.background = "#eee";
+            importBtn.style.color = "#999";
+            importBtn.style.border = "2px solid #ccc";
         }
-    });
+    }
+});
+
 
     function handleSyncClick() {
         if (window.location.hostname === "ettomio0518.github.io") {
@@ -2674,8 +2745,40 @@ function closeAiConsultDialog() {
 </script>
 
 
+<div id="ai-interaction-container" style="display:none;">
+    <p style="margin: 0 0 8px 0; font-weight: bold; color: #333; font-size: 0.85em;">💬 AI秘書へのメッセージ：</p>
+    <div style="display: flex; gap: 5px; align-items: center;">
+        <input type="text" id="ai-user-input" placeholder="何かお手伝いしますか？" style="border-radius: 10px; border: 1px solid #ccc;">
+        <div id="ai-button-group" style="display: flex; gap: 5px;">
+            <button onclick="startAiVoiceInput()" style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 10px;">🎤</button>
+            <button onclick="handleAiChat()" style="background: #5daab0; color: white; border: none; border-radius: 10px; font-weight: bold;">送信</button>
+        </div>
+    </div>
+    <div id="ai-chat-history" style="display: none;"></div>
+</div>
+
+
+<script>
+// 起動時の挨拶とスクロール
+function announceCompass() {
+    const chatContainer = document.getElementById('ai-interaction-container');
+    if (chatContainer) {
+        chatContainer.style.display = 'block';
+        // 最下段へスクロール
+        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+    
+    const msg = "何かお手伝いしましょうか？";
+    speakText(msg);
+    
+    // 入力欄にフォーカスを当てる
+    const inputField = document.getElementById('ai-user-input');
+    if (inputField) inputField.focus();
+}
+</script>
+
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 23.4 / Updated: 2026-04-04
+        © 2025 ettomio. All rights reserved. Version 23.6 / Updated: 2026-04-04
     </p>
     <div style="height: 50px;"></div>
 </body>
