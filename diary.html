@@ -282,8 +282,7 @@
     <div class="container">
     <div class="input-row">
 
-      <!-- 日付操作行 -->
-	<div class="date-row">
+      <div class="date-row">
 	  <button id="prevBtn" class="nav-button2" onclick="changeDate(-1)">◁</button>
 	  <button id="todayButton" class="nav-button" onclick="setToday()">今日</button>
 	  <button id="nextBtn" class="nav-button2" onclick="changeDate(1)">▷</button>
@@ -291,8 +290,6 @@
 	  <input type="date" id="date">
 	</div>
 
-      <!-- 日記入力 -->
-      <!-- <label for="diaryContent">日記:</label> -->
       <textarea id="diaryContent" rows="12"></textarea>
 
       <button class="save-button" onclick="saveDiary()">💾 保存</button>
@@ -416,7 +413,7 @@
 
     function saveDiary() {
       const date = document.getElementById('date').value;
-      const diaryContent = document.getElementById('diaryContent').value.trim();
+      let diaryContent = document.getElementById('diaryContent').value.trim();
       if (!date) {
         showCustomAlert('日付を選択してください。');
         return;
@@ -425,6 +422,14 @@
         showCustomAlert('日記内容を入力してください。');
         return;
       }
+
+      // 保存前に行頭へ日付を挿入
+      const ymd = date.replace(/-/g, '/');
+      if (!diaryContent.startsWith(ymd)) {
+        diaryContent = ymd + '\n' + diaryContent;
+        document.getElementById('diaryContent').value = diaryContent;
+      }
+
       const key = `diary_${date.replace(/-/g, '')}`;
       localStorage.setItem(key, diaryContent);
       alert('保存しました'); // カスタムアラートから変更 3/3
@@ -595,10 +600,9 @@
   </script>
   
   <footer>
-  © 20260303 ettomio - 舞いカレンダー
+  © 20260405 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
   </body>
 </html>
-
