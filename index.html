@@ -2784,136 +2784,183 @@ function announceCompass() {
 // モデル名固定: gemini-3-flash-preview
 
 /**
- * AI秘書の応答メインロジック（送信ボタンや音声入力から呼ばれる）
+ * AI秘書 統合応答メインロジック
  */
+/**
+ * 起動時の挨拶と表示（UIへの反映）
+ */
+function announceCompass() {
+    const chatContainer = document.getElementById('ai-interaction-container');
+    const historyArea = document.getElementById('ai-chat-history');
+
+    if (chatContainer) {
+        chatContainer.style.display = 'block';
+        
+        // 1. 画面上に挨拶を表示する
+        if (historyArea) {
+            historyArea.style.display = 'block';
+            historyArea.innerHTML = '<div id="ai-response-area" style="color: #5daab0; font-weight: bold;">何かお手伝いしましょうか？</div>';
+        }
+
+        // 2. 音声で挨拶する
+        nativeSpeak("何かお手伝いしましょうか？");
+
+        // 3. スクロールして入力欄にフォーカス
+        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        const inputField = document.getElementById('ai-user-input');
+        if (inputField) inputField.focus();
+    }
+}
+ 
 async function handleAiChat() {
     const inputField = document.getElementById("ai-user-input");
     const userInput = (inputField.value || "").trim();
     if (!userInput) return;
 
-    // 1. 応答エリアの準備
     const historyArea = document.getElementById("ai-chat-history");
     if (historyArea) {
         historyArea.style.display = "block";
         historyArea.innerHTML = '<div id="ai-response-area">考え中です...</div>';
     }
     
-    // 2. 音声でも「考え中です」と伝える
     nativeSpeak("考え中です。");
 
-    // 3. ローカル解析（APIを使わずにJavaScriptで即答する）
-    const handled = await processLocalLogic(userInput);
+    // 判定ロジック実行
+    await processLocalLogic(userInput);
     
-    // 4. 解析が終わったら入力欄を空にする
     inputField.value = "";
 }
 
 /**
- * キーワード判別ロジック
+ * 統合判別ロジック（予定・実務・換算・誘導）
  */
 async function processLocalLogic(text) {
     const now = new Date();
     const currentYear = now.getFullYear();
 
-    // A. 祝日の問い合わせ（例: 5/5の祝日名は、来年の春分の日は）
-    if (text.includes("祝日") || text.includes("の日")) {
-        let targetYear = currentYear;
-        if (text.includes("来年")) targetYear += 1;
-
-        // 月日の抽出
-        const mMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
-        const holidayNameMatch = text.match(/(.*)はいつ/);
-
-        let found = null;
-        if (mMatch) {
-            const m = String(mMatch[1]).padStart(2, '0');
-            const d = String(mMatch[2]).padStart(2, '0');
-            const targetDate = `${targetYear}/${m}/${d}`;
-            found = holidaysData.find(h => h[0].startsWith(targetDate));
-        } else if (text.includes("春分の日")) {
-            found = holidaysData.find(h => h[0].includes(`${targetYear}/`) && h[1] === "春分の日");
-        }
-
-        if (found) {
-            finishAiResponse(`${targetYear}年${found[0].split('/')[1]}月${found[0].split('/')[2].split(' ')[0]}日は「${found[1]}」ですよ。`);
-            return true;
-        }
-    }
-
-    // B. 今日の紹介・六曜・二十四節気（今日のカードへ誘導）
-    if (text.match(/今日|六曜|二十四節気|月相/)) {
-        finishAiResponse("それについては「今日のカード」で詳しくご案内しております。画面のボタンから移動してくださいね。");
-        return true;
-    }
-
-    // C. 予定を聞かれた場合（カレンダー操作への誘導）
-    if (text.match(/予定.*(何|教え|ある)|(何|教え).*予定/)) {
-        finishAiResponse("予定のご確認ですね。カレンダーの日付を直接タップしていただくと、より素早く詳細をご確認いただけますよ。");
-        return true;
-    }
-
-    // D. 予定入力の解析（年・月・日の抽出）
+    // 1. 【最優先】予定入力解析（年指定・来年・今日・明日、時間有無問わず）
     const dateInfo = parseScheduleText(text);
-    if (dateInfo) {
+    if (dateInfo && (text.match(/入れ|登録|保存|予定|メモ|書い|セット/) || dateInfo.pureContent.length > 0)) {
         const dateInput = document.getElementById("scheduleDate");
         const textArea = document.getElementById("scheduleInput");
         if (dateInput && textArea) {
             dateInput.value = dateInfo.formattedDate;
             textArea.value = dateInfo.content;
-            finishAiResponse(`${dateInfo.displayDate}の予定に内容をセットしました。保存を押して確定させてください。`);
+            finishAiResponse(`${dateInfo.displayDate}の予定欄にセットしました。内容をご確認の上、保存を押してください。`);
             return true;
         }
     }
 
-    // どれにも該当しない場合
-    finishAiResponse("申し訳ありません、その件についてはお答えが難しいです。カレンダーや今日のカードも活用してみてくださいね。");
+    // 2. 実務・単位換算（農業・速度）
+    if (text.match(/一反|1反/)) {
+        finishAiResponse("一反（いったん）は約300坪、約992平方メートルです。300歩（ぶ）とも言います。");
+        return true;
+    }
+    if (text.includes("時速") && text.includes("秒速")) {
+        const speedMatch = text.match(/(\d+)/);
+        if (speedMatch) {
+            const jisoku = parseInt(speedMatch[1]);
+            const byosoku = (jisoku / 3.6).toFixed(2);
+            finishAiResponse(`時速${jisoku}キロは、秒速約${byosoku}メートルになります。`);
+            return true;
+        }
+    }
+
+    // 3. 祝日・未来特定（2027年や来年の祝日対応）
+    if (text.match(/祝日|の日/)) {
+        let targetYear = currentYear;
+        if (text.includes("来年")) targetYear += 1;
+        const yearMatch = text.match(/(\d{4})年/);
+        if (yearMatch) targetYear = parseInt(yearMatch[1]);
+
+        const mMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
+        let found = null;
+        if (mMatch) {
+            const m = String(mMatch[1]).padStart(2, '0');
+            const d = String(mMatch[2]).padStart(2, '0');
+            found = holidaysData.find(h => h[0].startsWith(`${targetYear}/${m}/${d}`));
+        } else if (text.includes("春分の日")) {
+            found = holidaysData.find(h => h[0].includes(`${targetYear}/`) && h[1] === "春分の日");
+        }
+        if (found) {
+            const fDate = found[0].split(' ')[0];
+            finishAiResponse(`${targetYear}年のその日は「${found[1]}」です。（${fDate}）`);
+            return true;
+        }
+    }
+
+    // 4. 今日の紹介・六曜等（今日のカードへ誘導）
+    if (text.match(/六曜|二十四節気|月相|今日/) && !text.includes("予定")) {
+        finishAiResponse("それについては「今日のカード」で詳しくご案内しております。画面のボタンから移動してください。");
+        return true;
+    }
+
+    // 5. 予定の聞き取り
+    if (text.match(/予定.*(何|教え|ある)|(何|教え).*予定/)) {
+        finishAiResponse("予定のご確認ですね。カレンダーの日付を直接タップしていただくと、より素早く詳細をご確認いただけます。");
+        return true;
+    }
+
+    finishAiResponse("申し訳ありません、その件についてはお答えが難しいです。何か他にお手伝いしましょうか？");
     return true;
 }
 
 /**
- * 予定テキスト解析
+ * 高精度テキスト解析
  */
 function parseScheduleText(text) {
     const now = new Date();
     let year = now.getFullYear();
+
+    // 年の特定
     const yearMatch = text.match(/(\d{4})年/);
     if (yearMatch) year = parseInt(yearMatch[1], 10);
+    else if (text.includes("来年")) year = now.getFullYear() + 1;
 
+    // 月日の特定
+    let month, day;
     const dateMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
-    if (!dateMatch) return null;
+    
+    if (dateMatch) {
+        month = String(dateMatch[1]).padStart(2, '0');
+        day = String(dateMatch[2]).padStart(2, '0');
+    } else if (text.includes("今日")) {
+        month = String(now.getMonth() + 1).padStart(2, '0');
+        day = String(now.getDate()).padStart(2, '0');
+    } else if (text.includes("明日")) {
+        const tomorrow = new Date(now);
+        tomorrow.setDate(now.getDate() + 1);
+        month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        day = String(tomorrow.getDate()).padStart(2, '0');
+    } else {
+        return null;
+    }
 
-    const month = String(dateMatch[1]).padStart(2, '0');
-    const day = String(dateMatch[2]).padStart(2, '0');
-    let content = text.split(dateMatch[0])[1] || "";
-    content = content.replace(/^の|を|に|は/, "").trim();
+    // 内容抽出と整形
+    let content = text;
+    if (yearMatch) content = content.replace(yearMatch[0], "");
+    if (dateMatch) content = content.split(dateMatch[0])[1] || content;
+    else if (text.includes("今日")) content = content.split("今日")[1] || content;
+    else if (text.includes("明日")) content = content.split("明日")[1] || content;
+
+    content = content.replace(/と入れて|を登録|して|の予定|を入れて|を保存|メモして|セットして|は$/, "").trim();
+    content = content.replace(/^[をにのは]/, "").trim();
 
     return {
         formattedDate: `${year}-${month}-${day}`,
-        displayDate: `${year}年${dateMatch[1]}月${dateMatch[2]}日`,
-        content: `${month}/${day} ${content}`
+        displayDate: `${year}年${month}月${day}日`,
+        content: `${month}/${day} ${content}`,
+        pureContent: content
     };
 }
 
 /**
- * 応答出力
+ * 最終応答出力
  */
 function finishAiResponse(msg) {
     const resArea = document.getElementById("ai-response-area");
     if (resArea) resArea.textContent = msg;
     nativeSpeak(msg);
-}
-
-// 音声入力開始時に「何かお手伝いしましょうか」と喋らせる既存の関数の修正
-function announceCompass() {
-    const chatContainer = document.getElementById('ai-interaction-container');
-    if (chatContainer) {
-        chatContainer.style.display = 'block';
-        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-    const msg = "何かお手伝いしましょうか？";
-    nativeSpeak(msg); // speakText ではなく nativeSpeak を使用
-    const inputField = document.getElementById('ai-user-input');
-    if (inputField) inputField.focus();
 }
 
 </script>
