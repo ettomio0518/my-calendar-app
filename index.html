@@ -2771,7 +2771,7 @@ function announceCompass() {
         chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
     
-    const msg = "現在、こちらは工事中です。";
+    const msg = "何かお手伝いしましょうか？";
     speakText(msg);
     
     // 入力欄にフォーカスを当てる
@@ -2780,8 +2780,119 @@ function announceCompass() {
 }
 </script>
 
+<script>
+// モデル名固定: gemini-3-flash-preview
+
+/**
+ * AI秘書の応答ロジック
+ * @param {string} userInput ユーザーからの入力テキスト
+ */
+async function handleAiChat(userInput) {
+    if (!userInput) return;
+
+    const responseArea = document.getElementById("ai-response-area"); // 応答表示用の要素
+    const chatHistory = document.getElementById("ai-chat-history");
+    
+    // 1. まずは「考え中です...」と表示（即レスポンス）
+    responseArea.textContent = "考え中です...";
+    speakText("考え中です。");
+
+    // --- 解析開始 ---
+    const text = userInput.trim();
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    // A. 春分の日などの祝日問い合わせ（データ照合）
+    if (text.includes("春分の日")) {
+        let targetYear = currentYear;
+        if (text.includes("来年")) targetYear = currentYear + 1;
+        if (text.includes("再来年")) targetYear = currentYear + 2;
+
+        const holiday = holidaysData.find(h => h[0].includes(`${targetYear}/`) && h[1] === "春分の日");
+        if (holiday) {
+            const dateStr = holiday[0].split(' ')[0]; // "2027/03/21" 形式を取得
+            const res = `${targetYear}年の春分の日は、${dateStr}です。`;
+            finishAiResponse(res);
+            return;
+        }
+    }
+
+    // B. 今日の紹介・六曜・二十四節気・月相（今日のカードへ誘導）
+    if (text.match(/今日|六曜|二十四節気|月相/)) {
+        const res = "それについては「今日のカード」で詳しくご案内しております。画面のボタンから移動してください。";
+        finishAiResponse(res);
+        return;
+    }
+
+    // C. 予定を聞かれた場合（カレンダー操作への誘導）
+    if (text.match(/予定.*(何|教え|ある)|(何|教え).*予定/)) {
+        const res = "予定のご確認ですね。カレンダーの日付を直接タップしていただくと、より素早く詳細をご確認いただけますよ。";
+        finishAiResponse(res);
+        return;
+    }
+
+    // D. 予定入力の解析（音声入力・テキスト入力共通）
+    const dateInfo = parseScheduleText(text);
+    if (dateInfo) {
+        // 解析に成功したら、既存の入力欄にセットして保存を促す
+        document.getElementById("scheduleDate").value = dateInfo.formattedDate;
+        document.getElementById("scheduleInput").value = dateInfo.content;
+        
+        const res = `${dateInfo.displayDate}の予定欄に内容をセットしました。よろしければ「保存」を押してください。`;
+        finishAiResponse(res);
+        return;
+    }
+
+    // E. その他、分からない場合
+    const finalFallback = "申し訳ありません、その件についてはお答えが難しいです。何か他にお手伝いしましょうか？";
+    finishAiResponse(finalFallback);
+}
+
+/**
+ * 予定テキストの解析（年・月・日の抽出）
+ */
+function parseScheduleText(text) {
+    const now = new Date();
+    let year = now.getFullYear();
+
+    // 1. 年の判定
+    const yearMatch = text.match(/(\d{4})年/);
+    if (yearMatch) {
+        year = parseInt(yearMatch[1], 10);
+    }
+
+    // 2. 月日の判定
+    const dateMatch = text.match(/(\d{1,2})月(\d{1,2})日/);
+    if (!dateMatch) return null;
+
+    const month = String(dateMatch[1]).padStart(2, '0');
+    const day = String(dateMatch[2]).padStart(2, '0');
+    const formattedDate = `${year}-${month}-${day}`;
+    
+    // 3. 内容の抽出（日付以降の文字）
+    let content = text.split(dateMatch[0])[1] || "";
+    content = content.replace(/^の|を|に/, "").trim(); // 「〜の予定」の「の」などを除去
+
+    return {
+        formattedDate: formattedDate,
+        displayDate: `${year}年${dateMatch[1]}月${dateMatch[2]}日`,
+        content: `${month}/${day} ${content}`
+    };
+}
+
+/**
+ * 応答の最終出力（表示と音声）
+ */
+function finishAiResponse(message) {
+    const responseArea = document.getElementById("ai-response-area");
+    responseArea.textContent = message;
+    speakText(message);
+}
+
+</script>
+
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 23.7 / Updated: 2026-04-05
+        © 2025 ettomio. All rights reserved. Version 23.8 / Updated: 2026-04-07
     </p>
     <div style="height: 50px;"></div>
 </body>
