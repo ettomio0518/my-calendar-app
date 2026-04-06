@@ -2834,133 +2834,76 @@ async function handleAiChat() {
 /**
  * 統合判別ロジック（予定・実務・換算・誘導）
  */
-async function processLocalLogic(text) {
-    const now = new Date();
-    const currentYear = now.getFullYear();
+// モデル名固定: gemini-3-flash-preview
 
-    // 1. 【最優先】予定入力解析（年指定・来年・今日・明日、時間有無問わず）
+/**
+ * AI秘書 統合応答（Geminiの知能を最大限に活かす版）
+ */
+async function handleAiChat() {
+    const inputField = document.getElementById("ai-user-input");
+    const userInput = (inputField.value || "").trim();
+    if (!userInput) return;
+
+    const historyArea = document.getElementById("ai-chat-history");
+    if (historyArea) {
+        historyArea.style.display = "block";
+        historyArea.innerHTML = '<div id="ai-response-area">考え中です...</div>';
+    }
+    
+    nativeSpeak("考え中です。");
+
+    // 1. 【アプリ内処理】予定のセットなど、特定の「動作」を伴うもの
+    const handledLocal = processDirectAction(userInput);
+    
+    if (handledLocal) {
+        inputField.value = "";
+        return; 
+    }
+
+    // 2. 【Geminiへ丸投げ】それ以外の質問（森羅万象）はすべてAPIに飛ばす
+    // 「今日のカード」と同じように、ここで Gemini API を呼び出します
+    await callGeminiAPI(userInput);
+
+    inputField.value = "";
+}
+
+/**
+ * 直接的なアプリ操作（予定入力など）の判定
+ */
+function processDirectAction(text) {
     const dateInfo = parseScheduleText(text);
-    if (dateInfo && (text.match(/入れ|登録|保存|予定|メモ|書い|セット/) || dateInfo.pureContent.length > 0)) {
+    // 「〜入れて」「〜登録」など、明らかにカレンダー操作を求めている場合
+    if (dateInfo && text.match(/入れ|登録|保存|セット|メモ|書い/)) {
         const dateInput = document.getElementById("scheduleDate");
         const textArea = document.getElementById("scheduleInput");
         if (dateInput && textArea) {
             dateInput.value = dateInfo.formattedDate;
             textArea.value = dateInfo.content;
-            finishAiResponse(`${dateInfo.displayDate}の予定欄にセットしました。内容をご確認の上、保存を押してください。`);
+            finishAiResponse(`${dateInfo.displayDate}の予定欄にセットしました。保存を押してください。`);
             return true;
         }
     }
-
-    // 2. 実務・単位換算（農業・速度）
-    if (text.match(/一反|1反/)) {
-        finishAiResponse("一反（いったん）は約300坪、約992平方メートルです。300歩（ぶ）とも言います。");
-        return true;
-    }
-    if (text.includes("時速") && text.includes("秒速")) {
-        const speedMatch = text.match(/(\d+)/);
-        if (speedMatch) {
-            const jisoku = parseInt(speedMatch[1]);
-            const byosoku = (jisoku / 3.6).toFixed(2);
-            finishAiResponse(`時速${jisoku}キロは、秒速約${byosoku}メートルになります。`);
-            return true;
-        }
-    }
-
-    // 3. 祝日・未来特定（2027年や来年の祝日対応）
-    if (text.match(/祝日|の日/)) {
-        let targetYear = currentYear;
-        if (text.includes("来年")) targetYear += 1;
-        const yearMatch = text.match(/(\d{4})年/);
-        if (yearMatch) targetYear = parseInt(yearMatch[1]);
-
-        const mMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
-        let found = null;
-        if (mMatch) {
-            const m = String(mMatch[1]).padStart(2, '0');
-            const d = String(mMatch[2]).padStart(2, '0');
-            found = holidaysData.find(h => h[0].startsWith(`${targetYear}/${m}/${d}`));
-        } else if (text.includes("春分の日")) {
-            found = holidaysData.find(h => h[0].includes(`${targetYear}/`) && h[1] === "春分の日");
-        }
-        if (found) {
-            const fDate = found[0].split(' ')[0];
-            finishAiResponse(`${targetYear}年のその日は「${found[1]}」です。（${fDate}）`);
-            return true;
-        }
-    }
-
-    // 4. 今日の紹介・六曜等（今日のカードへ誘導）
-    if (text.match(/六曜|二十四節気|月相|今日/) && !text.includes("予定")) {
-        finishAiResponse("それについては「今日のカード」で詳しくご案内しております。画面のボタンから移動してください。");
-        return true;
-    }
-
-    // 5. 予定の聞き取り
-    if (text.match(/予定.*(何|教え|ある)|(何|教え).*予定/)) {
-        finishAiResponse("予定のご確認ですね。カレンダーの日付を直接タップしていただくと、より素早く詳細をご確認いただけます。");
-        return true;
-    }
-
-    finishAiResponse("申し訳ありません、その件についてはお答えが難しいです。何か他にお手伝いしましょうか？");
-    return true;
+    return false; // それ以外は Gemini に任せる
 }
 
 /**
- * 高精度テキスト解析
+ * Gemini API 呼び出し（今日のカードと同様の仕組み）
  */
-function parseScheduleText(text) {
-    const now = new Date();
-    let year = now.getFullYear();
+async function callGeminiAPI(userInput) {
+    const env = getAiEnvironment();
+    const apiKey = localStorage.getItem(env.storageName);
 
-    // 年の特定
-    const yearMatch = text.match(/(\d{4})年/);
-    if (yearMatch) year = parseInt(yearMatch[1], 10);
-    else if (text.includes("来年")) year = now.getFullYear() + 1;
-
-    // 月日の特定
-    let month, day;
-    const dateMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
-    
-    if (dateMatch) {
-        month = String(dateMatch[1]).padStart(2, '0');
-        day = String(dateMatch[2]).padStart(2, '0');
-    } else if (text.includes("今日")) {
-        month = String(now.getMonth() + 1).padStart(2, '0');
-        day = String(now.getDate()).padStart(2, '0');
-    } else if (text.includes("明日")) {
-        const tomorrow = new Date(now);
-        tomorrow.setDate(now.getDate() + 1);
-        month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-        day = String(tomorrow.getDate()).padStart(2, '0');
-    } else {
-        return null;
+    if (!apiKey) {
+        finishAiResponse("Web版でAIの鍵（合言葉）を開けてください。");
+        return;
     }
 
-    // 内容抽出と整形
-    let content = text;
-    if (yearMatch) content = content.replace(yearMatch[0], "");
-    if (dateMatch) content = content.split(dateMatch[0])[1] || content;
-    else if (text.includes("今日")) content = content.split("今日")[1] || content;
-    else if (text.includes("明日")) content = content.split("明日")[1] || content;
-
-    content = content.replace(/と入れて|を登録|して|の予定|を入れて|を保存|メモして|セットして|は$/, "").trim();
-    content = content.replace(/^[をにのは]/, "").trim();
-
-    return {
-        formattedDate: `${year}-${month}-${day}`,
-        displayDate: `${year}年${month}月${day}日`,
-        content: `${month}/${day} ${content}`,
-        pureContent: content
-    };
-}
-
-/**
- * 最終応答出力
- */
-function finishAiResponse(msg) {
-    const resArea = document.getElementById("ai-response-area");
-    if (resArea) resArea.textContent = msg;
-    nativeSpeak(msg);
+    try {
+        // ここに「今日のカード」と同様の fetch 処理を記述します
+        // 成功すれば、finishAiResponse(AIの回答内容) を実行
+    } catch (e) {
+        finishAiResponse("申し訳ありません、通信に失敗しました。");
+    }
 }
 
 </script>
