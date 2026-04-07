@@ -2830,10 +2830,15 @@ async function runDialogueCompass(userMessage) {
         return;
     }
 
+    // カレンダーの表示から現在の年・月を取得
+    const currentYear = document.getElementById('year')?.innerText || new Date().getFullYear();
+    const currentMonth = document.getElementById('month-number')?.innerText || (new Date().getMonth() + 1);
+
     const systemPrompt = `あなたはデータ照合マシンです。
+現在の基準日時は ${currentYear}年${currentMonth}月 です。
 【鉄の掟】
 1. 挨拶、前置き、案内は【永久に禁止】。
-2. ユーザーの質問に対し、自身の知識で迅速に答えよ。
+2. ユーザーの質問に対し、上記の基準日時を前提として自身の知識で迅速に答えよ。
 3. 丁寧な日本語（です・ます）を使用せよ。`;
 
     try {
@@ -2875,10 +2880,48 @@ function finishAiResponse(msg) {
     else if (typeof speakText === 'function') speakText(msg);
 }
 
+/**
+ * 6. 音声入力開始処理
+ */
+function startAiVoiceInput() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        finishAiResponse("お使いのブラウザは音声入力に対応していません。");
+        return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+        const historyArea = document.getElementById('ai-chat-history');
+        if (historyArea) {
+            historyArea.style.display = 'block';
+            historyArea.innerText = "聞き取り中...";
+        }
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        const inputField = document.getElementById("ai-user-input");
+        if (inputField) {
+            inputField.value = transcript;
+            handleAiChat();
+        }
+    };
+
+    recognition.onerror = () => {
+        finishAiResponse("マイクの使用が許可されていないか、エラーが発生しました。");
+    };
+
+    recognition.start();
+}
+
 </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 24.0 / Updated: 2026-04-07
+        © 2025 ettomio. All rights reserved. Version 24.1 / Updated: 2026-04-08
     </p>
     <div style="height: 50px;"></div>
 </body>
