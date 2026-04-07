@@ -2830,18 +2830,28 @@ async function runDialogueCompass(userMessage) {
         return;
     }
 
-    const currentYear = document.getElementById('year')?.innerText || "2026"; // 2026年を基準に
-    const currentMonth = document.getElementById('month-number')?.innerText || "4";
+    // カレンダーヘッダーから情報を取得
+    const yearText = document.getElementById('year')?.innerText || "2026";
+    const monthText = document.getElementById('month-number')?.innerText || "4";
+    // 1. current-date (例: "4月8日(水)") から「日」を抽出
+    const currentDateText = document.getElementById('current-date')?.innerText || "";
+    const dayMatch = currentDateText.match(/(\d{1,2})日/);
+    const dayText = dayMatch ? dayMatch[1] : "8";
 
-    const systemPrompt = `あなたは優秀な秘書です。現在の基準年次は ${currentYear}年 です。
-ユーザーの問いが「予定の入力」に関するもの（例：◯月◯日 予定）である場合、以下のJSON形式のみを返してください。
+    // 2. AIに教える「今日」の基準
+    const todayFullDate = `${yearText}年${monthText}月${dayText}日`;
+
+    const systemPrompt = `あなたは優秀な秘書です。
+現在の基準日時は ${todayFullDate} です。
+ユーザーの問いが「予定の入力」に関するもの（例：今日の10時に会議、◯月◯日 予定）である場合、必ず以下のJSON形式のみを返してください。
 {"type": "schedule", "date": "YYYY-MM-DD", "text": "時間や内容を含む予定文字列"}
 
-それ以外の質問には、普通に回答してください。
-【鉄の掟】
-1. 挨拶、前置きは【永久に禁止】。
-2. 年の指定がない日付は ${currentYear}年 とみなせ。
-3. 丁寧な日本語を使用せよ。`;
+【予定解析ルール】
+1. 「今日」と言われたら ${todayFullDate} の日付を使え。
+2. 「明日」と言われたら ${todayFullDate} の翌日の日付を計算して使え。
+3. 年の指定がない場合は ${yearText}年 とみなせ。
+4. 返すのはJSONのみ。挨拶、解説、能書きは【永久に禁止】。
+5. JSON以外の質問には、普通に丁寧な日本語で回答せよ。`;
 
     try {
         const modelName = "gemini-3-flash-preview"; 
@@ -2860,13 +2870,14 @@ async function runDialogueCompass(userMessage) {
             // JSON（予定データ）が含まれているかチェック
             if (aiResponse.includes('"type": "schedule"')) {
                 try {
-                    const scheduleData = JSON.parse(aiResponse);
-                    // 既存の入力フォームに値をセット
+                    // マークダウンのコードブロックが含まれる場合は除去
+                    const jsonStr = aiResponse.replace(/```json|```/g, "").trim();
+                    const scheduleData = JSON.parse(jsonStr);
+                    
                     document.getElementById('scheduleDate').value = scheduleData.date;
                     document.getElementById('scheduleInput').value = scheduleData.text;
                     
-                    finishAiResponse(`${scheduleData.date} の予定を準備しました。「保存」を押してください。`);
-                    // 必要であれば自動保存: saveSchedule(); 
+                    finishAiResponse(`${scheduleData.date} の予定を準備しました。`);
                 } catch (e) {
                     finishAiResponse(aiResponse.replace(/[*#]/g, ''));
                 }
