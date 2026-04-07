@@ -2930,6 +2930,98 @@ function finishAiResponse(msg) {
 
 </script>
 
+<script>
+// モデル名固定: gemini-3-flash-preview
+
+/**
+ * 予定入力・保存の強制実行ロジック
+ */
+async function processLocalLogic(text) {
+    const dateInfo = parseScheduleText(text);
+
+    // 日付と内容が抽出できているか確認
+    if (dateInfo && dateInfo.pureContent.length > 0) {
+        const dateInput = document.getElementById("scheduleDate");
+        const textArea = document.getElementById("scheduleInput");
+
+        if (dateInput && textArea) {
+            // 1. 画面の入力ボックスに物理的に値を書き込む
+            dateInput.value = dateInfo.formattedDate;
+            textArea.value = dateInfo.content;
+
+            // 2. ブラウザに入力が完了したことを強制的に通知（これがないと空のまま扱われることがあります）
+            dateInput.dispatchEvent(new Event('input', { bubbles: true }));
+            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
+            textArea.dispatchEvent(new Event('input', { bubbles: true }));
+
+            // 3. 画面上の「保存」ボタンを探してクリックする
+            // ボタンのIDが 'saveSchedule' または 'saveButton' など、実際のIDに合わせてください
+            const saveBtn = document.getElementById("saveSchedule") || 
+                            document.querySelector('button[onclick*="save"]');
+
+            if (saveBtn) {
+                saveBtn.click(); // AIが物理的にボタンを押す
+                finishAiResponse(`${dateInfo.displayDate}に「${dateInfo.pureContent}」を直接書き込み、保存ボタンを押しました！`);
+            } else {
+                // ボタンが自動で押せなかった場合でも、ボックスには文字が残るようにします
+                finishAiResponse(`${dateInfo.displayDate}のボックスに内容をセットしました。画面の「保存」を押して確定させてください。`);
+            }
+            return true;
+        } else {
+            // 要素が見つからない場合
+            console.error("入力要素が見つかりません: scheduleDate または scheduleInput");
+        }
+    }
+    
+    // 予定入力でない場合や失敗した場合は、Gemini本体の知能へ
+    return false; 
+}
+
+/**
+ * 解析器（時間を内容に含めて抽出）
+ */
+function parseScheduleText(text) {
+    const now = new Date();
+    let year = now.getFullYear();
+    const yearMatch = text.match(/(\d{4})年/);
+    if (yearMatch) year = parseInt(yearMatch[1], 10);
+    else if (text.includes("来年")) year += 1;
+
+    let month, day;
+    const dateMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
+    
+    if (dateMatch) {
+        month = String(dateMatch[1]).padStart(2, '0');
+        day = String(dateMatch[2]).padStart(2, '0');
+    } else if (text.includes("今日")) {
+        month = String(now.getMonth() + 1).padStart(2, '0');
+        day = String(now.getDate()).padStart(2, '0');
+    } else if (text.includes("明日")) {
+        const tomorrow = new Date(now);
+        tomorrow.setDate(now.getDate() + 1);
+        month = String(tomorrow.getMonth() + 1).padStart(2, '0');
+        day = String(tomorrow.getDate()).padStart(2, '0');
+    } else return null;
+
+    // 「12:00から」などの時間は content に残す
+    let content = text;
+    if (dateMatch) content = content.split(dateMatch[0])[1] || content;
+    else if (text.includes("今日")) content = content.split("今日")[1] || content;
+
+    content = content.replace(/と入れて|を登録|して|の予定|を入れて|を保存|メモして|セットして/g, "").trim();
+    content = content.replace(/^[をにのは]/, "").trim();
+
+    return {
+        formattedDate: `${year}-${month}-${day}`,
+        displayDate: `${year}年${month}月${day}日`,
+        content: `${month}/${day} ${content}`,
+        pureContent: content
+    };
+}
+
+</script>
+
+
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
         © 2025 ettomio. All rights reserved. Version 23.9 / Updated: 2026-04-07
     </p>
