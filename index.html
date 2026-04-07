@@ -2762,6 +2762,7 @@ function closeAiConsultDialog() {
 
 
 <script>
+
 // モデル名固定: gemini-3-flash-preview
 
 /**
@@ -2807,30 +2808,11 @@ async function handleAiChat() {
         return;
     }
 
-    // B. 予定入力（ID名を dateInput / planText に完全一致させました）
-    const dateInfo = parseScheduleText(userMessage);
-    if (dateInfo && userMessage.match(/入れ|登録|保存|セット|メモ|書い/)) {
-        const dateBox = document.getElementById("dateInput"); 
-        const planBox = document.getElementById("planText");
-        
-        if (dateBox && planBox) {
-            dateBox.value = dateInfo.formattedDate;
-            planBox.value = dateInfo.content;
-            
-            // 変更を通知
-            dateBox.dispatchEvent(new Event('change', { bubbles: true }));
-            planBox.dispatchEvent(new Event('input', { bubbles: true }));
-
-            // 既存の保存関数 saveData() があれば実行
-            if (typeof saveData === "function") {
-                saveData();
-                finishAiResponse(`${dateInfo.displayDate}の予定に保存しました。`);
-            } else {
-                finishAiResponse(`${dateInfo.displayDate}の枠にセットしました。保存を押してください。`);
-            }
-            inputField.value = "";
-            return;
-        }
+    // B. 予定入力（「予定入力には対応していません」と回答し、処理を中断する）
+    if (userMessage.match(/(\d{1,2})月(\d{1,2})日|今日|明日|明後日|来週/) && userMessage.match(/入れ|登録|保存|セット|メモ|書い/)) {
+        finishAiResponse("申し訳ありません。予定入力には対応しておりません。カレンダーの入力欄を直接お使いください。");
+        inputField.value = "";
+        return;
     }
 
     // C. 森羅万象（Gemini API 通信）
@@ -2877,37 +2859,10 @@ async function runDialogueCompass(userMessage) {
 }
 
 /**
- * 4. 予定解析（時間を内容に含める改良版）
+ * 4. 予定解析（使用しないため null を返す形に無効化）
  */
 function parseScheduleText(text) {
-    const now = new Date();
-    let year = now.getFullYear();
-    const yearMatch = text.match(/(\d{4})年/);
-    if (yearMatch) year = parseInt(yearMatch[1], 10);
-    else if (text.includes("来年")) year += 1;
-
-    let month, day;
-    const dateMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
-    if (dateMatch) {
-        month = String(dateMatch[1]).padStart(2, '0');
-        day = String(dateMatch[2]).padStart(2, '0');
-    } else if (text.includes("今日")) {
-        month = String(now.getMonth() + 1).padStart(2, '0');
-        day = String(now.getDate()).padStart(2, '0');
-    } else return null;
-
-    let content = text;
-    if (dateMatch) content = content.split(dateMatch[0])[1] || content;
-    else if (text.includes("今日")) content = content.split("今日")[1] || content;
-
-    content = content.replace(/と入れて|を登録|して|の予定|を入れて|を保存|メモして|セットして/g, "").trim();
-    content = content.replace(/^[をにのは]/, "").trim();
-
-    return {
-        formattedDate: `${year}-${month}-${day}`,
-        displayDate: `${month}月${day}日`,
-        content: content
-    };
+    return null;
 }
 
 /**
@@ -2923,7 +2878,7 @@ function finishAiResponse(msg) {
 </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 23.9 / Updated: 2026-04-07
+        © 2025 ettomio. All rights reserved. Version 24.0 / Updated: 2026-04-07
     </p>
     <div style="height: 50px;"></div>
 </body>
