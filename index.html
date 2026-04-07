@@ -2830,16 +2830,18 @@ async function runDialogueCompass(userMessage) {
         return;
     }
 
-    // カレンダーの表示から現在の年・月を取得
-    const currentYear = document.getElementById('year')?.innerText || new Date().getFullYear();
-    const currentMonth = document.getElementById('month-number')?.innerText || (new Date().getMonth() + 1);
+    const currentYear = document.getElementById('year')?.innerText || "2026"; // 2026年を基準に
+    const currentMonth = document.getElementById('month-number')?.innerText || "4";
 
-    const systemPrompt = `あなたはデータ照合マシンです。
-現在の基準日時は ${currentYear}年${currentMonth}月 です。
+    const systemPrompt = `あなたは優秀な秘書です。現在の基準年次は ${currentYear}年 です。
+ユーザーの問いが「予定の入力」に関するもの（例：◯月◯日 予定）である場合、以下のJSON形式のみを返してください。
+{"type": "schedule", "date": "YYYY-MM-DD", "text": "時間や内容を含む予定文字列"}
+
+それ以外の質問には、普通に回答してください。
 【鉄の掟】
-1. 挨拶、前置き、案内は【永久に禁止】。
-2. ユーザーの質問に対し、上記の基準日時を前提として自身の知識で迅速に答えよ。
-3. 丁寧な日本語（です・ます）を使用せよ。`;
+1. 挨拶、前置きは【永久に禁止】。
+2. 年の指定がない日付は ${currentYear}年 とみなせ。
+3. 丁寧な日本語を使用せよ。`;
 
     try {
         const modelName = "gemini-3-flash-preview"; 
@@ -2853,10 +2855,24 @@ async function runDialogueCompass(userMessage) {
 
         const data = await response.json();
         if (data.candidates && data.candidates[0].content) {
-            let aiResponse = data.candidates[0].content.parts[0].text.replace(/[*#]/g, '');
-            finishAiResponse(aiResponse);
-        } else {
-            finishAiResponse("申し訳ありません、うまく聞き取れませんでした。");
+            let aiResponse = data.candidates[0].content.parts[0].text.trim();
+            
+            // JSON（予定データ）が含まれているかチェック
+            if (aiResponse.includes('"type": "schedule"')) {
+                try {
+                    const scheduleData = JSON.parse(aiResponse);
+                    // 既存の入力フォームに値をセット
+                    document.getElementById('scheduleDate').value = scheduleData.date;
+                    document.getElementById('scheduleInput').value = scheduleData.text;
+                    
+                    finishAiResponse(`${scheduleData.date} の予定を準備しました。「保存」を押してください。`);
+                    // 必要であれば自動保存: saveSchedule(); 
+                } catch (e) {
+                    finishAiResponse(aiResponse.replace(/[*#]/g, ''));
+                }
+            } else {
+                finishAiResponse(aiResponse.replace(/[*#]/g, ''));
+            }
         }
     } catch (error) {
         finishAiResponse("通信に失敗しました。");
