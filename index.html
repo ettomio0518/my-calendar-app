@@ -2762,53 +2762,31 @@ function closeAiConsultDialog() {
 
 
 <script>
-// 起動時の挨拶とスクロール
-function announceCompass() {
-    const chatContainer = document.getElementById('ai-interaction-container');
-    if (chatContainer) {
-        chatContainer.style.display = 'block';
-        // 最下段へスクロール
-        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-    
-    const msg = "何かお手伝いしましょうか？";
-    speakText(msg);
-    
-    // 入力欄にフォーカスを当てる
-    const inputField = document.getElementById('ai-user-input');
-    if (inputField) inputField.focus();
-}
-</script>
-
-<script>
 // モデル名固定: gemini-3-flash-preview
 
 /**
- * 1. AI秘書（AI羅針盤）ボタンをタップした時の起動処理
+ * 1. AI秘書（AI羅針盤）起動処理
  */
 function announceCompass() {
-    // コンテナを表示
     const chatContainer = document.getElementById('ai-interaction-container');
     if (chatContainer) {
         chatContainer.style.display = 'block';
         chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
 
-    // まず挨拶を喋る
     const msg = "何かお手伝いしましょうか？";
     if (typeof nativeSpeak === 'function') {
         nativeSpeak(msg);
+    } else if (typeof speakText === 'function') {
+        speakText(msg);
     }
 
-    // 入力欄にフォーカスを当てる
     const inputField = document.getElementById('ai-user-input');
-    if (inputField) {
-        inputField.focus();
-    }
+    if (inputField) inputField.focus();
 }
 
 /**
- * 2. 入力（送信ボタンやEnter）後のメイン処理
+ * 2. メイン応答処理
  */
 async function handleAiChat() {
     const inputField = document.getElementById("ai-user-input");
@@ -2822,36 +2800,46 @@ async function handleAiChat() {
     }
     if (typeof nativeSpeak === 'function') nativeSpeak("考え中です。");
 
-    // A. 六曜・行事・節気・今日のこと（今日のカードへ誘導）
+    // A. 誘導系
     if (userMessage.match(/六曜|行事|節気|月相|今日.*(何|教え|紹介|カード)/)) {
-        const msg = "それについては「今日のカード」で詳しくご案内しております。画面のボタンから移動してください。";
-        finishAiResponse(msg);
+        finishAiResponse("それについては「今日のカード」で詳しくご案内しております。画面のボタンから移動してください。");
         inputField.value = "";
         return;
     }
 
-    // B. 予定入力の解析（日付＋内容＋保存の意志）
+    // B. 予定入力（ID名を dateInput / planText に完全一致させました）
     const dateInfo = parseScheduleText(userMessage);
     if (dateInfo && userMessage.match(/入れ|登録|保存|セット|メモ|書い/)) {
-        const dateInput = document.getElementById("scheduleDate");
-        const textArea = document.getElementById("scheduleInput");
-        if (dateInput && textArea) {
-            dateInput.value = dateInfo.formattedDate;
-            textArea.value = dateInfo.content;
-            const res = `${dateInfo.displayDate}の予定欄にセットしました。保存を押してください。`;
-            finishAiResponse(res);
+        const dateBox = document.getElementById("dateInput"); 
+        const planBox = document.getElementById("planText");
+        
+        if (dateBox && planBox) {
+            dateBox.value = dateInfo.formattedDate;
+            planBox.value = dateInfo.content;
+            
+            // 変更を通知
+            dateBox.dispatchEvent(new Event('change', { bubbles: true }));
+            planBox.dispatchEvent(new Event('input', { bubbles: true }));
+
+            // 既存の保存関数 saveData() があれば実行
+            if (typeof saveData === "function") {
+                saveData();
+                finishAiResponse(`${dateInfo.displayDate}の予定に保存しました。`);
+            } else {
+                finishAiResponse(`${dateInfo.displayDate}の枠にセットしました。保存を押してください。`);
+            }
             inputField.value = "";
             return;
         }
     }
 
-    // C. それ以外の森羅万象（Gemini API 通信）
+    // C. 森羅万象（Gemini API 通信）
     await runDialogueCompass(userMessage);
     inputField.value = "";
 }
 
 /**
- * 3. Gemini API 通信ロジック
+ * 3. Gemini API 通信（森羅万象）
  */
 async function runDialogueCompass(userMessage) {
     const apiKey = localStorage.getItem("gemini_api_key"); 
@@ -2883,14 +2871,13 @@ async function runDialogueCompass(userMessage) {
         } else {
             finishAiResponse("申し訳ありません、うまく聞き取れませんでした。");
         }
-
     } catch (error) {
         finishAiResponse("通信に失敗しました。");
     }
 }
 
 /**
- * 4. 予定解析ロジック
+ * 4. 予定解析（時間を内容に含める改良版）
  */
 function parseScheduleText(text) {
     const now = new Date();
@@ -2909,101 +2896,6 @@ function parseScheduleText(text) {
         day = String(now.getDate()).padStart(2, '0');
     } else return null;
 
-    let content = text.replace(/(\d{4}年|来年|今日|明日)/g, "").replace(/(\d{1,2}月\d{1,2}日|\d{1,2}\/\d{1,2})/, "").trim();
-    content = content.replace(/と入れて|を登録|して|の予定|を入れて|を保存|メモして|セットして/g, "").replace(/^[をにのは]/, "").trim();
-
-    return {
-        formattedDate: `${year}-${month}-${day}`,
-        displayDate: `${year}年${month}月${day}日`,
-        content: `${month}/${day} ${content}`
-    };
-}
-
-/**
- * 5. 応答出力（画面表示 ＋ 音声）
- */
-function finishAiResponse(msg) {
-    const resArea = document.getElementById('ai-chat-history');
-    if (resArea) resArea.innerText = msg;
-    if (typeof nativeSpeak === 'function') nativeSpeak(msg);
-}
-
-</script>
-
-<script>
-// モデル名固定: gemini-3-flash-preview
-
-/**
- * 予定入力・保存の強制実行ロジック
- */
-async function processLocalLogic(text) {
-    const dateInfo = parseScheduleText(text);
-
-    // 日付と内容が抽出できているか確認
-    if (dateInfo && dateInfo.pureContent.length > 0) {
-        const dateInput = document.getElementById("scheduleDate");
-        const textArea = document.getElementById("scheduleInput");
-
-        if (dateInput && textArea) {
-            // 1. 画面の入力ボックスに物理的に値を書き込む
-            dateInput.value = dateInfo.formattedDate;
-            textArea.value = dateInfo.content;
-
-            // 2. ブラウザに入力が完了したことを強制的に通知（これがないと空のまま扱われることがあります）
-            dateInput.dispatchEvent(new Event('input', { bubbles: true }));
-            dateInput.dispatchEvent(new Event('change', { bubbles: true }));
-            textArea.dispatchEvent(new Event('input', { bubbles: true }));
-
-            // 3. 画面上の「保存」ボタンを探してクリックする
-            // ボタンのIDが 'saveSchedule' または 'saveButton' など、実際のIDに合わせてください
-            const saveBtn = document.getElementById("saveSchedule") || 
-                            document.querySelector('button[onclick*="save"]');
-
-            if (saveBtn) {
-                saveBtn.click(); // AIが物理的にボタンを押す
-                finishAiResponse(`${dateInfo.displayDate}に「${dateInfo.pureContent}」を直接書き込み、保存ボタンを押しました！`);
-            } else {
-                // ボタンが自動で押せなかった場合でも、ボックスには文字が残るようにします
-                finishAiResponse(`${dateInfo.displayDate}のボックスに内容をセットしました。画面の「保存」を押して確定させてください。`);
-            }
-            return true;
-        } else {
-            // 要素が見つからない場合
-            console.error("入力要素が見つかりません: scheduleDate または scheduleInput");
-        }
-    }
-    
-    // 予定入力でない場合や失敗した場合は、Gemini本体の知能へ
-    return false; 
-}
-
-/**
- * 解析器（時間を内容に含めて抽出）
- */
-function parseScheduleText(text) {
-    const now = new Date();
-    let year = now.getFullYear();
-    const yearMatch = text.match(/(\d{4})年/);
-    if (yearMatch) year = parseInt(yearMatch[1], 10);
-    else if (text.includes("来年")) year += 1;
-
-    let month, day;
-    const dateMatch = text.match(/(\d{1,2})月(\d{1,2})日/) || text.match(/(\d{1,2})\/(\d{1,2})/);
-    
-    if (dateMatch) {
-        month = String(dateMatch[1]).padStart(2, '0');
-        day = String(dateMatch[2]).padStart(2, '0');
-    } else if (text.includes("今日")) {
-        month = String(now.getMonth() + 1).padStart(2, '0');
-        day = String(now.getDate()).padStart(2, '0');
-    } else if (text.includes("明日")) {
-        const tomorrow = new Date(now);
-        tomorrow.setDate(now.getDate() + 1);
-        month = String(tomorrow.getMonth() + 1).padStart(2, '0');
-        day = String(tomorrow.getDate()).padStart(2, '0');
-    } else return null;
-
-    // 「12:00から」などの時間は content に残す
     let content = text;
     if (dateMatch) content = content.split(dateMatch[0])[1] || content;
     else if (text.includes("今日")) content = content.split("今日")[1] || content;
@@ -3013,14 +2905,22 @@ function parseScheduleText(text) {
 
     return {
         formattedDate: `${year}-${month}-${day}`,
-        displayDate: `${year}年${month}月${day}日`,
-        content: `${month}/${day} ${content}`,
-        pureContent: content
+        displayDate: `${month}月${day}日`,
+        content: content
     };
 }
 
-</script>
+/**
+ * 5. 応答出力
+ */
+function finishAiResponse(msg) {
+    const resArea = document.getElementById('ai-chat-history');
+    if (resArea) resArea.innerText = msg;
+    if (typeof nativeSpeak === 'function') nativeSpeak(msg);
+    else if (typeof speakText === 'function') speakText(msg);
+}
 
+</script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
         © 2025 ettomio. All rights reserved. Version 23.9 / Updated: 2026-04-07
