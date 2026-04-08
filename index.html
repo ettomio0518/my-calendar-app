@@ -2199,7 +2199,7 @@
     
     <div style="display:flex; flex-direction:column; gap:12px;">
         <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/index.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #ccc; background:#f9f9f9; font-weight:bold; cursor:pointer;">🚧 工事中</button>
+            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">👑 Topページ</button>
         
         <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/today-card.html'" 
             style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">📅 今日のカード</button>
@@ -2879,7 +2879,7 @@ async function runDialogueCompass(userMessage) {
                         const mmdd = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')}`;
                         scheduleInput.value = `${mmdd} ${s.text}`;
 
-                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。`);
+                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押してください。次の場面ではいいえ`);
                         
                         // 入力欄にフォーカスを当てて、ユーザーが確認・保存しやすくする
                         scheduleInput.focus();
@@ -3013,7 +3013,7 @@ function startAiVoiceInput() {
 </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 24.2 / Updated: 2026-04-08
+        © 2025 ettomio. All rights reserved. Version 24.3 / Updated: 2026-04-08
     </p>
     <div style="height: 50px;"></div>
 </body>
