@@ -2818,6 +2818,7 @@ async function handleAiChat() {
 
 /**
  * 3. Gemini API 通信（森羅万象）
+ * 既存の保存システム・カレンダー着色ロジックと完全に同期させます。
  */
 async function runDialogueCompass(userMessage) {
     const apiKey = localStorage.getItem("gemini_api_key"); 
@@ -2826,27 +2827,24 @@ async function runDialogueCompass(userMessage) {
         return;
     }
 
-    // カレンダーヘッダーから情報を取得
+    // 基準日時の取得（カレンダーヘッダーから）
     const yearText = document.getElementById('year')?.innerText || "2026";
     const monthText = document.getElementById('month-number')?.innerText || "4";
     const currentDateText = document.getElementById('current-date')?.innerText || "";
     const dayMatch = currentDateText.match(/(\d{1,2})日/);
     const dayText = dayMatch ? dayMatch[1] : "8";
-
-    // AIに教える「今日」の基準
     const todayFullDate = `${yearText}年${monthText}月${dayText}日`;
 
     const systemPrompt = `あなたは優秀な秘書です。
 現在の基準日時は ${todayFullDate} です。
-ユーザーの問いが「予定の入力・保存・メモ」に関する内容である場合、必ず以下のJSON形式のみを返してください。
-{"type": "schedule", "date": "YYYY-MM-DD", "text": "時間や内容を含む予定文字列"}
+ユーザーの問いが「予定の入力・保存・予約」に関する内容である場合、必ず以下のJSON形式のみを返してください。
+{"type": "schedule", "year": "YYYY", "month": "MM", "day": "DD", "text": "予定内容"}
 
 【予定解析ルール】
-1. 「今日」は ${todayFullDate}。
-2. 「明日」や「来週」などは ${todayFullDate} を基準に正確に計算せよ。
-3. 年の指定がない日付は ${yearText}年 とせよ。
-4. 返すのはJSONのみ。挨拶、解説、能書きは【永久に禁止】。
-5. JSON以外の質問には、普通に丁寧な日本語で回答せよ。`;
+1. 年の指定がない日付は ${yearText}年 とせよ。
+2. 「明日」「来週」などは ${todayFullDate} を基準に計算せよ。
+3. 返すのはJSONのみ。挨拶、解説、能書きは【永久に禁止】。
+4. JSON以外の質問には、普通に丁寧な日本語で回答せよ。`;
 
     try {
         const modelName = "gemini-3-flash-preview"; 
@@ -2866,23 +2864,31 @@ async function runDialogueCompass(userMessage) {
             if (aiResponse.includes('"type": "schedule"')) {
                 try {
                     const jsonStr = aiResponse.replace(/```json|```/g, "").trim();
-                    const scheduleData = JSON.parse(jsonStr);
+                    const s = JSON.parse(jsonStr);
                     
-                    // 予定入力欄に値を反映
                     const dateInput = document.getElementById('scheduleDate');
                     const scheduleInput = document.getElementById('scheduleInput');
                     
                     if (dateInput && scheduleInput) {
-                        dateInput.value = scheduleData.date;
-                        scheduleInput.value = scheduleData.text;
-                        finishAiResponse(`${scheduleData.date} の予定を準備しました。「保存」ボタンを押してください。`);
-                    } else {
-                        finishAiResponse("入力欄が見つかりません。");
+                        // A. 日付選択ツール (input type="date") を更新
+                        const formattedDate = `${s.year}-${s.month.padStart(2,'0')}-${s.day.padStart(2,'0')}`;
+                        dateInput.value = formattedDate;
+
+                        // B. 予定内容ボックスを「既存の保存形式」で更新
+                        // 形式: MM/DD[半角スペース]予定内容
+                        const mmdd = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')}`;
+                        scheduleInput.value = `${mmdd} ${s.text}`;
+
+                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。`);
+                        
+                        // 入力欄にフォーカスを当てて、ユーザーが確認・保存しやすくする
+                        scheduleInput.focus();
                     }
                 } catch (e) {
                     finishAiResponse(aiResponse.replace(/[*#]/g, ''));
                 }
             } else {
+                // 通常の会話応答
                 finishAiResponse(aiResponse.replace(/[*#]/g, ''));
             }
         }
