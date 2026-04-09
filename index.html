@@ -2817,8 +2817,7 @@ async function handleAiChat() {
 }
 
 /**
- * 3. Gemini API 通信（森羅万象）
- * 既存の保存システム・カレンダー着色ロジックと完全に同期させます。
+ * 3. Gemini API 通信（修正版：日付認識の強化）
  */
 async function runDialogueCompass(userMessage) {
     const apiKey = localStorage.getItem("gemini_api_key"); 
@@ -2827,24 +2826,37 @@ async function runDialogueCompass(userMessage) {
         return;
     }
 
-    // 基準日時の取得（カレンダーヘッダーから）
-    const yearText = document.getElementById('year')?.innerText || "2026";
-    const monthText = document.getElementById('month-number')?.innerText || "4";
-    const currentDateText = document.getElementById('current-date')?.innerText || "";
-    const dayMatch = currentDateText.match(/(\d{1,2})日/);
-    const dayText = dayMatch ? dayMatch[1] : "8";
-    const todayFullDate = `${yearText}年${monthText}月${dayText}日`;
+    // デバイスの現在時刻を確実に取得
+//    const now = new Date();
+// --- テスト用の固定日付設定 ---
+    const now = new Date("2026-04-10T09:00:00"); // ここをテストしたい日に書き換える
+    // ----------------------------    
+    const y = now.getFullYear();
+    const m = now.getMonth() + 1;
+    const d = now.getDate();
+    const dayOfWeek = ["日","月","火","水","木","金","土"][now.getDay()];
+    
+    // AIに教える「絶対的な今日」
+    const todayFullDate = `${y}年${m}月${d}日(${dayOfWeek})`;
 
-    const systemPrompt = `あなたは優秀な秘書です。
+const systemPrompt = `あなたは優秀な秘書です。
 現在の基準日時は ${todayFullDate} です。
-ユーザーの問いが「予定の入力・保存・予約」に関する内容である場合、必ず以下のJSON形式のみを返してください。
-{"type": "schedule", "year": "YYYY", "month": "MM", "day": "DD", "text": "予定内容"}
+
+【役割分担の徹底】
+1. 予定の入力・保存・メモに関してはJSONで返せ。
+2. 「満月」「新月」「月相」「六曜」「二十四節気」「祝日」について聞かれたら、
+   絶対に自分で日付や名前を答えず、必ず以下の通りに回答してください。
+   「その情報は、『今日のカード』の中に詳しく記載されています。ぜひそちらを確認してみてください。」
+   
+【重要】現在の基準日時は ${todayFullDate} です。
+ユーザーの問いが「予定の入力・保存・メモ」に関する内容である場合、必ず以下のJSON形式のみを返してください。
+{"type": "schedule", "year": "${y}", "month": "${m}", "day": "${d}", "text": "内容"}
 
 【予定解析ルール】
-1. 年の指定がない日付は ${yearText}年 とせよ。
-2. 「明日」「来週」などは ${todayFullDate} を基準に計算せよ。
-3. 返すのはJSONのみ。挨拶、解説、能書きは【永久に禁止】。
-4. JSON以外の質問には、普通に丁寧な日本語で回答せよ。`;
+1. 「今日」は ${todayFullDate} です。
+2. 「明日」は ${y}年${m}月${d+1}日（月末などの計算は正確に行え）。
+3. ユーザーが「今日の予定」と言ったら、必ず日付を ${y}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')} にせよ。
+4. 返すのはJSONのみ。挨拶、解説、能書きは禁止。`;
 
     try {
         const modelName = "gemini-3-flash-preview"; 
@@ -2860,7 +2872,6 @@ async function runDialogueCompass(userMessage) {
         if (data.candidates && data.candidates[0].content) {
             let aiResponse = data.candidates[0].content.parts[0].text.trim();
             
-            // JSON（予定データ）が含まれているかチェック
             if (aiResponse.includes('"type": "schedule"')) {
                 try {
                     const jsonStr = aiResponse.replace(/```json|```/g, "").trim();
@@ -2870,25 +2881,20 @@ async function runDialogueCompass(userMessage) {
                     const scheduleInput = document.getElementById('scheduleInput');
                     
                     if (dateInput && scheduleInput) {
-                        // A. 日付選択ツール (input type="date") を更新
-                        const formattedDate = `${s.year}-${s.month.padStart(2,'0')}-${s.day.padStart(2,'0')}`;
-                        dateInput.value = formattedDate;
+                        // 日付をセット
+                        const targetDate = `${s.year}-${s.month.padStart(2,'0')}-${s.day.padStart(2,'0')}`;
+                        dateInput.value = targetDate;
 
-                        // B. 予定内容ボックスを「既存の保存形式」で更新
-                        // 形式: MM/DD[半角スペース]予定内容
-                        const mmdd = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')}`;
-                        scheduleInput.value = `${mmdd} ${s.text}`;
+                        // テキストボックスに「MM/DD 内容」をセット
+                        scheduleInput.value = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')} ${s.text}`;
 
-                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押してください。次の場面ではいいえ`);
-                        
-                        // 入力欄にフォーカスを当てて、ユーザーが確認・保存しやすくする
+                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。`);
                         scheduleInput.focus();
                     }
                 } catch (e) {
                     finishAiResponse(aiResponse.replace(/[*#]/g, ''));
                 }
             } else {
-                // 通常の会話応答
                 finishAiResponse(aiResponse.replace(/[*#]/g, ''));
             }
         }
@@ -3013,7 +3019,7 @@ function startAiVoiceInput() {
 </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 24.3 / Updated: 2026-04-08
+        © 2025 ettomio. All rights reserved. Version 24.4 / Updated: 2026-04-09
     </p>
     <div style="height: 50px;"></div>
 </body>
