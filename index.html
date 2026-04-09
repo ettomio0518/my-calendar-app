@@ -2850,7 +2850,10 @@ async function runDialogueCompass(userMessage) {
 
 【役割分担の徹底】
 1. 予定の入力・保存・メモに関してはJSONで返せ。
-2. 「満月」「新月」「月相」「六曜」「二十四節気」「祝日」について聞かれたら、
+2. 予定の「確認（今日の予定は？等）」や「内容の問い合わせ」をされたら、
+   絶対に自分で内容を答えず、必ず以下の通りに回答してください。
+   「予定の確認は、カレンダーの日付セルをタップすることで対応できます。そちらを確認してみてください。」
+3. 「満月」「新月」「月相」「六曜」「二十四節気」「祝日」について聞かれたら、
    絶対に自分で日付や名前を答えず、必ず以下の通りに回答してください。
    「その情報は、『今日のカード』で対応できます。ぜひそちらを確認してみてください。」
    
@@ -2861,8 +2864,11 @@ async function runDialogueCompass(userMessage) {
 【予定解析ルール】
 1. 「今日」は ${todayFullDate} です。
 2. 「明日」は ${y_tomorrow}年${m_tomorrow}月${d_tomorrow}日 です。
-3. 年の指定がない日付は、原則として ${y_now}年 とせよ。
-4. 返すのはJSONのみ。挨拶、解説、能書きは禁止。`;
+3. ユーザーが「今日の予定」と言った場合：
+   - 「今日の予定は？（確認）」なら、セルタップを案内。
+   - 「今日の予定にテストと入れて（入力）」なら、JSONを生成。
+4. 年の指定がない日付は、原則として ${y_now}年 とせよ。
+5. 返すのはJSONまたは指定の案内文のみ。挨拶、解説、能書きは一切禁止。`;
 
     try {
         const modelName = "gemini-3-flash-preview"; 
@@ -2894,7 +2900,7 @@ async function runDialogueCompass(userMessage) {
                         // テキストボックスに「MM/DD 内容」をセット
                         scheduleInput.value = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')} ${s.text}`;
 
-                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押して、次の場面ではキャンセルしてください。`);
+                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押して、次の場面ではいいえ。`);
                         scheduleInput.focus();
                     }
                 } catch (e) {
