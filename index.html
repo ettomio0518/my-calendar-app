@@ -2207,26 +2207,19 @@ document.getElementById("btnSearch7").onclick = () => {
     <button onclick="openAiConsultDialog()" style="padding:15px 25px; border-radius:12px; border:2px solid #5daab0; background:#5daab0; color:white; cursor:pointer; font-weight:bold; font-size:1.1em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">💬 AIに相談する❗️</button>
 </div>
 
-<div id="ai-consult-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:25px; border:4px solid #5daab0; z-index:20000; border-radius:20px; width:85%; max-width:350px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); font-family: sans-serif;">
-    
-    <h3 style="margin-top:0; color:#5daab0; text-align:center; font-size:1.2em;">どちらに進みますか？</h3>
-    
-    <div style="display:flex; flex-direction:column; gap:12px;">
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/index.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">👑 Topページ</button>
-        
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/today-card.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">📅 今日のカード</button>
-        
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/metrology.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">📐 度量衡コンバーター</button>
-            
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/shopping.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">🧮 お買い物電卓</button>
-                    
-        <button onclick="closeAiConsultDialog()" 
-            style="margin-top:10px; padding:10px; border-radius:10px; border:none; background:#eee; color:#666; font-weight:bold; cursor:pointer;">閉じる</button>
-    </div>
+<div id="ai-consult-modal" class="dialog-overlay" style="display:none;">
+  <div class="dialog-box">
+
+    <h3>どちらに進みますか？</h3>
+
+    <button onclick="location.href='index.html'">👑 Topページ</button>
+    <button onclick="location.href='today-card.html'">📅 今日のカード</button>
+    <button onclick="location.href='metrology.html'">📐 度量衡</button>
+    <button onclick="location.href='shopping.html'">🧮 お買い物電卓</button>
+
+    <button onclick="closeAiConsultDialog()">閉じる</button>
+
+  </div>
 </div>
 
 
@@ -3047,28 +3040,14 @@ function startAiVoiceInput() {
 </script>
 
 <script>
-window.openAiConsultDialog = function() {
-    document.getElementById("ai-consult-modal").style.display = "block";
-};
+function openAiConsultDialog() {
+    document.getElementById("ai-consult-modal").style.display = "flex";
+}
 
-window.closeAiConsultDialog = function() {
+function closeAiConsultDialog() {
     document.getElementById("ai-consult-modal").style.display = "none";
-};
-</script>
+}
 
-<script>
-window.openAiConsultDialog = function() {
-    const modal = document.getElementById("ai-consult-modal");
-
-    console.log(modal); // ←これ重要
-
-    if (!modal) {
-        alert("見つからない");
-        return;
-    }
-
-    modal.style.display = "block";
-};
 </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
