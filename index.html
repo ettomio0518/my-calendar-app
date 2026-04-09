@@ -2083,12 +2083,13 @@
 			// };
 			
 		    // 4/10追加
-			document.getElementById("btnSearch7").onclick = () => {
-			    // 1. 最初のダイアログを閉じる
-			    hideDialog();
-			    // 2. AI相談のダイアログを表示する
-			    openAiConsultDialog()
-			};
+document.getElementById("btnSearch7").onclick = () => {
+    // まず黒い幕を消す
+    document.getElementById("customDialog").style.display = "none";
+
+    // そのあとAIダイアログを出す
+    openAiConsultDialog();
+};
 
 			document.getElementById("btnSearch").onclick = () => {
 			    window.location.href = "AdvancedSearch.html?from=index";
