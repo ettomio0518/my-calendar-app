@@ -966,7 +966,8 @@
 		  <div class="dialog-box">
 		    <h3>どちらに進みますか？</h3>
 		    <button id="btnSchedule">今日のカード</button>
-		    <button id="btnSearch7">予定を音声入力</button>
+		    <!-- <button id="btnSearch7">予定を音声入力</button> -->
+		    <button id="btnSearch7">AIに相談する</button>
 		    <button id="btnSearch">高機能検索に進む</button>
 		    <button id="btnSearch2">ノートに進む</button>
 		    <button id="btnSearch3">簡易日記に進む</button>
@@ -2075,10 +2076,18 @@
 			};
 		    
 		    // 10/8追加
+			// document.getElementById("btnSearch7").onclick = () => {
+			//     document.getElementById("voiceInputButton2").style.display = "inline-block"; 
+			//     startVoiceInput2();
+			//     hideDialog();
+			// };
+			
+		    // 4/10追加
 			document.getElementById("btnSearch7").onclick = () => {
-			    document.getElementById("voiceInputButton2").style.display = "inline-block"; 
-			    startVoiceInput2();
+			    // 1. 最初のダイアログを閉じる
 			    hideDialog();
+			    // 2. AI相談のダイアログを表示する
+			    openAiConsultDialog()
 			};
 
 			document.getElementById("btnSearch").onclick = () => {
@@ -3036,8 +3045,33 @@ function startAiVoiceInput() {
 
 </script>
 
+<script>
+window.openAiConsultDialog = function() {
+    document.getElementById("ai-consult-modal").style.display = "block";
+};
+
+window.closeAiConsultDialog = function() {
+    document.getElementById("ai-consult-modal").style.display = "none";
+};
+</script>
+
+<script>
+window.openAiConsultDialog = function() {
+    const modal = document.getElementById("ai-consult-modal");
+
+    console.log(modal); // ←これ重要
+
+    if (!modal) {
+        alert("見つからない");
+        return;
+    }
+
+    modal.style.display = "block";
+};
+</script>
+
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 24.6 / Updated: 2026-04-10
+        © 2025 ettomio. All rights reserved. Version 24.7 / Updated: 2026-04-10
     </p>
     <div style="height: 50px;"></div>
 </body>
