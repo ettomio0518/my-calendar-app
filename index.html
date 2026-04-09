@@ -2803,7 +2803,7 @@ async function handleAiChat() {
 
     // A. 誘導系
     if (userMessage.match(/六曜|行事|節気|月相|今日.*(何|教え|紹介|カード)/)) {
-        finishAiResponse("それについては「今日のカード」で詳しくご案内しております。画面のボタンから移動してください。");
+        finishAiResponse("それについては「今日のカード」で対応できます。画面のボタンから移動してください。");
         inputField.value = "";
         return;
     }
@@ -2826,36 +2826,42 @@ async function runDialogueCompass(userMessage) {
         return;
     }
 
-    // デバイスの現在時刻を確実に取得
-//    const now = new Date();
-// --- テスト用の固定日付設定 ---
-    const now = new Date("2026-04-10T09:00:00"); // ここをテストしたい日に書き換える
-    // ----------------------------    
-    const y = now.getFullYear();
-    const m = now.getMonth() + 1;
-    const d = now.getDate();
+    // --- 1. デバイスの「今日」を取得 ---
+    const now = new Date();
+    // テスト用の固定設定（必要時のみコメントアウト解除）
+    // const now = new Date("2026-04-10T09:00:00"); 
+
+    const y_now = now.getFullYear();
+    const m_now = now.getMonth() + 1;
+    const d_now = now.getDate();
     const dayOfWeek = ["日","月","火","水","木","金","土"][now.getDay()];
     
     // AIに教える「絶対的な今日」
-    const todayFullDate = `${y}年${m}月${d}日(${dayOfWeek})`;
+    const todayFullDate = `${y_now}年${m_now}月${d_now}日(${dayOfWeek})`;
 
-const systemPrompt = `あなたは優秀な秘書です。
+    // --- 2. 「明日」をJavaScript側で計算（AIへのヒント用） ---
+    const tomorrow = new Date(y_now, m_now - 1, d_now + 1);
+    const y_tomorrow = tomorrow.getFullYear();
+    const m_tomorrow = tomorrow.getMonth() + 1;
+    const d_tomorrow = tomorrow.getDate();
+
+    const systemPrompt = `あなたは優秀な秘書です。
 現在の基準日時は ${todayFullDate} です。
 
 【役割分担の徹底】
 1. 予定の入力・保存・メモに関してはJSONで返せ。
 2. 「満月」「新月」「月相」「六曜」「二十四節気」「祝日」について聞かれたら、
    絶対に自分で日付や名前を答えず、必ず以下の通りに回答してください。
-   「その情報は、『今日のカード』の中に詳しく記載されています。ぜひそちらを確認してみてください。」
+   「その情報は、『今日のカード』で対応できます。ぜひそちらを確認してみてください。」
    
 【重要】現在の基準日時は ${todayFullDate} です。
 ユーザーの問いが「予定の入力・保存・メモ」に関する内容である場合、必ず以下のJSON形式のみを返してください。
-{"type": "schedule", "year": "${y}", "month": "${m}", "day": "${d}", "text": "内容"}
+{"type": "schedule", "year": "YYYY", "month": "MM", "day": "DD", "text": "内容"}
 
 【予定解析ルール】
 1. 「今日」は ${todayFullDate} です。
-2. 「明日」は ${y}年${m}月${d+1}日（月末などの計算は正確に行え）。
-3. ユーザーが「今日の予定」と言ったら、必ず日付を ${y}-${m.toString().padStart(2,'0')}-${d.toString().padStart(2,'0')} にせよ。
+2. 「明日」は ${y_tomorrow}年${m_tomorrow}月${d_tomorrow}日 です。
+3. 年の指定がない日付は、原則として ${y_now}年 とせよ。
 4. 返すのはJSONのみ。挨拶、解説、能書きは禁止。`;
 
     try {
@@ -2888,7 +2894,7 @@ const systemPrompt = `あなたは優秀な秘書です。
                         // テキストボックスに「MM/DD 内容」をセット
                         scheduleInput.value = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')} ${s.text}`;
 
-                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。`);
+                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押して、次の場面ではキャンセルしてください。`);
                         scheduleInput.focus();
                     }
                 } catch (e) {
@@ -3019,7 +3025,7 @@ function startAiVoiceInput() {
 </script>
 
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 24.4 / Updated: 2026-04-09
+        © 2025 ettomio. All rights reserved. Version 24.5 / Updated: 2026-04-09
     </p>
     <div style="height: 50px;"></div>
 </body>
