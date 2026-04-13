@@ -2546,14 +2546,15 @@ function getAiEnvironment() {
 function openAiUnlock() {
     const env = getAiEnvironment();
 
-    // 【アプリ版(apk)で実行された場合】
-    if (env.type === "android") {
-        const confirmJump = confirm("AI秘書の鍵を開ける設定を行います。\n安全な設定画面（Web版）へ移動してよろしいですか？");
-        if (confirmJump) {
-            window.location.href = env.webUrl;
-        }
-        return; 
+// 【アプリ版(apk)で実行された場合】の箇所を少し修正
+if (env.type === "android") {
+    const confirmJump = confirm("AI秘書の鍵を開ける設定を行います。\n安全な設定画面（Web版）へ移動してよろしいですか？");
+    if (confirmJump) {
+        // URLの末尾に ?open=unlock を追加してジャンプ
+        window.location.href = env.webUrl + "?open=unlock";
     }
+    return; 
+}
 
     // 【Web版(GitHub)で実行された場合】
     const savedKey = localStorage.getItem(env.storageName);
@@ -3036,8 +3037,21 @@ function startAiVoiceInput() {
 
 </script>
 
+<script>
+// 全ての読み込みが終わったら、URLをチェックする
+window.addEventListener('load', () => {
+    const params = new URLSearchParams(window.location.search);
+    // もしURLに ?open=unlock が付いていたら
+    if (params.get('open') === 'unlock') {
+        // 自動的に鍵開けダイアログを叩く
+        openAiUnlock(); 
+    }
+});
+
+</script>
+
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 24.7 / Updated: 2026-04-10
+        © 2025 ettomio. All rights reserved. Version 24.8 / Updated: 2026-04-13
     </p>
     <div style="height: 50px;"></div>
 </body>
