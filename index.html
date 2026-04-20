@@ -62,7 +62,7 @@
 		  border: 1px solid #ccc;
 		  border-radius: 10px;
 		  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		  background: linear-gradient(to bottom, #f7eeff 0%, #dbdbff 50%, #b9ffff 100%);
+		  background: linear-gradient(to bottom, #ffecff 0%, #dbdbff 50%, #b9ffff 100%);
 		  box-sizing: border-box;
 		}
 
@@ -825,7 +825,7 @@
 		}
 
 		.current-date {
-		  cursor: pointer;       /* マウスを乗せたらクリックできる雰囲気 12/7 */
+		  /*cursor: pointer; マウスを乗せたらクリックできる雰囲気 12/7 */
 		  text-decoration: none; /* 下線を消す */
 		  color: #d60000; /* 元の赤に戻す（好みの赤に変更可） */
 		}
@@ -915,6 +915,7 @@
       transition: background 0.5s, color 0.5s;
       position: relative;
       overflow: hidden;
+      cursor: pointer;
     }
 
     .info { flex: 1; text-align: left; z-index: 1; }
@@ -931,27 +932,14 @@
       color: #000;
     }
     .night {
-      background: linear-gradient(to bottom, #0b1e33, #570057);
+      background: linear-gradient(to bottom, #8f8f8f, #dfffff);
       color: #fff;
     }
     /* 夜間モード時の文字色調整 */
-    .night .city, .night .date, .night .time, .night .wareki { color: #fff; }
-    .night .diff { color: #ffb1b1; }
-    
-/* 夜間モード時の文字色を一括で白く調整 */
-.night .city, 
-.night .date, 
-.night .time, 
-.night .utc, 
-.night .wareki { 
-  color: #ffffff !important; 
-}
-
-/* 時差のテキストも明るい色に変更 */
-.night .diff { 
-  color: #ffb1b1; 
-}
-		
+    .night .city, .night .date,  .night .wareki { color: #fff; }
+    .night .time { color: #ff99ff; }
+    .night .diff { color: #686868; }
+    		
     </style>
     
 	<script>
@@ -1080,10 +1068,10 @@
 
 	<script>
 	// 12/7 追加　今日の日付をクリックで遷移 さらに12/30
-	document.getElementById("current-date").addEventListener("click", function() {
-	  sessionStorage.setItem('fromIndex', 'true');
-	  window.location.href = "today-card.html";
-	});
+	// document.getElementById("current-date").addEventListener("click", function() {
+	//  sessionStorage.setItem('fromIndex', 'true');
+	//   window.location.href = "today-card.html";
+	// });
 	</script>
 
 
@@ -1595,6 +1583,15 @@
     
 <!-- Tokyo時刻 4/20 -->
   <div id="clockGrid" class="grid"></div>
+  
+	<script>
+	//4/20 追加　Tokyoの時刻をクリックで遷移
+	document.getElementById("clockGrid").addEventListener("click", function() {
+	  sessionStorage.setItem('fromIndex', 'true');
+	  window.location.href = "today-card.html";
+	});
+	</script>
+	
       
 	    <!-- 12/23に更新 margin-tight部分 -->
 		<div class="centered-label-button margin-tight">
@@ -3187,38 +3184,40 @@ function startAiVoiceInput() {
         ctx.save();
         ctx.translate(radius, radius);
 
-        // 枠線（細め）
+        // 枠線（常に黒）
         ctx.beginPath();
         ctx.arc(0, 0, radius - 2, 0, 2 * Math.PI);
         ctx.lineWidth = 1;
-        ctx.strokeStyle = isDay ? "black" : "white";
+        ctx.strokeStyle = "black";
         ctx.stroke();
 
         const hours = cityDate.getHours();
         const minutes = cityDate.getMinutes();
         const seconds = cityDate.getSeconds();
 
-        // 時針（細め）
+        // 時針（常に黒）
         ctx.save();
         ctx.rotate((hours % 12 + minutes / 60) * 30 * Math.PI / 180);
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(0, -radius * 0.5);
         ctx.lineWidth = 2;
+        ctx.strokeStyle = "black";
         ctx.stroke();
         ctx.restore();
 
-        // 分針（細め）
+        // 分針（常に黒）
         ctx.save();
         ctx.rotate((minutes + seconds / 60) * 6 * Math.PI / 180);
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(0, -radius * 0.7);
         ctx.lineWidth = 1;
+        ctx.strokeStyle = "black";
         ctx.stroke();
         ctx.restore();
 
-        // 秒針
+        // 秒針（常に赤）
         ctx.save();
         ctx.rotate(seconds * 6 * Math.PI / 180);
         ctx.strokeStyle = "red";
@@ -3230,6 +3229,7 @@ function startAiVoiceInput() {
         ctx.restore();
 
         ctx.restore();
+
       });
     }
 
@@ -3238,7 +3238,7 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 25.2 / Updated: 2026-04-20
+        © 2025 ettomio. All rights reserved. Version 25.3 / Updated: 2026-04-21
     </p>
     <div style="height: 50px;"></div>
 </body>
