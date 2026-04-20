@@ -57,7 +57,7 @@
 
 		.container {
 		  max-width: 600px;
-		  margin: 10px auto;
+		  margin: 5px auto; /* 4/20i10pxから5px */
 		  padding: 10px;
 		  border: 1px solid #ccc;
 		  border-radius: 10px;
@@ -79,7 +79,7 @@
 
 		.container3 {
 		  max-width: 100%;
-		  margin: 0 auto;
+		  margin: 10px auto;
 		  padding: 10px;
 		  border: none !important; /* 枠線を強制的に消去 */
 		  border-radius: 10px;
@@ -901,6 +901,53 @@
         padding: 8px 10px; font-size: 14px; white-space: nowrap;
     }
 }   
+
+    /* Tokyo 4/20追加 */
+    .card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      transition: background 0.5s, color 0.5s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .info { flex: 1; text-align: left; z-index: 1; }
+    .city { font-weight: 600; font-size: 1.1rem; color: #606060; margin-bottom: 6px; }
+    .date { margin-bottom: 6px; font-weight: 800; color: #606060;}
+    .wareki { margin-bottom: 6px; font-weight: 700; color: #b16363;}
+    .time { font-weight: 800; font-size: 1.3rem; color: #606060; margin-bottom: 8px; }
+    .diff { color: #b16363; font-size: 0.9rem; margin-top: 4px; }
+    canvas { background: #fafafa; border: 1px solid #ccc; border-radius: 50%; margin-left: 16px; z-index: 1; }
+
+    /* 昼夜で背景と文字色を切り替え */
+    .day {
+      background: linear-gradient(to bottom, #b9ffff, #fef3c7);
+      color: #000;
+    }
+    .night {
+      background: linear-gradient(to bottom, #0b1e33, #570057);
+      color: #fff;
+    }
+    
+/* 夜間モード時の文字色を一括で白く調整 */
+.night .city, 
+.night .date, 
+.night .time, 
+.night .utc, 
+.night .wareki { 
+  color: #ffffff !important; 
+}
+
+/* 時差のテキストも明るい色に変更 */
+.night .diff { 
+  color: #ffb1b1; 
+}
 		
     </style>
     
@@ -1543,6 +1590,9 @@
 	<div class="container">
     <!--  <h1>予定表</h1> -->
     
+<!-- Tokyo時刻 4/20 -->
+  <div id="clockGrid" class="grid"></div>
+      
 	    <!-- 12/23に更新 margin-tight部分 -->
 		<div class="centered-label-button margin-tight">
 		    <h5 class="section-title">予定入力</h5>
@@ -2202,8 +2252,10 @@ document.getElementById("btnSearch7").onclick = () => {
 		<!-- ボタン 9/29 -->
 		<button id="keyNButton">データの保存と復元ツール</button>
 
-<!-- AIボタン 4/04 -->
+<!-- 以前のAIボタン 4/04 -->
 
+<!-- Tokyo時刻 4/20 -->
+<!--   <div id="clockGrid" class="grid"></div> -->
 		
 <div>
 	<button id="toggleButton2">＋ その他機能</button>
@@ -3039,8 +3091,150 @@ function startAiVoiceInput() {
 
 </script>
 
+  <script>
+    const tokyo = { name: "東京", tz: "Asia/Tokyo" };
+    const cities = [tokyo];
+
+    const grid = document.getElementById("clockGrid");
+    const cards = cities.map(city => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      const info = document.createElement("div");
+      info.className = "info";
+
+      const cityEl = document.createElement("div");
+      cityEl.className = "city";
+      cityEl.textContent = city.name;
+
+      const dateEl = document.createElement("div");
+      dateEl.className = "date";
+
+      const warekiEl = document.createElement("div");
+      warekiEl.className = "wareki";
+
+      const timeEl = document.createElement("div");
+      timeEl.className = "time";
+
+      const diffEl = document.createElement("div");
+      diffEl.className = "diff";
+
+      info.append(cityEl, dateEl, warekiEl, timeEl, diffEl);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 120;
+      canvas.height = 120;
+
+      card.append(info, canvas);
+      grid.appendChild(card);
+
+      return { city, card, dateEl, warekiEl, timeEl, diffEl, canvas };
+    });
+
+    function updateClocks() {
+      const now = new Date();
+      const tokyoDate = new Date(now.toLocaleString("en-US", { timeZone: tokyo.tz }));
+
+      cards.forEach(({ city, card, dateEl, warekiEl, timeEl, diffEl, canvas }) => {
+        const dateStr = new Intl.DateTimeFormat("ja-JP", {
+          timeZone: city.tz, year: "numeric", month: "2-digit", day: "2-digit", weekday: "short"
+        }).format(now);
+
+        const timeStr = new Intl.DateTimeFormat("ja-JP", {
+          timeZone: city.tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
+        }).format(now);
+
+        // 和暦の取得
+        const warekiStr = new Intl.DateTimeFormat("ja-JP-u-ca-japanese", {
+          timeZone: city.tz, era: "long", year: "numeric"
+        }).format(now);
+
+        dateEl.textContent = dateStr;
+        timeEl.textContent = timeStr;
+        warekiEl.textContent = warekiStr;
+
+        const cityDate = new Date(now.toLocaleString("en-US", { timeZone: city.tz }));
+        const diffHours = (cityDate - tokyoDate) / (1000 * 60 * 60);
+
+        let diffText;
+        if (city.name === "東京") {
+          diffText = "基準 (UTC+9)";
+        } else if (diffHours < 0) {
+          diffText = `東京より ${Math.abs(diffHours).toFixed(2).replace(/\.00$/, '')}時間 遅れている`;
+        } else if (diffHours > 0) {
+          diffText = `東京より ${diffHours.toFixed(2).replace(/\.00$/, '')}時間 進んでいる`;
+        } else {
+          diffText = "東京と時差なし";
+        }
+        diffEl.textContent = diffText;
+
+        const hour = cityDate.getHours();
+        if (hour >= 6 && hour < 18) {
+          card.classList.add("day");
+          card.classList.remove("night");
+        } else {
+          card.classList.add("night");
+          card.classList.remove("day");
+        }
+
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const radius = canvas.width / 2;
+        ctx.save();
+        ctx.translate(radius, radius);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, radius - 2, 0, 2 * Math.PI);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = (hour >= 6 && hour < 18) ? "black" : "white";
+        ctx.stroke();
+
+        const hours = cityDate.getHours();
+        const minutes = cityDate.getMinutes();
+        const seconds = cityDate.getSeconds();
+
+        // 時針
+        ctx.save();
+        ctx.rotate((hours % 12 + minutes / 60) * 30 * Math.PI / 180);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -radius * 0.5);
+        ctx.lineWidth = 4;
+        ctx.stroke();
+        ctx.restore();
+
+        // 分針
+        ctx.save();
+        ctx.rotate((minutes + seconds / 60) * 6 * Math.PI / 180);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -radius * 0.7);
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        ctx.restore();
+
+        // 秒針
+        ctx.save();
+        ctx.rotate(seconds * 6 * Math.PI / 180);
+        ctx.strokeStyle = "red";
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -radius * 0.8);
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.restore();
+      });
+    }
+
+    updateClocks();
+    setInterval(updateClocks, 1000);
+  </script>
+
+  
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 25.1 / Updated: 2026-04-18
+        © 2025 ettomio. All rights reserved. Version 25.2 / Updated: 2026-04-20
     </p>
     <div style="height: 50px;"></div>
 </body>
