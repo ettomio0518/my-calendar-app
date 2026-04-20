@@ -934,6 +934,9 @@
       background: linear-gradient(to bottom, #0b1e33, #570057);
       color: #fff;
     }
+    /* 夜間モード時の文字色調整 */
+    .night .city, .night .date, .night .time, .night .wareki { color: #fff; }
+    .night .diff { color: #ffb1b1; }
     
 /* 夜間モード時の文字色を一括で白く調整 */
 .night .city, 
@@ -3144,7 +3147,6 @@ function startAiVoiceInput() {
           timeZone: city.tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
         }).format(now);
 
-        // 和暦の取得
         const warekiStr = new Intl.DateTimeFormat("ja-JP-u-ca-japanese", {
           timeZone: city.tz, era: "long", year: "numeric"
         }).format(now);
@@ -3169,7 +3171,8 @@ function startAiVoiceInput() {
         diffEl.textContent = diffText;
 
         const hour = cityDate.getHours();
-        if (hour >= 6 && hour < 18) {
+        const isDay = (hour >= 6 && hour < 18);
+        if (isDay) {
           card.classList.add("day");
           card.classList.remove("night");
         } else {
@@ -3177,39 +3180,41 @@ function startAiVoiceInput() {
           card.classList.remove("day");
         }
 
+        // アナログ時計描画
         const ctx = canvas.getContext("2d");
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const radius = canvas.width / 2;
         ctx.save();
         ctx.translate(radius, radius);
 
+        // 枠線（細め）
         ctx.beginPath();
         ctx.arc(0, 0, radius - 2, 0, 2 * Math.PI);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = (hour >= 6 && hour < 18) ? "black" : "white";
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = isDay ? "black" : "white";
         ctx.stroke();
 
         const hours = cityDate.getHours();
         const minutes = cityDate.getMinutes();
         const seconds = cityDate.getSeconds();
 
-        // 時針
+        // 時針（細め）
         ctx.save();
         ctx.rotate((hours % 12 + minutes / 60) * 30 * Math.PI / 180);
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(0, -radius * 0.5);
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 2;
         ctx.stroke();
         ctx.restore();
 
-        // 分針
+        // 分針（細め）
         ctx.save();
         ctx.rotate((minutes + seconds / 60) * 6 * Math.PI / 180);
         ctx.beginPath();
         ctx.moveTo(0, 0);
         ctx.lineTo(0, -radius * 0.7);
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 1;
         ctx.stroke();
         ctx.restore();
 
@@ -3231,7 +3236,6 @@ function startAiVoiceInput() {
     updateClocks();
     setInterval(updateClocks, 1000);
   </script>
-
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
         © 2025 ettomio. All rights reserved. Version 25.2 / Updated: 2026-04-20
