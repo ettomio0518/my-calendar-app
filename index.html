@@ -1946,7 +1946,7 @@
             const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
             if (dateMatch) { document.getElementById('scheduleDate').value = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`; }
             currentEditingKey = key; // 編集中のキーを設定
-            window.scrollTo({ top: 0, behavior: 'smooth' });// ページ上部へスクロール
+            // window.scrollTo({ top: 0, behavior: 'smooth' });// ページ上部へスクロール 4/22中止
         }
     }
 
@@ -3238,7 +3238,7 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 25.3 / Updated: 2026-04-21
+        © 2025 ettomio. All rights reserved. Version 25.4 / Updated: 2026-04-22
     </p>
     <div style="height: 50px;"></div>
 </body>
