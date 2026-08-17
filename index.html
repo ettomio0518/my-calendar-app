@@ -989,6 +989,12 @@
 
     </script>
   	
+  	<script> 
+  	// カレンダーのモード管理用変数（初期値は予定出力）
+let calendarMode = 'output'; // 'output' または 'input'
+
+	</script> 
+	
 </head>	
 		
 <body>
@@ -1592,24 +1598,31 @@
 	});
 	</script>
 	
-      
-	    <!-- 12/23に更新 margin-tight部分 -->
+
+		
 		<div class="centered-label-button margin-tight">
-		    <h5 class="section-title">予定入力</h5>
-		    <button id="voiceInputButton2" onclick="startVoiceInput2()">🎤 日付音声入力</button>
-		</div>	    
-
-	    <!-- 日付選択行 -->
-	    <div class="input-row date-row">
-	        <label for="scheduleDate">日付選択:</label>
-	        <input type="date" id="scheduleDate" class="word-input">
+		    <h5 class="section-title">日付タップのモード切り替え</h5>
 	    </div>
+	    
+	      
+<!-- カレンダー下部または適切な位置に配置するトグルボタン -->
+<div class="centered-label-button" style="text-align: center; margin: 10px 0;">
+    <button id="calendarModeToggle" onclick="toggleCalendarMode()" style="padding: 8px 16px; font-weight: bold;">モード: 予定出力</button>
+</div>
+	    <div id="calendarHint04" style="font-size: 15px; color: #666; margin-top: 8px;margin-bottom: 0px;">
+		  日付タップの動作を<span style="color: blue;">「予定の出力」と「予定入力」</span>で切り替えます。
+		</div>		
+		<br>
+		
+<!-- 日付選択（選択日付の表示部分を id="dateDisplayContainer" で囲み、初期は非表示にする） -->
+<div id="dateDisplayContainer" class="input-row date-row" style="display:none;">
+    <label>選択日付:</label>
+    <span id="displaySelectedDate" style="font-weight: bold; margin-left: 5px;">未選択</span>
+    <input type="hidden" id="scheduleDate">
+</div>
 
-    	<!--  11/3更新 -->
-		<div class="centered-label-button">
-		    <label for="scheduleInput">予定内容:</label> 
-		    <button id="voiceInputButton" onclick="startVoiceInput()">🎤 音声入力</button>
-		</div>
+<!-- 音声入力ボタン（初期は非表示） -->
+<button id="voiceInputButton" onclick="startVoiceInput()" style="display:none;">🎤 音声入力</button>
 
 		<!-- 予定入力欄 -->
 		<div class="input-row"> 
@@ -1696,6 +1709,29 @@
         setInterval(updateTime, 1000); 
         showScrollButtonsIfPageLong();
     });
+
+
+// モード切替用の関数
+function toggleCalendarMode() {
+    calendarMode = calendarMode === 'output' ? 'input' : 'output';
+    const btn = document.getElementById('calendarModeToggle');
+    const dateContainer = document.getElementById('dateDisplayContainer');
+    const voiceBtn = document.getElementById('voiceInputButton');
+
+    if (calendarMode === 'output') {
+        btn.textContent = 'モード: 予定出力';
+        btn.style.backgroundColor = '';
+        // 出力モード時は「選択日付」と「音声ボタン」を隠す
+        if (dateContainer) dateContainer.style.display = 'none';
+        if (voiceBtn) voiceBtn.style.display = 'none';
+    } else {
+        btn.textContent = 'モード: 予定入力';
+        btn.style.backgroundColor = '#ffeb3b';
+        // 入力モード時は「選択日付」を表示する（音声ボタンは日付をタップしてから表示）
+        if (dateContainer) dateContainer.style.display = 'block';
+    }
+}
+
 
 	// 日付音声入力の処理
     function startVoiceInput2() {
@@ -2074,13 +2110,16 @@
         });
     }
 
-	// --- 祝日・日付クリック関数 ---
-    function displayScheduleForDate(year, month, day) {
+// displayScheduleForDate 関数を修正（モードによって処理を分岐）
+function displayScheduleForDate(year, month, day) {
+    const formattedYMD = `${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+    const mmdd = `${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+
+    if (calendarMode === 'output') {
         const prefix = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
         const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
         const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month+1).padStart(2,'0')}/${String(day).padStart(2,'0')}`));
         
-        // 1. 予定のメッセージを生成
         let hasS = keys.length > 0;
         let hasH = !!holiday;
         let sText = ''; let aMsg = ''; let aType;
@@ -2089,26 +2128,41 @@
             const ss = keys.map(k => localStorage.getItem(k).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
             const t = new Date(); t.setHours(0,0,0,0);
             const c = new Date(year, month, day); c.setHours(0,0,0,0);
-            // 過去の日付の場合
             if (c < t) { sText += `${month+1}月${day}日は${ss.join('。 ')}でした。`; aMsg += `過去：${ss.join('、 ')}`; } 
-            // 今日または未来の日付の場合
             else { sText += `${month+1}月${day}日の予定は${ss.join('。 ')}です。`; aMsg += `予定：${ss.join('、 ')}`; }
             aType = 'custom-alert';
         }
-         // 2. 祝日のメッセージを生成
         if (hasH) {
             if (hasS) { sText += ` なお、${holiday[1]}です。`; aMsg += `\n祝日：${holiday[1]}`; } 
             else { sText += `${month+1}月${day}日は${holiday[1]}です。`; aMsg += `祝日：${holiday[1]}`; aType = 'custom-alert3'; }
         }
-        // 3. 予定も祝日もない場合の処理
         if (!hasS && !hasH) { sText = `${month+1}月${day}日は何も登録されていません。`; aMsg = sText; aType = 'custom-alert2'; }
 
-		// 最終的なアラートと音声出力
         if (aType === 'custom-alert') showCustomAlert(aMsg);
         else if (aType === 'custom-alert3') showCustomAlert3(aMsg);
         else showCustomAlert2(aMsg);
         nativeSpeak(sText);
+
+    } else if (calendarMode === 'input') {
+        // 1. 日付表示を更新
+        document.getElementById('displaySelectedDate').textContent = formattedYMD;
+        document.getElementById('scheduleDate').value = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        
+        // 2. 予定内容にセット
+        const scheduleInput = document.getElementById('scheduleInput');
+        scheduleInput.value = `${mmdd} `;
+        scheduleInput.focus();
+        
+        // 3. ★ここで音声入力ボタンを表示する
+        const voiceBtn = document.getElementById('voiceInputButton');
+        if (voiceBtn) {
+            voiceBtn.style.display = 'inline-block';
+        }
+        
+        showCustomAlert2(`${mmdd} をセットしました。予定を入力してください。`);
     }
+}
+
     </script>
 
     <script>
@@ -2363,7 +2417,6 @@ document.getElementById("btnSearch7").onclick = () => {
 
 </div>
 </div>
-</div>
 	
 		<script>
 
@@ -2511,6 +2564,8 @@ document.getElementById("btnSearch7").onclick = () => {
         if (clickCount === 3) { clickCount = 0; window.location.href = 'index-NNN.html'; }
     }
     </script>
+
+</div>
 
     <button onclick="location.href='introduction.html'">紹介ページ</button>
     
@@ -3243,8 +3298,9 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 26.1 / Updated: 2026-08-17
+        © 2025 ettomio. All rights reserved. Version 26.2 / Updated: 2026-08-18
     </p>
     <div style="height: 50px;"></div>
+
 </body>
 </html>
