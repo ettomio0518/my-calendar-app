@@ -52,10 +52,13 @@
             width: 100%;
             margin-bottom: 20px;
         }
-        input[type="number"], input[type="text"] {
+        input[type="number"], input[type="text"], input[type="date"] {
             width: 70px;
             height: 30px;
             box-sizing: border-box;
+        }
+        input[type="date"] {
+            width: 135px;
         }
         h1 {
           text-align: center;
@@ -82,10 +85,10 @@
             border: 1px solid #000;
             border-radius:5px; 
             width: 100%;
-            max-width: 60px;
+            max-width: 50px;
             padding: 3px;
-            margin: 1.5px;
-            font-size: 13px;
+            margin: 1px;
+            font-size: 12px;
             min-height: 24px;
             line-height: 1.2;
             background-color: lightgray;
@@ -155,7 +158,7 @@
         footer {
           text-align: center;
           padding: 12px;
-        }   
+        }    
 
         @media (max-width: 480px) {
           .app {
@@ -275,8 +278,7 @@
     #ai-button-group button {
         padding: 8px 10px; font-size: 14px; white-space: nowrap;
     }
-}   
-                
+}    
     </style>
 </head>
 
@@ -291,7 +293,6 @@
 <button id="ai-button" class="blinking" onclick="announceCompass()">
     🧭 AI羅針盤
 </button>
-
 
 <section>
 <h2>🏷 割引計算</h2>    
@@ -343,9 +344,8 @@
     </div>
     <br>
 
-    <button class="total-button" onclick="window.location.href='receipt.html'">今月の買い物記録</button>
+    <button class="total-button" onclick="window.location.href='receipt.html'">今月の買い物記録に移動</button>
 </section>    
-
 
 <section>    
     <h3>オマケ: 🍚 生活の目安：ご飯一膳いくら ?</h3>
@@ -357,7 +357,6 @@
 </section>
   </div>
       
-      
 <div id="ai-interaction-container" style="display:none;">
     <p style="margin: 0 0 8px 0; font-weight: bold; color: #333; font-size: 0.85em;">💬 AI秘書（お買い物計算）：</p>
     <div style="display: flex; gap: 5px; align-items: center;">
@@ -368,9 +367,11 @@
         </div>
     </div>
     <div id="ai-chat-history" style="display: none;"></div>
+    <p style="font-size: 0.8em; color: #666; margin-top: 8px; margin-bottom: 0;">
+      ※2027/4/1〜2029/3/31の期間は「食品を1%で」などとAIに直接伝えると1%で計算してくれます。
+    </p>
 </div>
 
-      
     <script>
         let itemIndex = 0;
 
@@ -387,12 +388,14 @@
                 <td><input type="number" id="price${itemIndex}" onchange="updateSubtotal(${itemIndex});checkAndAddRow(${itemIndex})"></td>
                 <td><input type="text" id="quantity${itemIndex}" value="1" onclick="increaseQuantity(${itemIndex})" onchange="updateSubtotal(${itemIndex})"></td>
                 <td>
+                    <button class="tax-button" onclick="setTaxRate(${itemIndex}, 1)">1</button>
                     <button class="tax-button" onclick="setTaxRate(${itemIndex}, 8)">8</button>
                     <button class="tax-button" onclick="setTaxRate(${itemIndex}, 10)">10</button>
                 </td>
                 <td><button onclick="clearRow(${itemIndex})">消去</button></td>
                 <td><input type="text" id="subtotal${itemIndex}" readonly></td>
             `;
+            setTaxRate(itemIndex, 8);
             itemIndex++;
         }
 
@@ -407,7 +410,7 @@
             const buttons = document.querySelectorAll(`#itemTable tr:nth-child(${index + 2}) .tax-button`);
             buttons.forEach(button => button.classList.remove('active'));
             
-            const activeButton = Array.from(buttons).find(button => button.textContent.includes(taxRate));
+            const activeButton = Array.from(buttons).find(button => button.textContent.trim() === String(taxRate));
             if (activeButton) activeButton.classList.add('active');
             
             document.getElementById(`price${index}`).setAttribute("data-tax-rate", taxRate);
@@ -547,10 +550,6 @@ function saveChatHistory(history) {
 }
 
 // 3. 通信ロジック（能書き排除・履歴参照）
-// ==========================================
-// 🧭 AI羅針盤：信頼重視・復唱版（端数切り捨て徹底）
-// ==========================================
-
 async function runDialogueCompass(userMessage) {
     nativeSpeak("考え中です。");
     const apiKey = localStorage.getItem("gemini_api_key"); 
@@ -618,7 +617,7 @@ function startAiVoiceInput() {
     }
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'ja-JP';
-    recognition.interimResults = false; // 途中の言葉で勝手に送信しない
+    recognition.interimResults = false; 
     recognition.continuous = false;
 
     recognition.start();
@@ -626,49 +625,38 @@ function startAiVoiceInput() {
     recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
         document.getElementById('ai-user-input').value = transcript;
-        handleAiChat(); // 確定したら送信
+        handleAiChat(); 
     };
 }
 
-
-        function handleAiChat() {
-            const inputField = document.getElementById('ai-user-input');
-            const message = inputField.value.trim();
-            if (message) {
-                runDialogueCompass(message);
-                inputField.value = ""; 
+        window.onload = function() {
+            // 1. 日本時間の今日を正しく取得してデフォルト設定
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const today = `${year}-${month}-${day}`;
+            
+            const purchaseDateInput = document.getElementById('purchaseDate');
+            if (purchaseDateInput) {
+                purchaseDateInput.value = today;
             }
-        }
 
-        function startAiVoiceInput() {
-            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-            recognition.lang = 'ja-JP';
-            recognition.start();
-            recognition.onresult = (event) => {
-                document.getElementById('ai-user-input').value = event.results[0][0].transcript;
-                handleAiChat(); 
-            };
-        }
+            // 2. 最初の一行（既存の入力欄追加）を実行
+            addItemRow();
 
-		window.onload = function() {
-		    // 1. 最初の一行（既存の入力欄追加）を実行
-		    addItemRow();
+            // 3. AIボタンを取得
+            const aiButton = document.getElementById('ai-button');
 
-		    // 2. AIボタンを取得
-		    const aiButton = document.getElementById('ai-button');
+            // 4. GitHub (Web版) かどうかの判定
+            if (window.location.hostname.includes("github.io")) {
+                document.body.classList.add("github-version"); 
+                if (aiButton) aiButton.style.display = 'block'; 
+            } else {
+                if (aiButton) aiButton.style.display = 'none';  
+            }
+        };
 
-		    // 3. GitHub (Web版) かどうかの判定
-		    if (window.location.hostname.includes("github.io")) {
-		        // --- Web版（GitHub Pages）の場合 ---
-		        document.body.classList.add("github-version"); // 背景色を変える
-		        if (aiButton) aiButton.style.display = 'block'; // AIボタンを表示する
-		    } else {
-		        // --- アプリ版（WebView / ローカル）の場合 ---
-		        if (aiButton) aiButton.style.display = 'none';  // AIボタンを隠す
-		    }
-		};
-
-        
         function showCustomAlert(message) {
             const alertContainer = document.createElement('div');
             alertContainer.className = 'custom-alert';
@@ -681,9 +669,9 @@ function startAiVoiceInput() {
 
         function speakText(text) {
            if ('speechSynthesis' in window) {
-               const utterance = new SpeechSynthesisUtterance(text);
-               utterance.lang = "ja-JP";
-               window.speechSynthesis.speak(utterance);
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "ja-JP";
+                window.speechSynthesis.speak(utterance);
            }
         }
 
@@ -709,13 +697,12 @@ function startAiVoiceInput() {
             showCustomAlert(message2);
             nativeSpeak(message2);
             document.getElementById("result").textContent = `一膳の価格: ${roundedPrice2} 円`;
-        }           
+        }            
     </script>
 
     <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
     <button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
-        
-
+      
  <script>
     function scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -753,7 +740,7 @@ function startAiVoiceInput() {
 </script>
 
     <footer>
-      © 20260404 ettomio
+      © 20260820 ettomio
     </footer>
 
     <div style="height: 50px;"></div>
@@ -778,4 +765,3 @@ function startAiVoiceInput() {
 
 </body>
 </html>
-
