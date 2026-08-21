@@ -1933,7 +1933,7 @@ function toggleCalendarMode() {
         const scheduleKeys = Object.keys(localStorage).filter(key => key.startsWith("ScheduledText"));
         if (limitEnabled && scheduleKeys.length >= 10 && !currentEditingKey) {
             showCustomAlert("予定は10件までです。");
-            nativeSpeak("入力件数は10件までです。機能充実正規版をお勧めします。");
+            nativeSpeak("入力件数は10件までです。機能充実の正規版をお勧めします。");
             return;
         }
 
@@ -1960,8 +1960,8 @@ function toggleCalendarMode() {
                 localStorage.setItem(key, scheduleToStore);
             }
 
-            const continueInput = await showCustomConfirm("日付音声入力ボタンを表示しますか？"); 
-            if (continueInput) { voiceInputButton2.style.display = "inline-block"; }
+            //const continueInput = await showCustomConfirm("日付音声入力ボタンを表示しますか？"); 
+            //if (continueInput) { voiceInputButton2.style.display = "inline-block"; }
 
 			// 入力欄をクリア
             dateInput.value = '';
@@ -3021,7 +3021,9 @@ const systemPrompt = `あなたは博識で有能な秘書です。
                         // テキストボックスに「MM/DD 内容」をセット
                         scheduleInput.value = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')} ${s.text}`;
 
-                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押して、次の場面ではいいえ。`);
+                        // finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押して、次の場面ではいいえ。`);
+
+                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押してください。`);
                         scheduleInput.focus();
                     }
                 } catch (e) {
@@ -3035,6 +3037,7 @@ const systemPrompt = `あなたは博識で有能な秘書です。
         finishAiResponse("通信に失敗しました。");
     }
 }
+
 
 /**
  * 4. 予定解析（無効化維持）
@@ -3298,7 +3301,7 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 26.4 / Updated: 2026-08-21
+        © 2025 ettomio. All rights reserved. Version 26.5 / Updated: 2026-08-22
     </p>
     <div style="height: 50px;"></div>
 
