@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>medication-check</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #FFFFF0;
+            color: #333;
+            margin: 0;
+            padding: 10px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 1.2rem;
+            margin: 10px 0;
+        }
+        .header-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .header-nav button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .calendar-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            height: 48px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 0.9rem;
+            position: relative;
+            padding: 0;
+        }
+        th {
+            background-color: #f2f2f2;
+            height: 35px;
+        }
+        .sun { color: red; }
+        .sat { color: blue; }
+        
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .blink-today {
+            animation: blink 1s infinite;
+            font-weight: bold;
+        }
+
+        /* セル分割用スタイル */
+        .cell-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .split-2 {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+        .split-2 > div {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        .split-3 {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+        .split-3 > div {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        /* 着色色 */
+        .bg-pink { background-color: #ffc0cb !important; }
+        .bg-blue { background-color: #cce5ff !important; }
+        .bg-orange { background-color: #ffe5cc !important; }
+
+        .med-section {
+            max-width: 400px;
+            margin: 20px auto 0 auto;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        .med-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+        .med-row input[type="text"] {
+            flex: 1;
+            padding: 6px;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .med-row button {
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        .mode-select {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+	    /* 戻るボタン（右上）を統一デザインに変更 */
+	    .top-right-button {
+	        /*position: absolute; */
+    		position: fixed;
+		    right: 15px;
+		    top: 12px;
+		    padding: 4px 12px;
+		    font-size: 14px;
+		    border: none;
+		    border-radius: 20px;
+		    background: #ccffff;
+		    color: #333;
+		    cursor: pointer;
+		    transition: 0.2s;
+	    }
+	    .top-right-button:hover {
+    		background: #cecece;
+	    }
+		/* ===============================
+		   フッター
+		   =============================== */
+		footer {
+		    text-align: center;
+		    color: #0080ff;
+		    padding: 10px;
+		    font-size: 14px;
+		}
+
+
+    </style>
+</head>
+<body>
+    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+    
+    <h1 id="title-text">2026 お薬手帳</h1>
+    
+    <div class="header-nav">
+        <button onclick="changeMonth(-1)">◁</button>
+        <span id="current-month-label" style="font-size: 1.1rem; font-weight: bold;"></span>
+        <button onclick="changeMonth(1)">▷</button>
+    </div>
+
+    <div class="calendar-container">
+        <table id="cal-table">
+            <thead>
+                <tr>
+                    <th class="sun">日</th>
+                    <th>月</th>
+                    <th>火</th>
+                    <th>水</th>
+                    <th>木</th>
+                    <th>金</th>
+                    <th class="sat">土</th>
+                </tr>
+            </thead>
+            <tbody id="cal-body">
+                <!-- 動的生成 -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="med-section">
+        <div style="font-weight: bold; margin-bottom: 10px; font-size: 0.95rem;">お薬リスト</div>
+        <div id="med-list-container">
+            <!-- 5つの入力欄を動的生成 -->
+        </div>
+        <div class="mode-select">
+            <label><input type="radio" name="freqMode" value="1" checked onchange="changeMode(1)"> 1日1回</label>
+            <label><input type="radio" name="freqMode" value="2" onchange="changeMode(2)"> 1日2回</label>
+            <label><input type="radio" name="freqMode" value="3" onchange="changeMode(3)"> 1日3回</label>
+        </div>
+    </div>
+
+<script>
+let today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth();
+let viewingYear = currentYear;
+let viewingMonth = currentMonth;
+
+const STORAGE_KEY_MEDS = "med_list_names_v2";
+const STORAGE_KEY_STATUS = "med_status_v2";
+const STORAGE_KEY_MODE = "med_freq_mode_v2";
+
+let currentMode = 1; // 1: 1日1回, 2: 1日2回(午前午後), 3: 1日3回(朝昼夕)
+
+function init() {
+    const savedMode = localStorage.getItem(STORAGE_KEY_MODE);
+    if (savedMode) {
+        currentMode = parseInt(savedMode);
+        document.querySelector(`input[name="freqMode"][value="${currentMode}"]`).checked = true;
+    }
+    loadMeds();
+    renderCalendar();
+    checkTodayMedicationStatus();
+}
+
+function speakText(text) {
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP';
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
+function changeMonth(direction) {
+    viewingMonth += direction;
+    if (viewingMonth > 11) {
+        viewingMonth = 0;
+        viewingYear++;
+    } else if (viewingMonth < 0) {
+        viewingMonth = 11;
+        viewingYear--;
+    }
+    renderCalendar();
+}
+
+function changeMode(mode) {
+    currentMode = mode;
+    localStorage.setItem(STORAGE_KEY_MODE, mode);
+    renderCalendar();
+}
+
+function renderCalendar() {
+    document.getElementById('title-text').innerText = `${viewingYear} お薬手帳`;
+    document.getElementById('current-month-label').innerText = `${viewingYear}年 ${viewingMonth + 1}月`;
+
+    const body = document.getElementById('cal-body');
+    body.innerHTML = '';
+
+    const firstDayIndex = new Date(viewingYear, viewingMonth, 1).getDay();
+    const lastDay = new Date(viewingYear, viewingMonth + 1, 0).getDate();
+
+    let date = 1;
+    const savedStatus = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS) || "{}");
+
+    for (let i = 0; i < 6; i++) {
+        let row = '<tr>';
+        let isRowEmpty = true;
+
+        for (let j = 0; j < 7; j++) {
+            if (i === 0 && j < firstDayIndex) {
+                row += '<td></td>';
+            } else if (date > lastDay) {
+                row += '<td></td>';
+            } else {
+                isRowEmpty = false;
+                const dateStr = `${viewingYear}-${String(viewingMonth + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+                const isToday = (viewingYear === currentYear && viewingMonth === currentMonth && date === today.getDate());
+                
+                let dayClass = '';
+                if (j === 0) dayClass = 'sun';
+                if (j === 6) dayClass = 'sat';
+                if (isToday) dayClass += ' blink-today';
+
+                const status = savedStatus[dateStr];
+                let cellInner = '';
+
+                if (currentMode === 1) {
+                    let bgClass = (status === true || (status && status.single)) ? 'bg-pink' : '';
+                    row += `<td class="${bgClass}" onclick="onDateClick('${dateStr}')"><div class="cell-content"><span class="${dayClass}">${date}</span></div></td>`;
+                } else if (currentMode === 2) {
+                    // 1日2回: 上(午前), 下(午後)
+                    let amBg = (status && status.am) ? 'bg-pink' : '';
+                    let pmBg = (status && status.pm) ? 'bg-blue' : '';
+                    row += `<td>
+                        <div class="split-2">
+                            <div class="${amBg}" onclick="onSubDateClick('${dateStr}', 'am')">${date}</div>
+                            <div class="${pmBg}" onclick="onSubDateClick('${dateStr}', 'pm')"></div>
+                        </div>
+                    </td>`;
+                } else if (currentMode === 3) {
+                    // 1日3回: 上(朝), 中(昼), 下(夕)
+                    let morBg = (status && status.morning) ? 'bg-pink' : '';
+                    let lunBg = (status && status.lunch) ? 'bg-blue' : '';
+                    let dinBg = (status && status.dinner) ? 'bg-orange' : '';
+                    row += `<td>
+                        <div class="split-3">
+                            <div class="${morBg}" onclick="onSubDateClick('${dateStr}', 'morning')">${date}</div>
+                            <div class="${lunBg}" onclick="onSubDateClick('${dateStr}', 'lunch')"></div>
+                            <div class="${dinBg}" onclick="onSubDateClick('${dateStr}', 'dinner')"></div>
+                        </div>
+                    </td>`;
+                }
+                date++;
+            }
+        }
+        row += '</tr>';
+        if (!isRowEmpty) {
+            body.innerHTML += row;
+        }
+        if (date > lastDay) break;
+    }
+}
+
+function checkTodayMedicationStatus() {
+    const todayStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const savedStatus = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS) || "{}");
+    const currentHour = today.getHours();
+
+    setTimeout(() => {
+        const status = savedStatus[todayStr] || {};
+
+        if (currentMode === 1) {
+            if (status === true || status.single) {
+                const msg = "今日はお薬は飲んでおられます。";
+                speakText(msg); // ★同時発話
+                alert(msg);
+            } else {
+                const msg = "今日はお薬はまだ飲んでおられません。今から飲まれますか？";
+                speakText(msg); // ★同時発話
+                if (confirm(msg)) {
+                    savedStatus[todayStr] = { single: true };
+                    localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
+                    renderCalendar();
+                    speakText("お薬手帳の記録を更新しました。");
+                }
+            }
+        } else if (currentMode === 2) {
+            let targetKey = (currentHour >= 15) ? 'pm' : 'am';
+            let targetName = (currentHour >= 15) ? '午後' : '午前';
+
+            if (!status[targetKey]) {
+                const msg = `本日の${targetName}のお薬はまだ飲んでおられません。今から飲まれますか？`;
+                speakText(msg); // ★同時発話
+                if (confirm(msg)) {
+                    if (typeof status !== 'object') savedStatus[todayStr] = {};
+                    savedStatus[todayStr][targetKey] = true;
+                    localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
+                    renderCalendar();
+                    speakText(`${targetName}のお薬を記録しました。`);
+                }
+            } else {
+                const msg = `本日の${targetName}のお薬はすでに飲んでおられます。`;
+                speakText(msg); // ★同時発話
+                alert(msg);
+            }
+        } else if (currentMode === 3) {
+            let targetKey = 'morning';
+            let targetName = '朝の';
+            if (currentHour >= 12 && currentHour < 18) {
+                targetKey = 'lunch';
+                targetName = '昼の';
+            } else if (currentHour >= 18) {
+                targetKey = 'dinner';
+                targetName = '夕方の';
+            }
+
+            if (!status[targetKey]) {
+                const msg = `本日の${targetName}お薬はまだ飲んでおられません。今から飲まれますか？`;
+                speakText(msg); // ★同時発話
+                if (confirm(msg)) {
+                    if (typeof status !== 'object') savedStatus[todayStr] = {};
+                    savedStatus[todayStr][targetKey] = true;
+                    localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
+                    renderCalendar();
+                    speakText(`${targetName}お薬を記録しました。`);
+                }
+            } else {
+                const msg = `本日の${targetName}お薬はすでに飲んでおられます。`;
+                speakText(msg); // ★同時発話
+                alert(msg);
+            }
+        }
+    }, 500);
+}
+
+function onDateClick(dateStr) {
+    const savedStatus = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS) || "{}");
+    if (savedStatus[dateStr]) {
+        if (confirm(`${dateStr} の服薬記録を「未服用」に戻しますか？`)) {
+            delete savedStatus[dateStr];
+            localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
+            renderCalendar();
+        }
+    } else {
+        if (confirm(`${dateStr} の服薬を「服用済み」にしますか？`)) {
+            savedStatus[dateStr] = { single: true };
+            localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
+            renderCalendar();
+        }
+    }
+}
+
+function onSubDateClick(dateStr, slotKey) {
+    const savedStatus = JSON.parse(localStorage.getItem(STORAGE_KEY_STATUS) || "{}");
+    if (!savedStatus[dateStr] || typeof savedStatus[dateStr] !== 'object') {
+        savedStatus[dateStr] = {};
+    }
+
+    let slotNames = { am: '午前', pm: '午後', morning: '朝', lunch: '昼', dinner: '夕方' };
+    let sName = slotNames[slotKey];
+
+    if (savedStatus[dateStr][slotKey]) {
+        if (confirm(`${dateStr} の${sName}の服薬記録を「未服用」に戻しますか？`)) {
+            savedStatus[dateStr][slotKey] = false;
+            localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
+            renderCalendar();
+        }
+    } else {
+        if (confirm(`${dateStr} の${sName}の服薬を「服用済み」にしますか？`)) {
+            savedStatus[dateStr][slotKey] = true;
+            localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
+            renderCalendar();
+        }
+    }
+}
+
+function loadMeds() {
+    const container = document.getElementById('med-list-container');
+    container.innerHTML = '';
+    const savedMeds = JSON.parse(localStorage.getItem(STORAGE_KEY_MEDS) || "[]");
+
+    for (let i = 0; i < 5; i++) {
+        const val = savedMeds[i] || "";
+        const row = document.createElement('div');
+        row.className = 'med-row';
+        row.innerHTML = `
+            <input type="text" id="med-${i}" value="${val}" readonly placeholder="お薬名 ${i+1}">
+            <button id="btn-${i}" onclick="toggleEdit(${i})">編集</button>
+        `;
+        container.appendChild(row);
+    }
+}
+
+function toggleEdit(index) {
+    const input = document.getElementById(`med-${index}`);
+    const btn = document.getElementById(`btn-${index}`);
+
+    if (input.hasAttribute('readonly')) {
+        input.removeAttribute('readonly');
+        input.focus();
+        btn.innerText = '保存';
+        btn.style.backgroundColor = '#4CAF50';
+    } else {
+        input.setAttribute('readonly', 'readonly');
+        btn.innerText = '編集';
+        btn.style.backgroundColor = '#2196F3';
+        saveMedsToStorage();
+    }
+}
+
+function saveMedsToStorage() {
+    const meds = [];
+    for (let i = 0; i < 5; i++) {
+        const val = document.getElementById(`med-${i}`).value;
+        meds.push(val);
+    }
+    localStorage.setItem(STORAGE_KEY_MEDS, JSON.stringify(meds));
+}
+
+window.onload = init;
+</script>
+
+<footer>
+    © 20260903 ettomio - 舞いカレンダー
+</footer>
+
+</body>
+</html>
