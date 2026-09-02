@@ -279,6 +279,24 @@
         padding: 8px 10px; font-size: 14px; white-space: nowrap;
     }
 }    
+
+    /* 戻るボタン（右上）を統一デザインに変更 */
+    .top-right-button {
+	    /*position: absolute; */
+	    position: fixed;
+	    right: 15px;
+	    top: 12px;
+	    padding: 4px 12px;
+	    font-size: 14px;
+	    border: none;
+	    border-radius: 20px;
+	    background: #ccffff;
+	    color: #333;
+	    cursor: pointer;
+	    transition: 0.2s;    }
+    .top-right-button:hover {
+      background: #e2e2e2;
+    }
     </style>
 </head>
 
@@ -740,7 +758,7 @@ function startAiVoiceInput() {
 </script>
 
     <footer>
-      © 20260820 ettomio
+      © 20260903 ettomio
     </footer>
 
     <div style="height: 50px;"></div>
