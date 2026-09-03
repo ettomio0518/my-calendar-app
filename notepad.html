@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>メモの入力と確認</title>
+    <style>
+		body {
+		  font-family: Arial, sans-serif;
+		  font-size: 16px;   /* ← これ追加 */
+		  padding: 20px;
+		  max-width: 500px;
+		  margin: auto;
+		  background-color: #ffe6ff;
+		}
+        
+		.app-header {
+		  background: #8080ff;
+		  color: white;
+
+		  display: flex;
+		  align-items: center;        /* ← 縦中央 */
+		  justify-content: space-between;
+
+		  padding: 10px 14px;         /* ← 余白を最小限に */
+		  
+		}
+
+		.app-header h1 {
+	  	  /* margin: 0;   */    /* ← これ超重要 */
+  		  margin-left: 30px; /* ← 左に30pxの余白 */  
+		  font-size: 18px;
+		  font-weight: normal;
+		}
+          
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+            background-color: #cbe4e4;
+        }
+        
+		.detail-container {
+		    padding: 8px 10px;
+		}
+        
+		.input-row {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: flex-start;
+		    margin-left: 8px;
+		    width: 100%;
+		}
+		
+		.input-row label {
+		    margin: 6px 0 2px 0;   /* 上下だけ */
+		}
+
+		.input-row input,
+		.input-row textarea,
+		.input-row select {
+		    margin: 0 0 8px 0;     /* 左右ゼロ */
+		}
+		.input-row textarea {
+		  width: 100%;
+		  min-height: 200px;   /* ← 150 → 180 */
+		  max-height: 300px;
+		}
+
+		.input-row,
+		.input-row * {
+		    box-sizing: border-box;
+		}
+
+        .input-row input {
+            height: 30px;
+            font-size: 16px;
+        }
+        
+		.url-box {
+		    width: 97%;           /* ← 90 → 94 で十分効く */
+		    max-width: 560px;     /* ← 10pxだけ増やす */
+		    margin-left: 5px;     /* ← ラベルと揃う */
+		    margin-right: auto;
+		}
+
+		#memoContent {
+		  font-size: 1rem;
+          margin-top: 8px; 		  
+		}
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        th.keyword-column, td.keyword-column {
+            width: 60%;
+        }
+        th.actions-column, td.actions-column {
+            width: 40%;
+        }
+        #memoList {
+            width: 100%;
+        }
+        button {
+            font-size: 15px;
+            padding: 3px 7px; /* ボタンの余白を調整 */
+            margin: 3px;
+            border-radius: 5px;
+            background-color: #ffffff;
+            color: black;
+            border: 1px solid #0000ff;
+            cursor: pointer;
+		    white-space: nowrap;
+		    line-height: 1.2;            
+        }
+        .save-button {
+            padding: 3px 7px;
+            background-color: #ffdbed;
+        }        
+        .new-button {
+            padding: 3px 7px;
+            background-color: #ffffff;
+            color: blue;            
+        }
+        .new-button2{
+            padding: 3px 7px;
+            background-color: #ffffe3;
+            color: black;
+            margin-top: 15px;                        
+        }
+        .copy-button {
+            padding: 3px 7px;
+            background-color: #ffe8e8;
+        }
+        .close-list-button {
+            background-color: #aeaeae;
+            color: white;            
+        }
+
+		#gmailbutton {
+		background: #f0f0f0;
+		min-width: 72px;
+		padding: 3px 10px;
+		font-size: 14px;
+		white-space: nowrap;
+		line-height: 1.2;
+	    margin-left: 20px;
+		}
+		  
+        .custom-alert {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ffcccb;
+            color: black;
+            padding: 10px 20px;
+            border: 1px solid red;
+            border-radius: 5px;
+            font-size: 16px;
+            z-index: 1000;
+        }
+
+		.detail-container {
+    		margin: 10px 0;
+		    background-color: #f2f2f2;
+		    word-break: break-all; /* 長いURLを強制的に改行 */
+		}
+
+	    footer {
+	      text-align: center;
+	      padding: 12px;
+          font-size: 15px;	
+          color: #b87272;                
+	    }	
+
+		/* 11/4 Top/Bottomボタン */
+		.bottom-button, .top-button {
+		    position: fixed;
+		    bottom: 20px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background: #a74fff;
+		    color: white;
+		    border: none;
+		    border-radius: 20px;
+		    padding: 10px 20px;
+		    font-size: 16px;
+		    cursor: pointer;
+		    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		    z-index: 9999;
+		    display: none;
+		}
+		.bottom-button:hover, .top-button:hover {
+		    background: #0056b3;
+		}    
+	
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+  		  /* position: static;   /* ← absolute をやめる */
+  		  position: fixed;
+	      top: 10px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
+
+		.category-row {
+		  display: flex;
+		  align-items: center;   /* 高さを揃える */
+		  gap: 30px;             /* select とボタンの間隔 */
+		  margin-bottom: 8px;
+		  flex-wrap: wrap;       /* スマホで狭ければ折り返す */
+		}
+
+		.category-row select {
+		  height: 30px;
+		  font-size: 16px;
+		}
+
+		@media (max-width: 600px) {
+		  th, td {
+		    padding: 4px 4px;
+		    font-size: 14.5px;
+			line-height: 1.4;
+		  }
+		}
+
+    /* 2/5 */
+    #keyNButton {
+        background-color: #c89191;
+        color: white;
+        min-width: 72px;
+        padding: 3px 7px;
+        font-size: 15px;
+        white-space: nowrap;
+        line-height: 1.2;
+    }
+    
+    </style>
+    
+	<script>
+	function openOCRReader() {
+	  if (typeof Android !== "undefined" && Android.openOCRReader) {
+	    Android.openOCRReader(); // WebView内ならアプリ側へ
+	  } else {
+	    window.open(
+	      'https://ettomio0518.github.io/ettomio-ocr-reader/',
+	      '_blank'
+	    ); // 通常ブラウザなら直接開く
+	  }
+	}
+	</script>
+	    
+</head>
+<body>
+
+		<header class="app-header">
+		  <h1>📝🔒 ノート notepad</h1>
+		  <button class="top-right-button"
+		    onclick="window.location.href='index.html'">戻る</button>
+		</header>
+		  	
+		<div class="container">
+  	    
+		<div class="input-row">
+        <label for="keyword">キーワード:</label>
+        <input type="text" id="keyword" maxlength="20" onfocus="showKeywordAlert(); this.onfocus=null;" class="input-field">
+		<div class="category-row">
+		  <select id="category" class="input-field">
+		    <option value="1">覚え</option>
+		    <option value="2">個人</option>
+		    <option value="3">仕事・学習</option>
+		    <option value="4">趣味・娯楽</option>
+		    <option value="5">その他</option>
+		    <option value="6">後で読む</option>
+		  </select>
+
+		  <button onclick="openOCRReader()">簡易版OCR</button>
+		</div>
+
+		<div>         
+        <label for="memoContent">ノート編集:</label>
+        	<button id="gmailbutton" onclick="openGmailInbox()">📬 Gmail送受信</button>
+    	</div>
+        
+        <textarea id="memoContent" rows="5" class="input-field" style="width: 100%;"></textarea>
+        </div>
+        
+		<div>	        
+        <button class="save-button" onclick="saveMemo()">💾 保存</button>
+        
+        <button class="new-button" onclick="resetInputs()">🆕 新規入力</button>
+
+		<button id="keyNButton" onclick="location.href='AdvancedSearch.html?from=notepad'">高機能検索</button>      
+    	<button class="copy-button" onclick="copyNote()">全選択コピー</button>
+    	
+    </div>
+    
+    <button id="toggleMemoList" onclick="toggleMemoList()" style="margin-top: 15px;margin-bottom: 8px;"> ノートのリスト </button>
+
+	<div class="url-box">
+        <label for="urlContent" style="color: #0000ff; font-size: 15px;">クリッカブルURL対応詳細:</label>
+        <div id="urlContent" class="detail-container"></div>
+    </div>
+
+	<div id="memoList" class="table-container">
+
+        <p style="color: #800000; margin-left: 7px;">カテゴリー抽出:</p>
+        	
+	  <!-- ✅ カテゴリボタンを先頭に移動 -->
+	<div id="categoryFilter" style="display: none; margin-bottom: 10px; text-align: center;">
+	  <button class="new-button2" onclick="filterMemosByCategory('1')">1.覚え</button>
+	  <button class="new-button2" onclick="filterMemosByCategory('2')">2.個人</button>
+	  <button class="new-button2" onclick="filterMemosByCategory('3')">3.仕事・学習</button>
+	  <button class="new-button2" onclick="filterMemosByCategory('4')">4.趣味・娯楽</button>
+	  <button class="new-button2" onclick="filterMemosByCategory('5')">5.その他</button>
+	  <button class="new-button2" onclick="filterMemosByCategory('6')">6.後で読む</button>
+	  <button class="new-button2" onclick="displayMemos()" style="margin-left: 10px;">全て表示</button>
+	</div>
+
+	<div id="memoTableArea"></div>
+	</div>
+
+    <button id="closeMemoListBottom" class="close-list-button" style="display: none;" onclick="toggleMemoList()">✕ リストを閉じる</button>
+
+</div>
+
+<script>
+    let currentKey = '';
+    let isMemoListDisplayed = false;
+
+    function showCustomAlert(message) {
+        const alertContainer = document.createElement('div');
+        alertContainer.className = 'custom-alert';
+        alertContainer.textContent = message;
+        document.body.appendChild(alertContainer);
+        setTimeout(() => {
+            document.body.removeChild(alertContainer);
+        }, 5000);
+    }
+
+	  // 2/22追加 2/23修正
+	  /** * Gmailを開く前に確認ダイアログを表示する */
+	  function openGmailInbox() {
+	    const isGmailUser = confirm("Gmailをお使いですか?");
+	    if (isGmailUser) {
+	      window.open('https://mail.google.com/mail/u/0/#inbox', '_blank');
+	    } else {
+	      console.log("Gmailは開きませんでした。");
+	    }
+	  }
+
+    function showKeywordAlert() {
+        showCustomAlert("一目で分かる10文字程度のキーワードを入れて下さい。本文には重要な内容は書き込まれないことをお勧めします。");
+    }
+
+	function saveMemo() {
+	    const keyword = document.getElementById('keyword').value.trim();
+	    const category = document.getElementById('category').value;
+	    const memoContent = document.getElementById('memoContent');
+	    const originalText = memoContent.value;
+
+	    const lines = originalText.split(/\r?\n/);
+	    const cleanedLines = lines.filter(line => line.trim() !== '');
+	    const cleanedText = cleanedLines.join('\n');
+
+	    if (keyword.length < 1) {
+	        showCustomAlert("一目で分かる10文字程度のキーワードを入れて下さい。本文には重要な内容は書き込まれないことをお勧めします。");
+	        return;
+	    }
+
+	    const newKey = `memo_${category}_${keyword}`;
+	    localStorage.setItem(newKey, cleanedText);
+
+	    if (currentKey && currentKey !== newKey) {
+	        localStorage.removeItem(currentKey);
+	    }
+
+	    if (localStorage.getItem(newKey) === cleanedText) {
+	        alert("保存しました\n\nOK");
+
+	        document.getElementById('keyword').value = keyword;
+	        memoContent.value = cleanedText;
+	        document.getElementById('category').value = category;
+	        displayURLs(cleanedText);
+	        currentKey = newKey;
+	    } else {
+	        showCustomAlert('メモの保存に失敗しました。');
+	    }
+
+	    displayMemos(); // ← これでリスト更新
+	    // resetInputs()
+	} // ← ここで正しく閉じる
+
+	function resetInputs() {
+	    document.getElementById('keyword').value = '';
+	    document.getElementById('memoContent').value = '';
+	    document.getElementById('category').value = '1';
+	    document.getElementById('urlContent').innerHTML = '';
+	    currentKey = '';
+	    window.scrollTo({ top: 0, behavior: 'smooth' }); // 最上部に戻る
+	}
+
+	function copyNote() {
+	    const text = document.getElementById('memoContent').value;
+
+	    navigator.clipboard.writeText(text).then(() => {
+	        showCustomAlert('コピーしました。メールアプリや外部アプリに貼り付けてご利用ください。');
+	    });
+	}
+
+	function displayMemos(filterCategory = null) {
+	    const keys = Object.keys(localStorage).filter(key => key.startsWith('memo_'));
+	    const categorizedMemos = {};
+
+	    keys.forEach(key => {
+	        const parts = key.split('_');
+	        const category = parts[1];
+	        const keyword = parts.slice(2).join('_');
+	        if (!categorizedMemos[category]) {
+	            categorizedMemos[category] = [];
+	        }
+	        categorizedMemos[category].push({ key, keyword });
+	    });
+
+	    const memoTableArea = document.getElementById('memoTableArea');
+	    memoTableArea.innerHTML = ''; // ← テーブルだけを消す
+
+	    const table = document.createElement('table');
+	    const categoriesToShow = filterCategory ? [filterCategory] : Object.keys(categorizedMemos).sort();
+
+	    categoriesToShow.forEach(category => {
+	        const option = document.querySelector(`#category option[value="${category}"]`);
+	        const categoryLabel = option ? option.textContent : 'カテゴリ不明';
+
+	        const categoryRow = document.createElement('tr');
+	        const categoryCell = document.createElement('td');
+	        categoryCell.colSpan = 2;
+	        categoryCell.textContent = `${category}.${categoryLabel}`;
+	        categoryCell.style.fontSize = 'larger';
+	        categoryCell.style.color = '#0000ff';
+	        categoryRow.appendChild(categoryCell);
+	        table.appendChild(categoryRow);
+
+	        categorizedMemos[category].sort((a, b) => a.keyword.localeCompare(b.keyword)).forEach(memo => {
+	            const row = document.createElement('tr');
+	            const keywordCell = document.createElement('td');
+	            const actionsCell = document.createElement('td');
+
+	            keywordCell.textContent = memo.keyword;
+	            keywordCell.style.wordBreak = 'break-all';
+
+	            const viewButton = document.createElement('button');
+	            viewButton.textContent = '表示';
+	            viewButton.onclick = () => {
+	                document.getElementById('keyword').value = memo.keyword;
+	                document.getElementById('memoContent').value = localStorage.getItem(memo.key);
+	                document.getElementById('category').value = category;
+	                displayURLs(localStorage.getItem(memo.key));
+	                currentKey = memo.key;
+	                window.scrollTo({ top: 0, behavior: 'smooth' });
+	            };
+
+	            const deleteButton = document.createElement('button');
+	            deleteButton.textContent = '消去';
+	            deleteButton.onclick = () => deleteMemo(memo.key);
+
+	            actionsCell.appendChild(viewButton);
+	            actionsCell.appendChild(deleteButton);
+	            actionsCell.style.whiteSpace = 'nowrap';
+
+	            row.appendChild(keywordCell);
+	            row.appendChild(actionsCell);
+	            table.appendChild(row);
+	        });
+	    });
+
+		memoTableArea.appendChild(table);
+
+		// ✅ カテゴリボタンを表示！
+		document.getElementById('categoryFilter').style.display = 'block';
+
+
+	    // ← ボタンを表示
+	    document.getElementById('categoryFilter').style.display = 'block';
+	}
+
+
+	function filterMemosByCategory(category) {
+	    displayMemos(category);
+	}
+
+    function deleteMemo(key) {
+        localStorage.removeItem(key);
+        showCustomAlert('メモが消去されました。');
+        displayMemos();
+    }
+
+    function toggleMemoList() {
+        const memoList = document.getElementById('memoList');
+        const toggleButton = document.getElementById('toggleMemoList');
+        const closeButtonBottom = document.getElementById('closeMemoListBottom'); // 追加
+
+        if (isMemoListDisplayed) {
+            memoList.style.display = 'none';
+            toggleButton.textContent = 'ノートのリスト';
+            toggleButton.classList.remove('close-list-button');
+            closeButtonBottom.style.display = 'none'; // 追加
+            document.getElementById('keyword').value = '';
+            document.getElementById('memoContent').value = '';
+            document.getElementById('category').value = '1';
+            document.getElementById('urlContent').innerHTML = '';
+        } else {
+            displayMemos();
+            memoList.style.display = 'block';
+            toggleButton.textContent = '✕ リストを閉じる';
+            toggleButton.classList.add('close-list-button');
+            closeButtonBottom.style.display = 'block'; // 追加
+            document.getElementById('categoryFilter').style.display = 'block'; // ← ここ！
+        }
+        isMemoListDisplayed = !isMemoListDisplayed;
+    }
+
+	function displayURLs(memoContent) {
+	    const urlContainer = document.getElementById('urlContent');
+	    urlContainer.innerHTML = '';
+
+	    const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+	    const formattedContent = memoContent.replace(urlRegex, (url) =>
+	        `<a href="${url}" style="color: blue; text-decoration: underline;" target="_blank">${url}</a>`
+	    );
+
+	    urlContainer.innerHTML = formattedContent.replace(/\n/g, '<br>');
+	}
+
+	window.onload = function () {
+	    document.getElementById('keyword').value = '';
+	    document.getElementById('memoContent').value = '';
+	    document.getElementById('category').value = '1';
+	    document.getElementById('urlContent').innerHTML = '';
+	    document.getElementById('memoList').style.display = 'none'; // ← ここに移動！
+	};
+
+</script>
+
+	    <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
+		<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	    
+
+  <script>
+	    // ==========================================================
+	    // ★ スクロールボタン制御 (Top/Bottom)
+	    // ==========================================================
+
+	    function scrollToTop() {
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	    }
+
+	    function scrollToBottom() {
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	    }
+
+	    function hideScrollButtons() {
+	        document.getElementById("topBtn").style.display = "none";
+	        document.getElementById("bottomBtn").style.display = "none";
+	    }
+
+		// ==========================================================
+		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
+		// ==========================================================
+		function showScrollButtonsIfPageLong() {
+		    const topBtn = document.getElementById("topBtn");
+		    const bottomBtn = document.getElementById("bottomBtn");
+		    
+		    const docHeight = document.body.scrollHeight;
+		    const viewHeight = window.innerHeight;
+		    const scrollY = window.scrollY;
+		    
+		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
+		    
+		    // ページがスクロール可能でなければ両方非表示
+		    if (docHeight <= viewHeight + scrollThreshold) {
+		        topBtn.style.display = "none";
+		        bottomBtn.style.display = "none";
+		        return;
+		    }
+
+		    // --- Topボタンの表示制御 ---
+		    // 100px以上スクロールしたらTopボタンを表示
+		    if (scrollY > scrollThreshold) {
+		        topBtn.style.display = "block";
+		    } else {
+		        topBtn.style.display = "none";
+		    }
+
+			// --- Bottomボタンの表示制御 ---
+			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
+			if (
+			    scrollY > scrollThreshold &&
+			    docHeight - viewHeight - scrollY > scrollThreshold
+			) {
+			    bottomBtn.style.display = "block";
+			} else {
+			    bottomBtn.style.display = "none";
+			}
+		}
+
+	    // スクロール時のボタン表示制御
+	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
+	    
+	    // 初期ロード時にもボタン表示をチェック
+	    window.addEventListener("load", showScrollButtonsIfPageLong);
+	    
+	    // 画面サイズ変更時にもチェック (スマホの向き変更など)
+	    window.addEventListener("resize", showScrollButtonsIfPageLong);
+
+
+	    // ==========================================================
+	    // ★ 初期化
+	    // ==========================================================
+	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
+	    document.addEventListener('DOMContentLoaded', () => {
+	        showScrollButtonsIfPageLong();
+	    });
+	    
+  </script>
+    
+  <footer>
+  © 20260904 ettomio - 舞いカレンダー
+  </footer>
+  <div style="height: 50px;"></div>
+  
+  </body>
+</html>
+
