@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>幸福ワードランキング</title>
-    <style>
+<style>
         :root {
             --bg-color: #fdfbf7;
             --card-bg: #ffffff;
@@ -12,6 +12,7 @@
             --primary-color: #ffb703;
             --primary-hover: #fb8500;
             --accent-color: #219ebc;
+            --danger-color: #e63946;
             --border-color: #e0e0e0;
             --shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
@@ -25,6 +26,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding-bottom: 60px;
         }
 
         .container {
@@ -162,12 +164,51 @@
             font-size: 1.05rem;
             font-weight: bold;
             word-break: break-all;
+            flex: 1;
+            padding-right: 8px;
+        }
+
+        .word-right-side {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+            white-space: nowrap;
         }
 
         .word-stars {
             color: #ffb703;
             font-size: 0.9rem;
-            white-space: nowrap;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .action-btn {
+            background: #f0f0f0;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: 0.2s;
+        }
+
+        .edit-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .delete-btn:hover {
+            background: var(--danger-color);
+            color: white;
+            border-color: var(--danger-color);
         }
 
         .word-footer {
@@ -189,6 +230,63 @@
             padding: 20px;
             font-size: 0.9rem;
         }
+
+        /* フッター・戻るボタン */
+        footer {
+            /*margin-top: 30px; */
+            text-align: center;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* 編集モーダル用スタイル */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-save { background: var(--primary-hover); color: white; }
+        .btn-cancel { background: #e0e0e0; color: #333; }
         
 		/* ===============================
 		   フッター
@@ -196,7 +294,7 @@
 		footer {
 		    text-align: center;
 		    color: #0080ff;
-		    padding: 10px;
+		    margin-top: 20px;
 		    font-size: 14px;
 		}
 
@@ -217,7 +315,7 @@
 	    .top-right-button:hover {
 	      background-color: #0056b3;
 	    }
-    		        
+    		                
     </style>
 </head>
 <body>
@@ -225,7 +323,7 @@
 <div class="container">
     <header>
         <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
-        
+    
         <h1>幸福ワードランキング</h1>
         <div class="catchphrase">日常生活をポジティブ思考で行こう❗️<br>
          ポジティブ思考は絶対に必要❗️</div>
@@ -259,17 +357,53 @@
     </div>
 
     <div class="list-header">
-        <span>登録ワード一覧（★ 昇順）</span>
+        <span>登録ワード一覧（★ 降順）</span>
         <span id="countLabel">0件</span>
     </div>
 
     <div class="word-list" id="wordList">
         <div class="empty-state">まだワードが登録されていません。</div>
     </div>
+
+    <!--<footer>
+        <button class="btn-back" onclick="goBack()">戻る</button>
+    </footer> -->
+    
+</div>
+
+<!-- 編集モーダル -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <h3 style="margin-top:0; font-size:1.1rem; color:#d4a373;">ワードの編集</h3>
+        <div class="form-group">
+            <label>前向きワード・内容</label>
+            <input type="text" id="editWordInput">
+        </div>
+        <div class="form-group">
+            <label>幸福度ランク</label>
+            <div class="rating-select" id="editRatingSelect">
+                <button type="button" data-rating="1">★1</button>
+                <button type="button" data-rating="2">★2</button>
+                <button type="button" data-rating="3">★3</button>
+                <button type="button" data-rating="4">★4</button>
+                <button type="button" data-rating="5">★5</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>参考URL（任意）</label>
+            <input type="text" id="editUrlInput">
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" onclick="closeEditModal()">キャンセル</button>
+            <button type="button" class="btn-save" onclick="saveEditedWord()">保存</button>
+        </div>
+    </div>
 </div>
 
 <script>
     let currentRating = 5;
+    let editRating = 5;
+    let editingId = null;
     let words = JSON.parse(localStorage.getItem('happiness_words') || '[]');
 
     const ratingButtons = document.querySelectorAll('#ratingSelect button');
@@ -278,6 +412,15 @@
             ratingButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentRating = parseInt(btn.dataset.rating);
+        });
+    });
+
+    const editRatingButtons = document.querySelectorAll('#editRatingSelect button');
+    editRatingButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            editRatingButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            editRating = parseInt(btn.dataset.rating);
         });
     });
 
@@ -320,7 +463,13 @@
             div.innerHTML = `
                 <div class="word-main">
                     <div class="word-text">${formattedContent}</div>
-                    <div class="word-stars">${stars}</div>
+                    <div class="word-right-side">
+                        <div class="word-stars">${stars}</div>
+                        <div class="action-buttons">
+                            <button class="action-btn edit-btn" onclick="openEditModal(${item.id})">編集</button>
+                            <button class="action-btn delete-btn" onclick="deleteWord(${item.id})">削除</button>
+                        </div>
+                    </div>
                 </div>
                 ${item.url ? `<div class="word-link">🔗 ${formattedUrl}</div>` : ''}
                 <div class="word-footer">
@@ -361,6 +510,73 @@
         urlInput.value = '';
         render();
     });
+
+    function deleteWord(id) {
+        if (confirm('このワードを削除しますか？')) {
+            words = words.filter(item => item.id !== id);
+            localStorage.setItem('happiness_words', JSON.stringify(words));
+            render();
+        }
+    }
+
+    function openEditModal(id) {
+        const item = words.find(w => w.id === id);
+        if (!item) return;
+
+        editingId = id;
+        document.getElementById('editWordInput').value = item.content;
+        document.getElementById('editUrlInput').value = item.url || '';
+        editRating = item.rating;
+
+        editRatingButtons.forEach(btn => {
+            if (parseInt(btn.dataset.rating) === editRating) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+        editingId = null;
+    }
+
+    function saveEditedWord() {
+        const content = document.getElementById('editWordInput').value.trim();
+        const url = document.getElementById('editUrlInput').value.trim();
+
+        if (!content) {
+            alert('内容を入力してください。');
+            return;
+        }
+
+        words = words.map(item => {
+            if (item.id === editingId) {
+                return {
+                    ...item,
+                    content: content,
+                    rating: editRating,
+                    url: url
+                };
+            }
+            return item;
+        });
+
+        localStorage.setItem('happiness_words', JSON.stringify(words));
+        closeEditModal();
+        render();
+    }
+
+    function goBack() {
+        if (window.Android && typeof window.Android.goBack === 'function') {
+            window.Android.goBack();
+        } else {
+            history.back();
+        }
+    }
 
     render();
 </script>
