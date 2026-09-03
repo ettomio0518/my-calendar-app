@@ -3,183 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>keyリスト</title>
+	<meta name="author" content="ettomio">
 
-    <title>舞いカレンダー - Android向け音声入力対応のスケジュール・メモ・タスク管理アプリ</title>
-    <meta name="description" content="Androidアプリ「舞いカレンダー」は、音声で手軽に予定やメモを登録し、読み上げ機能でスケジュールを確認できる高機能カレンダーです。日記、買い物電卓、ブックマーク、タスク管理もこれ一つで完結。忙しい毎日をサポートします。72歳開発者 ettomioより">
-    
-    <meta name="author" content="ettomio">
-
-    <meta property="og:title" content="舞いカレンダー - 声で管理するスマートなカレンダーツール" />
-    <meta property="og:description" content="音声入力、音声通知、日記、タスク管理機能を備えた多機能Androidアプリ。あなたの毎日をもっと便利に。72歳開発者 ettomioより" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://ettomio0518.github.io/my-calendar-app/index.html" /> 
-	<meta property="og:image" content="https://ettomio0518.github.io/my-calendar-app/image64.png" />
-	<meta property="og:site_name" content="音声カレンダー 公式サイト" />
-    <meta property="og:locale" content="ja_JP" />
-
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:site" content="@ettomio0518" />
-	<meta name="twitter:creator" content="@ettomio0518" />
-	<meta name="twitter:title" content="舞いカレンダー - 声で管理するスマートなAndroidカレンダー" />
-	<meta name="twitter:description" content="音声入力、音声通知、日記、タスク管理機能を備えた多機能Androidアプリ。あなたの毎日をもっと便利に。72歳開発者 ettomio" />
-	<meta name="twitter:image" content="https://ettomio0518.github.io/my-calendar-app/image64.png" />
-	
     <style>
         /* 全体のスタイル設定 */
         body {
-            font-family: Arial, sans-serif; /* フォント設定 */
-            text-align: center; /* テキスト中央揃え */
-            position: relative; /* 位置を相対的に設定 */
-            background-color: #ffffcc; /* 背景色 */
+            font-family: Arial, sans-serif;
+            text-align: center;
+            position: relative;
+            background-color: #e6e6ff;
         }
-		/* 星屑ノイズ（控えめ・高貴寄り）12/23 */
-		body::after {
-		  content: "";
-		  position: fixed;
-		  top: 0; left: 0; right: 0; bottom: 0;
-		  background-image: radial-gradient(white 0.7px, transparent 0.7px);
-		  background-size: 2.5px 2.5px;
-		  opacity: 0.10;
-		  pointer-events: none;
-		}        
-	    /* 星の粒ノイズ weather、todayで使用*/
-	    /*
-	    body::after {
-	      content: "";
-	      position: fixed;
-	      top:0; left:0; right:0; bottom:0;
-	      background-image: radial-gradient(white 1px, transparent 1px);
-	      background-size: 3px 3px;
-	      opacity: 0.15;
-	      pointer-events: none;
-	    } 
-	    */		
-
-		.container {
-		  max-width: 600px;
-		  margin: 5px auto; /* 4/20i10pxから5px */
-		  padding: 10px;
-		  border: 1px solid #ccc;
-		  border-radius: 10px;
-		  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		  background: linear-gradient(to bottom, #ffecff 0%, #dbdbff 50%, #b9ffff 100%);
-		  box-sizing: border-box;
-		}
-
-		.container2 {
-		  max-width: 100%; /* 親に合わせる */
-		  /* 上:10px, 左右:auto, 下:2px */
-  		  margin: 10px auto 2px;
-		  padding: 10px;
-		  border: 1px solid #ccc;
-		  border-radius: 10px;
-		  background: linear-gradient(to bottom, #b9ffff 0%, #b7ffdb 50%, #ffffa6 100%);
-		  box-sizing: border-box;
-		}
-
-		.container3 {
-		  max-width: 100%;
-		  margin: 10px auto;
-		  padding: 10px;
-		  border: none !important; /* 枠線を強制的に消去 */
-		  border-radius: 10px;
-		  display: none;
-		  background: linear-gradient(to bottom, #ffffa6 0%, #b7ffdb 50%, #d0d0ff 100%);
-		  box-sizing: border-box;
-		  outline: none; /* フォーカス時の線も消したい場合 */
-		}
-		/* 開いた状態 */
-		.container3.open {
-		  display: block;
-		}
-
-		header {
-		    background: #ffdcb9;
-		    color: #595959;
-		    padding: 0.1em;
-		    text-align: center;
-		}
-
-        h1 { font-size: 19px; color: #595959; }
-        h2 { font-size: 16px; }
-        h3 { 
-        	font-size: 17px; 
-        	color: #b87272;  
-			margin-bottom: 5px;   /* デフォルトより小さく */
-        }
-		h4 { font-size: 20px; margin: 0; }
-		/* 2. タイトル自体の設定をさらに追い込む */
-		h5.section-title {
-		    display: inline-block; /* ブロック要素としての余計な振る舞いを防ぐ   12/23 */
-		    margin: 0;             /* 上下左右すべての余白を一旦ゼロに */
-		    padding: 0;
-		    font-size: 17px;
-		    color: #b87272;
-		}
-        
-        input, textarea, button {
+        .container {
+            max-width: 600px;
+            margin: 10px auto;
             padding: 10px;
-            margin: 10px 0;
-            font-size: 16px;
-        }
-        textarea {
-            width: calc(100% - 22px);
-        }
-        .inline-elements {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .inline-elements button {
-            margin-left: 10px;
-        }
-        .output-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 10px 0;
-            text-align: left;
-        }
-        .output-row div {
-            flex-grow: 1;
-            margin-right: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: left;
-        }
-        .output-row button {
-            flex-shrink: 0;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #e7e7e7;
         }
 
-        /* カレンダーのスタイル設定 */
-		.calendar-header { 
-		    display: flex; 
-		    justify-content: space-between; 
-		    align-items: center; 
-		    padding: 10px; 
-		    background-color: inherit; /* bodyの背景色を継承 */
-		    border-bottom: 1px solid #ccc; 
-		}
-		.calendar-header button { 
-		    background-color: #4caf50; 
-		    color: white; 
-		    border: none; 
-		    padding: 10px 15px; 
-		    cursor: pointer; 
-		    border-radius: 5px; 
-		    font-size: 1.2em; 
-		}
+        h2 { font-size: 16px; }
+        h3 { font-size: 19px; color: #0000ff; }
 
-		.calendar-header button:hover { 
-		    background-color: #45a049; 
-		}
-				
-        .home-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-        }
+        /* ボタンの共通スタイル */
         button {
             width: auto;
             flex-shrink: 0;
@@ -191,240 +39,26 @@
             color: black;
     		border: 1px solid black;
             cursor: pointer;
+            white-space: nowrap;
         }
-
-		/* 「予定の確認」ボタンのスタイルを設定 */
-		.check-button {
-		    background-color:#d9ffd9;
-		    color: black;
-		    padding:  3px 10px;
-		    border-radius: 5px;
-		    cursor: pointer;
-		}
-
-		.diary-button {
-		    background-color:#ffffff;
-		    color: black;
-		    padding:  3px 10px;
-		    border-radius: 5px;
-		    cursor: pointer;
-		}
-		
-		.limit-button { /* このクラスは現在使用されていませんが、念のため残しておきます */
-		    background-color: white;
-		    color: #0000ff;
-		    padding:  3px 10px;
-		    border-radius: 5px;
-		    cursor: pointer;
-		}
-
-		/* 「予定の音声出力」ボタンだけ異なるスタイルを設定 */
-		.output-button {
-		    background-color: #ffdacc;
-		    color: black;
-		    padding:  3px 10px;
-		    border-radius: 5px;
-		    cursor: pointer;
-		}
-
-		/* 「保存」ボタンだけ異なるスタイルを設定 */
-		.save-button {
-		    font-size: 16px;
-		    padding: 3px 10px;
-		    background-color: #ffe6cc;
-		}
-
-		/* 保存・確認ボタンの上余白を減らす */
-		.save-button,
-		.check-button {
-		  margin-top: 4px;
-		}
-
-		/* 「時計」ボタンだけスタイルを変更 */
-		.clock-button {
-		    font-size: 16px; /* フォントサイズを大きく */
-		    padding: 3px 15px; /* ボタン全体の大きさを調整 */
-		    color: blue;
-		    background-color: #ffffff; /* 背景色も変更可能 */
-		}
-
-		/* 「今日のカード」ボタンだけスタイルを変更 */
-		.todaycard-button {
-		    font-size: 16px; /* フォントサイズを大きく */
-		    padding: 3px 30px; /* ボタン全体の大きさを調整 */
-		    color: blue;
-		    background-color: #ffecd9; /* 背景色も変更可能 */
-		}
-		
-		/* 「カレンダー」ボタンだけ異なるスタイルを設定 */
-		.calendar-button {
-		    background-color: #ffffc4;/* 背景色も変更可能 */
-		    color: blue; /* 文字色の変更 */
-		}
-
-		/* 「今日のカード」「ノート」「走り書き」ボタンだけスタイルを変更 12/22 */
-		#note-button,
-		#note-button2 {
-		    font-size: 16px; /* フォントサイズを大きく */
-		    padding: 3px 10px; /* ボタン全体の大きさを調整 */
-		    color: blue;
-		    background-color: #ffe6ff; /* 背景色も変更可能 */
-		    border-radius: 5px;	
-		}		    
-		#note-button3 {
-		    font-size: 16px; /* フォントサイズを大きく */
-		    padding: 3px 10px; /* ボタン全体の大きさを調整 */
-		    color: blue;
-		    background-color:  #ffffc6; /* 背景色も変更可能 */
-		    border-radius: 5px;		    	    
-		}
-		
-		/* 「現在地の天気予報」ボタンだけスタイルを変更 12/22 */
-		#weather-button {
-		    font-size: 16px; /* フォントサイズを大きく */
-		    padding: 3px 30px; /* ボタン全体の大きさを調整 */
-		    color: blue;
-		    background-color: #ffffec; /* 背景色も変更可能 */
-		    border-radius: 5px;	
-		}
-				
-		/* container2のボタンを全て白くする 12/22 */
-		.container2 button {
-		  background: #fff;
-		  border: 1px solid #6bbfae;
-		  color: #004d40;
-		}
-		 
-		/* 押したときだけ： */
-		.container2 button:active {
-		  background: #e0f2f1;
-		}
-				
-		.month-number {
-		    color: #595959;		
-            font-size: 40px;
-            font-weight: bold;
-            margin: 0 4px;
-        }
-        .year-month {
-		    text-align: center; 
-        }
-		#year { 
-            font-size: 19px;
-		    font-weight: bold; 
-		}
         
-		.date-info {
-		    font-size: 18px;
-		    text-align: center; /* 既存の左揃えを中央揃えに変更 */
-		}
-
-        .current-time {
-            font-size: 11px;
-            margin-top: 5px;
+        /* 戻るボタン（右上） */
+        .top-right-button {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 14px;
+            cursor: pointer;
         }
-        .current-date {
-            font-size: 15px;        
-            color: red;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            width: 14%;
-            /* 縦方向の圧縮を反映 */
-            padding: 6px 0;
-            border: 1px solid #ddd;
-            text-align: center;
-            font-size: 18px;
-        }
-        th {
-            background-color: #f4f4f4;
-		    color: #595959;             
-        }
-        .today {
-            font-weight: bold;
-            animation: blink 1s step-start 0s infinite;
+        .top-right-button:hover {
+            background-color: #0056b3;
         }
 
-		#listContainer {
-		    position: relative;
-		    /* padding-top: 35px; */ /* ボタンを動的に生成しないため、パディングは不要 */
-		}
-
-		#closeListButton {
-		    display: none; /* 初期状態で非表示 */
-            background-color: #eaea00; /* 元のデザインに近い色に変更 */
-            color: black;
-		}
-
-		#scheduleInput {
-		    height: 40px; /* 2行弱くらいで固定。今回のUIにはちょうど良いです。 */
-		    line-height: 22px; /* 文字の詰まり感もなく、可読性OK。 */
-		    resize: none; /* レイアウト崩れ防止。*/
-		    margin-top: 1px;
-		    margin-bottom: 6px; /* 下の「保存」「予定の確認」との間隔を詰める目的にピッタリ。 */
-		}
-
-		/* カスタムアラート */
-		.custom-alert, .custom-alert2, .custom-alert3, .custom-alert4{ 
-		    position: fixed; 
-		    top: 20px; 
-		    left: 50%; 
-		    transform: translateX(-50%); 
-		    background-color: #333; 
-		    color: white; 
-		    padding: 15px 25px; 
-		    border-radius: 5px; 
-		    box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
-		    z-index: 1000; 
-		    font-size: 1em; 
-		}
-
-		.custom-alert2 { 
-		    background-color: #2196f3; 
-		} /* 青色メッセージ */
-
-		.custom-alert3 { 
-		    background-color: #ffc107; 
-		    color: #333; 
-		} /* 休日情報 */
-
-		.custom-alert4 { 
-		    background-color: #333; 
-		    color: white;  
-		} /* 音声入力 8/12 */
-
-		.logo-title {
-		    display: flex;
-		    flex-direction: row;
-		    align-items: center;
-		    justify-content: center;
-		    gap: 10px;
-		}
-		.logo-title img {
-		    height: 64px;
-		    width: auto;
-		}
-
-		/* 1秒ごとに点滅する現在時刻
-		@keyframes blink が重複定義されている
-		@keyframes blink { 
-		    0% { opacity: 1; }
-		    50% { opacity: 0; }
-		    100% { opacity: 1; }
-		} */
-
-		#current-time { 
-		    /* font-size: 1.2em;  以前1.5より少し小さくする */
-		    font-weight: bold; 
-		    color: blue; 
-		    animation: blink 1s infinite; 
-		}
-
-		/* 11/4 Top/Bottomボタン */
 		.bottom-button, .top-button {
 		    position: fixed;
 		    bottom: 20px;
@@ -443,2292 +77,578 @@
 		}
 		.bottom-button:hover, .top-button:hover {
 		    background: #0056b3;
-		}    
-		
-        /* 予定がある日の背景色 6/4 */
-        .has-schedule {
-            background-color: #fff59b !important; /* 予定がある日 */
-        }
-
-		/* 4. 下に来る「日付選択」行の上の余白を消す 12/23 */
-		.input-row.date-row {
-		    margin-top: 0px !important;
 		}
+	    
+        #keyButton { background-color: #008040; color: white; }
+        #keyButton2 { background-color: #800040; color: white; }
+        #keyButton3 { background-color: #0080c0; color: white; }
+	 
+		.key-label { margin-bottom: 5px; }
 
-        #keyNButton {
-            background-color: #63b1b1;
-            color: white;
-            margin-top: 12px;
-        }
- 
- 	    #keyNButton2 {
-	        background-color: #a6a6ff;
-	        color: white;
-            margin-bottom: 10px;	        
-	    }
-
-		/* 12/22 */
- 	    #keyNButton3 {
-	        background-color: #c89191;
-	        color: white;
-	        margin-top: 8px;
-	    }
-	    	           
-		/* 共通の設定（予定内容などはこっちが適用される） 12/23 */
-		.centered-label-button {
-		    margin-top: 5px;
-		    margin-bottom: 10px; /* ここを10px程度に広げておけば、予定内容と入力欄はくっつきません */
-		    line-height: 1;
-		}
-
-		/* 💡 特定の場所（予定入力）だけ余白をゼロにする設定 12/23 */
-		.centered-label-button.margin-tight {
-		    margin-bottom: 0px !important;
-		}
-
-		/* --------------------------------- */
-
-		/* --------------------------------- */
-		/* 新規追加: 画面幅が600px以下の場合のスタイル (スマートフォン向け) 11/3 12/23  */
-		@media (max-width: 600px) {
-		    .centered-label-button {
-		        flex-direction: column; 
-		        justify-content: center; 
-		        align-items: center; 
-		    }
-		    
-		    /* 1. 基本のタイトル余白（予定内容などはこちらが適用される） */
-		    .centered-label-button .section-title {
-		        margin-top: 5px; 
-		        margin-bottom: 5px;
-		    }
-		    
-		    /* 2. 【ここが修正ポイント】
-		          margin-tightが付いている場合（予定入力）だけ、
-		          タイトルとボタンの下余白をゼロに上書きする */
-		    .centered-label-button.margin-tight .section-title {
-		        margin-bottom: 0px;
-		    }
-		    .centered-label-button.margin-tight button {
-		        margin-bottom: 0px;
-		    }
-		    
-		    /* ラベルとボタンを幅いっぱいに広げる設定 */
-		    .centered-label-button label, 
-		    .centered-label-button button {
-		        width: 100%;
-		        box-sizing: border-box; 
-		    }
-		}
-
-	    #voiceInputButton {
-	        display: none; /* 初期状態で非表示 */
-		    color: #4d0000; 	        
-            background-color: #c8ffe3;
-    	    border-radius: 5px; 
-	    	border: 1px solid #0000ff;    	    	        
-	    }
-
-	    #voiceInputButton2 { /* 10/8追加 */
-	        display: none; /* 初期状態で非表示 */
-		    color: #4d0000; 	        
-            background-color: #c8ffe3;
-    	    border-radius: 5px; 
-	    	border: 1px solid #0000ff; 
-	    	margin: 0;
-            vertical-align: middle; /* テキストとの高さを合わせる */ 
+        #keys {
+            display: inline-block;
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+            width: 300px;
 	    }
 	    
-	    .date-row {
-	        display: flex;
-	        justify-content: center;
-	        align-items: center;
-	        gap: 10px;
-    		/* margin-top: -5px; マイナスの数値で上に引っ張り上げる */	        
-	    }
-
-		@keyframes blink { 
-		  0% { opacity: 1; }
-		  50% { opacity: 0.3; }
-		  100% { opacity: 1; }
-		}
-
-		.saturday { color: blue; }
-		.weekend { color: red; }
-		.holiday { color: #ff00ff; }
-
-		.navigation-buttons { margin-top: 20px; }
-		.bottom-home-button { margin-top: 20px; }
-
-		.blinking {
-		  animation: blink 1s infinite;
-		}        	    
-
-		/* 10/8追加も使わない
-		.blinking2 {
-		  animation: blink 1s infinite;
-		}    */
-				
-		#voiceInputButton.recording {
-		    color: red !important;
-		    background-color: #ffd0d0 !important; /* 薄めの赤 */
-		}
-
-		#voiceInputButton2.recording2 { /* 10/8追加 */
-		    color: red !important;
-		    background-color: #ffd0d0 !important; /* 薄めの赤 */
-		}
-		
-		/* 8/21追加 マスコットの360度回転*/
-		@keyframes spinAround {
-		    0%   { transform: rotate(0deg); }
-		    100% { transform: rotate(360deg); }
-		}
-		.spin-around {
-		    animation: spinAround 0.8s ease-in-out;
-		}
-		
-		/* 8/21追加 ウィンク
-		@keyframes mascotWink {
-		    0% { transform: scale(1); }
-		    50% { transform: scale(1.1) rotate(5deg); }
-		    100% { transform: scale(1); }
-		}
-		.mascot-animate {
-		    animation: mascotWink 0.6s ease-in-out;
-		}
-		*/
-		
-		/* 8/21追加 ダブルウィンク
-		@keyframes doubleWink {
-		    0%   { transform: rotate(0deg); }
-		    25%  { transform: rotate(5deg); }
-		    50%  { transform: rotate(0deg); }
-		    75%  { transform: rotate(5deg); }
-		    100% { transform: rotate(0deg); }
-		}
-		.double-wink {
-		    animation: doubleWink 1s ease-in-out;
-		}
-		*/
-		
-		/* 8/21追加 ジャンプ 
-		.mascot-animate {
-		    animation: bounce 0.6s ease;
-		}
-		@keyframes bounce {
-		    0%   { transform: translateY(0); }
-		    50%  { transform: translateY(-10px); }
-		    100% { transform: translateY(0); }
-		}
- 		*/
-
-		/* 8/23追加 ダイアログボックス */
-		.dialog-overlay {
-		  position: fixed;
-		  top: 0; left: 0;
-		  width: 100%; height: 100%;
-		  background: rgba(0, 0, 0, 0.5);
-		  backdrop-filter: blur(4px); /* 背景をぼかすことで透け防止 */
-		  z-index: 9999; /* 最前面に表示 */
-		  display: flex;
-		  justify-content: center;
-		  align-items: center;
-		}
-
-		.dialog-box {
-		  background: white;
-		  padding: 20px;
-		  border-radius: 12px;
-		  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-		  text-align: center;
-		  max-width: 90%;
-		  animation: fadeIn 0.3s ease-out;
-		  display: flex;
-		  flex-direction: column;
-		  align-items: center;
-		}
-
-		.dialog-box button {
-		  width: 100%;
-		  max-width: 300px;
-		  box-sizing: border-box;
-		  margin: 10px 0;
-		  padding: 10px 20px;
-		  font-size: 16px;
-		  border: none;
-		  border-radius: 6px;
-		  background-color: #0078d4;
-		  color: white;
-		  cursor: pointer;
-		  transition: background-color 0.2s;
-		}
-
-		.dialog-box button:hover {
-		  background-color: #005A9E;
-		}
-
-
-		/* モーダルのフェードイン演出 */
-		@keyframes fadeIn {
-		  from { opacity: 0; transform: scale(0.95); }
-		  to { opacity: 1; transform: scale(1); }
-		}
-
-		/* 🔥 ここに追記します */
-		/* ジャンプリスト（カスタムダイアログ）内の特定ボタンの色設定 */
-		/* #btnSearch7, */
-		#btnSearch,
-		#btnSearch2,
-		#btnSearch5,		
-		#btnSearch6 {
-		  color: yellow; /* 文字色を黄色に変更 */
-		}
-
-		/* 🔥 ここに追記します */
-		/* ジャンプリスト（カスタムダイアログ）内の特定ボタンの色設定 */
-		#btnSearch7
-		/* #btnSearch,
-		#btnSearch2,
-		#btnSearch5,		
-		#btnSearch6 */{
-		  color:#aeffff; /* 文字色を空色に変更 */
-		}
-		
-		/* 新しいカスタム確認ダイアログのスタイル 10/21 10/23 */
-		.custom-confirm {
-		    position: fixed;
-		    top: 50%; /* 中央寄せ */
-		    left: 50%;
-		    transform: translate(-50%, -50%); /* 中央寄せ */
-		    background-color: #f8f9fa; /* 薄いグレーの背景 */
-		    color: #333;
-		    padding: 20px;
-		    border: 3px solid #007bff; /* 青色の枠線 */
-		    border-radius: 8px;
-		    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-		    font-size: 16px;
-		    z-index: 10000; /* 最前面に表示 */
-		    width: 80%;
-		    max-width: 350px;
-		    text-align: center;
-		}
-
-		.custom-confirm-buttons button {
-		    margin: 10px 5px 0;
-		    padding: 8px 15px;
-		    font-size: 15px;
-		    cursor: pointer;
-		    border-radius: 5px;
-		    border: 1px solid #ccc;
-		}
-
-		.custom-confirm-buttons .btn-yes {
-		    background-color: #28a745; /* 緑色の「はい」 */
-		    color: white;
-		}
-
-		.custom-confirm-buttons .btn-no {
-		    background-color: #dc3545; /* 赤色の「いいえ」 */
-		    color: white;
-		}
-
-
-		/* モーダルの中身 */
-		.modal-content {
-		    background-color: #fefefe;
-		    margin: 15% auto; /* 画面中央に配置 */
-		    padding: 20px;
-		    border: 1px solid #888;
-		    width: 80%;
-		    max-width: 400px;
-		    border-radius: 8px;
-		    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-		    text-align: center;
-		}
-
-		/* 候補ボタンのコンテナ */
-		#alternativeButtons {
-		    margin: 15px 0;
-		}
-
-		/* 候補ボタンのスタイル */
-		#alternativeButtons button {
-		    display: block; /* 縦に並べる */
+	    #keys div { margin: 5px 0; }
+	    
+		#displayText {
+		    text-align: left;
 		    width: 100%;
-		    padding: 10px;
-		    margin-bottom: 8px;
-		    border: 1px solid #ccc;
-		    background-color: #e9e9e9;
-		    cursor: pointer;
-		    font-size: 16px;
-		    border-radius: 4px;
-		    transition: background-color 0.2s;
 		}
-
-		#alternativeButtons button:hover {
-		    background-color: #d1d1d1;
-		}
-
-		/* キャンセルボタンのスタイル */
-		#closeModalButton {
-		    background-color: #f8887e;
+		
+		.custom-alert {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #6868b5;
 		    color: white;
 		    padding: 10px 20px;
-		    border: none;
-		    border-radius: 4px;
-		    cursor: pointer;
+		    border: 1px solid red;
+		    border-radius: 5px;
 		    font-size: 16px;
-		    margin-top: 10px;
+		    z-index: 1000;
 		}
 
-
-		/* --------------------------------- */
-		/* 画面幅が600px以下の場合のスタイル (スマートフォン向け) 11/3 */
-		@media (max-width: 600px) {
-		    
-		    /* (前回の設定を維持: コンテナを縦並び・中央揃えにする) */
-		    .centered-label-button {
-		        flex-direction: column; 
-		        align-items: center; 
-		        /* ... 他の設定 ... */
-		    }
-		    
-		    /* 💡 修正点: ラベルとボタンから width: 100% を削除、または上書き */
-		    .centered-label-button label, 
-		    .centered-label-button button {
-		        /* この設定を削除またはコメントアウト
-		        width: 100%;
-		        box-sizing: border-box; */
-		        
-		        /* 代わりに、幅を内容に合わせて自動調整し、中央に配置しやすくします */
-		        width: auto; 
-		    }
-		    
-		    /* 💡 追加: ボタンのみを中央に配置する */
-		    /* 親要素の `align-items: center;` でボタンは中央に来ますが、
-		       `width: 100%;` の上書きを確実にするため、明示的に指定します。*/
-		    #voiceInputButton, 
-		    #voiceInputButton2 {
-		        /* ボタンの幅を内容量に合わせる */
-		        width: auto;
-		        /* 余白を設けることで、左右いっぱいに広がるのを防ぎます */
-		        padding-left: 15px;
-		        padding-right: 15px;
-		    }
+		.custom-alert2 {
+		    position: fixed;
+		    top: 10px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: #000;
+		    color: #fff;
+		    padding: 10px 20px;
+		    border: 1px solid red;
+		    border-radius: 5px;
+		    font-size: 16px;
+		    z-index: 1000;
 		}
 
-		/* 全部のリンクに効かせるのではなく、特定のクラスだけ 12/4 */
-		.header-link {
-		  text-decoration: none;
-		  color: inherit;
-		}
+        /* トグルボタンのスタイル */
+        #toggleButton {
+            background-color: #6c6cff;
+            color: white;
+            padding: 3px 10px;
+            box-sizing: border-box;
+			margin-bottom: 20px;
+        }
 
-		.current-date {
-		  /*cursor: pointer; マウスを乗せたらクリックできる雰囲気 12/7 */
-		  text-decoration: none; /* 下線を消す */
-		  color: #d60000; /* 元の赤に戻す（好みの赤に変更可） */
-		}
+        /* 予定リストのスタイル */
+        #scheduleList {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
 
-		/* トグルボタンの装飾（お好みで） */
-		#toggleButton2 {
-		  padding: 3px 10px;
-		  cursor: pointer;
-		  border-radius: 5px;
-		  border: 1px solid #ab57ff;
-		  background-color: #ffffff;
-    	  margin-top: 15px;		  
-		  transition: 0.3s;
-		  cursor: pointer;
-		}
+        .schedule-item {
+            background-color: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95em;
+        }
 
-#ai-button {
-    font-size: 15px;
-    padding: 2px 10px;
-    color: #00ffff; 
-    background-color: #5b5b5b; 
-    border-radius: 5px; 
-    margin-top: 10px;
-    margin-bottom: 10px;    
-    /* margin-left: 35px;   */   
-	display: none; /* これを追加：最初は隠しておく */             
-}
+        .schedule-info {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            padding-right: 10px;
+        }
 
-.blinking {
-    animation: blink 1.0s infinite;
-}
+        .date-display {
+            font-weight: bold;
+            color: #555;
+            margin-right: 10px;
+            min-width: 40px;
+        }
 
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0; }
-    100% { opacity: 1; }
-}
+        .schedule-actions {
+            display: flex;
+            flex-shrink: 0;
+        }
 
-/* AI羅針盤（お買い物版スタイル追加） */
-#ai-interaction-container {
-    background: #fdfdfd;
-    border: 2px solid #5daab0;
-    border-radius: 15px;
-    margin: 20px 10px;
-    padding: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
+        /* 詳細/消去ボタンのスタイル */
+        .detail-btn { background-color: #72b8b8; color: white; }
+        .delete-btn { background-color: #ed969e; color: white; }
 
-#ai-chat-history {
-    margin-top: 10px;
-    padding: 10px;
-    background: #f0f9fa;
-    border-radius: 8px;
-    font-size: 0.95em;
-    line-height: 1.5;
-    color: #333;
-    border-left: 4px solid #5daab0;
-}
+        /* 修正エリアのスタイル */
+        #detailArea {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+        }
+        
+        #detailDate {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
 
-@media screen and (max-width: 480px) {
-    #ai-interaction-container > div {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    #ai-user-input {
-        flex: 1; min-width: 0; padding: 8px; font-size: 14px;
-    }
-    #ai-button-group {
-        display: flex; gap: 5px; flex-shrink: 0;
-    }
-    #ai-button-group button {
-        padding: 8px 10px; font-size: 14px; white-space: nowrap;
-    }
-}   
+        #detailTextarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            resize: vertical;
+            font-size: 1em;
+        }
 
-    /* Tokyo 4/20追加 */
-    .card {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      padding: 16px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-      transition: background 0.5s, color 0.5s;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
+        #saveButton {
+            background-color: #ffdc71;
+            color: #333;
+            width: 50%;
+            padding: 10px 15px;
+        }
 
-    .info { flex: 1; text-align: left; z-index: 1; }
-    .city { font-weight: 600; font-size: 1.1rem; color: #737373; margin-bottom: 6px; }
-    .date { margin-bottom: 6px; font-weight: 800; color: #737373; }
-    .wareki { margin-bottom: 6px; font-weight: 700; color: #b16363;}
-    .time { font-weight: 800; font-size: 1.3rem; color: #737373; margin-bottom: 8px; }
-    .diff { color: #b16363; font-size: 0.9rem; margin-top: 4px; }
-    canvas { background: #fafafa; border: 1px solid #ccc; border-radius: 50%; margin-left: 16px; z-index: 1; }
-
-    /* 昼夜で背景と文字色を切り替え */
-    .day {
-      background: linear-gradient(to bottom, #b9ffff, #fef3c7);
-      color: #000;
-    }
-    .night {
-      background: linear-gradient(to bottom, #8f8f8f, #dfffff);
-      color: #fff;
-    }
-    /* 夜間モード時の文字色調整 */
-    .night .city, .night .date,  .night .wareki { color: #fff; }
-    .night .time { color: #ff99ff; }
-    .night .diff { color: #686868; }
-    		
+        /* 非表示要素 */
+        .hidden { display: none; }
+        
+		.word-label { margin-bottom: 5px; font-size: 14px; }
+		.word-input { margin-top: 0; width: 35%; }
+	    .input-row { margin-bottom: 10px; }
+	    #scheduleDate { width: 130px; }
     </style>
-    
-	<script>
-	function openQRReader() {
-	  if (typeof Android !== "undefined" && Android.openQrReader) {
-	    Android.openQrReader(); // WebView内ならアプリ側へ
-	  } else {
-	    window.open('https://ettomio0518.github.io/ettomio-qr-reader/', '_blank'); // 通常ブラウザなら直接開く
-	  }
-	}
-	</script>
+</head>
 
-	<script>
-	function openOCRReader() {
-	  if (typeof Android !== "undefined" && Android.openOCRReader) {
-	    Android.openOCRReader(); // WebView内ならアプリ側へ
-	  } else {
-	    window.open(
-	      'https://ettomio0518.github.io/ettomio-ocr-reader/',
-	      '_blank'
-	    ); // 通常ブラウザなら直接開く
-	  }
-	}
-	</script>
-
-
-    <script> // 9/23追加 10/31修正
-	/**
-	 * Googleカレンダーを開く前に確認ダイアログを表示する
-	 */
-	function openTodayCalendar() {
-	    // confirm()関数は「OK」が押されたら true、「キャンセル」が押されたら false を返します。
-	    const isGoogleCalendarUser = confirm("Googleカレンダーをお使いですか?");
-
-	    if (isGoogleCalendarUser) {
-	        // 「OK」（Yes）が押された場合
-	        
-	        // 🔥 修正点: r/day を r/week に変更します
-	        window.open('https://calendar.google.com/calendar/r/week', '_blank'); 
-	        
-	    } else {
-	        // 「キャンセル」（No）が押された場合
-	        // 何もしません
-	        console.log("Googleカレンダーは開きませんでした。");
-	    }
-	}
-
-    </script>
-  	
-  	<script> 
-  	// カレンダーのモード管理用変数（初期値は予定出力）
-let calendarMode = 'output'; // 'output' または 'input'
-
-	</script> 
-	
-</head>	
-		
 <body>
-
-	<header>
-	  <div class="logo-title">
-	    <img src="image64.png" alt="サンプル画像">
-	    <h4><a href="weather.html" class="header-link">舞い ♪ カレンダー</a></h4>
-	  </div>
-	</header>
-
-<div id="customDialog" style="display:none;" class="dialog-overlay">
-  <div class="dialog-box">
-    <h3>どちらに進みますか？</h3>
-    <button id="btnSchedule">今日のカード</button>
-    <button id="btnSearch7">AIに相談する</button>
-    <button id="btnSearch">高機能検索に進む</button>
-    <button id="btnSearch2">ノートに進む</button>
-    <button id="btnSearch3">簡易日記に進む</button>
-    <button id="btnSearch4">お買い物電卓に進む</button>
-    <button id="btnSearch5">QRリーダー & 拡大鏡</button>
-    <button id="btnSearch6">活用事例7選に進む</button>
-    <button id="btnSearch8">データの保存と復元ツール</button>
-    <button id="btnClose">閉じる</button>
-  </div>
-</div>
-
-<div id="dialogOverlay" class="dialog-overlay" style="display: none;">
-  <div class="dialog-box">
-    <h3>どちらのツールを使用しますか？</h3>
-    <button id="androidBtn">Androidアプリ版ツール</button>
-    <button id="webBtn">Web版ツール</button>
-    <button id="keyListBtn">Keyリスト</button>
-    <button id="closeBtn">閉じる</button>
-  </div>
-</div>
-
-
-<div id="ai-consult-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:25px; border:4px solid #5daab0; z-index:2000; border-radius:20px; width:85%; max-width:350px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); font-family: sans-serif;">
-    
-    <h3 style="margin-top:0; color:#5daab0; text-align:center; font-size:1.2em;">どちらに進みますか？</h3>
-    
-    <div style="display:flex; flex-direction:column; gap:12px;">
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/index.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">👑 Topページ</button>
-        
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/today-card.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">📅 今日のカード</button>
-        
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/metrology.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">📐 度量衡コンバーター</button>
-            
-        <button onclick="location.href='https://ettomio0518.github.io/my-calendar-app/shopping.html'" 
-            style="padding:12px; border-radius:10px; border:1px solid #5daab0; background:#e0f2f1; color:#00796b; font-weight:bold; cursor:pointer;">🧮 お買い物電卓</button>
-                    
-        <button onclick="closeAiConsultDialog()" 
-            style="margin-top:10px; padding:10px; border-radius:10px; border:none; background:#eee; color:#666; font-weight:bold; cursor:pointer;">閉じる</button>
-    </div>
-</div>
-
-
-    <div class="calendar-header">
-        <button onclick="changeMonth(-1)">◁</button>
-        <div class="year-month">
-            <span id="year"></span>
-            <br>
-            <span id="month-name"></span>
-        </div>
-        <div class="month-number" id="month-number">11</div>
-        <div class="date-info">
-            <span id="current-time"></span>
-            <br>
-            <span id="current-date" class="current-date"></span>
-        </div>
-        <button onclick="changeMonth(1)">▷</button>
-    </div>
-
-	<script>
-	// 12/7 追加　今日の日付をクリックで遷移 さらに12/30
-	// document.getElementById("current-date").addEventListener("click", function() {
-	//  sessionStorage.setItem('fromIndex', 'true');
-	//   window.location.href = "today-card.html";
-	// });
-	</script>
-
-
-    <div class="navigation-buttons">
-        <button onclick="changeYear(-1)">1年前</button>
-        <button onclick="goToCurrentMonth()">今月</button>
-        <button onclick="changeYear(1)">1年後</button>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th>
-            </tr>
-        </thead>
-        <tbody id="calendar-body"></tbody>
-    </table>
-
-    <script>
-        // --- ここからカレンダー描画のスクリプト ---
-        // CSVデータを配列として定義
-        const holidaysData = [
-		// 2020年
-		["2020/01/01 (水)","元日"],
-		["2020/01/13 (月)","成人の日"],
-		["2020/02/11 (火)","建国記念の日"],
-		["2020/02/23 (日)","天皇誕生日"],
-		["2020/02/24 (月)","振替休日"],
-		["2020/03/20 (金)","春分の日"],
-		["2020/04/29 (水)","昭和の日"],
-		["2020/05/03 (日)","憲法記念日"],
-		["2020/05/04 (月)","みどりの日"],
-		["2020/05/05 (火)","こどもの日"],
-		["2020/05/06 (水)","振替休日"],
-		["2020/07/23 (木)","海の日"],
-		["2020/07/24 (金)","スポーツの日"],
-		["2020/08/10 (月)","山の日"],
-		["2020/09/21 (月)","敬老の日"],
-		["2020/09/22 (火)","秋分の日"],
-		["2020/11/03 (火)","文化の日"],
-		["2020/11/23 (月)","勤労感謝の日"],
-		// 2021年        	
-		["2021/01/01 (金)","元日"],
-		["2021/01/11 (月)","成人の日"],
-		["2021/02/11 (木)","建国記念の日"],
-		["2021/02/23 (火)","天皇誕生日"],
-		["2021/03/20 (土)","春分の日"],
-		["2021/04/29 (木)","昭和の日"],
-		["2021/05/03 (月)","憲法記念日"],
-		["2021/05/04 (火)","みどりの日"],
-		["2021/05/05 (水)","こどもの日"],
-		["2021/07/19 (月)","海の日"],
-		["2021/08/11 (水)","山の日"],
-		["2021/09/20 (月)","敬老の日"],
-		["2021/09/23 (木)","秋分の日"],
-		["2021/10/11 (月)","スポーツの日"],
-		["2021/11/03 (水)","文化の日"],
-		["2021/11/23 (火)","勤労感謝の日"],
-		// 2022年
-		["2022/01/01 (土)","元日"],
-		["2022/01/10 (月)","成人の日"],
-		["2022/02/11 (金)","建国記念の日"],
-		["2022/02/23 (水)","天皇誕生日"],
-		["2022/03/21 (月)","春分の日"],
-		["2022/04/29 (金)","昭和の日"],
-		["2022/05/03 (火)","憲法記念日"],
-		["2022/05/04 (水)","みどりの日"],
-		["2022/05/05 (木)","こどもの日"],
-		["2022/07/18 (月)","海の日"],
-		["2022/08/11 (木)","山の日"],
-		["2022/09/19 (月)","敬老の日"],
-		["2022/09/23 (金)","秋分の日"],
-		["2022/10/10 (月)","スポーツの日"],
-		["2022/11/03 (木)","文化の日"],
-		["2022/11/23 (水)","勤労感謝の日"],
-		// 2023年
-		["2023/01/01 (日)","元日"],
-		["2023/01/02 (月)","振替休日"],
-		["2023/01/09 (月)","成人の日"],
-		["2023/02/11 (土)","建国記念の日"],
-		["2023/02/23 (木)","天皇誕生日"],
-		["2023/03/21 (火)","春分の日"],
-		["2023/04/29 (土)","昭和の日"],
-		["2023/05/03 (水)","憲法記念日"],
-		["2023/05/04 (木)","みどりの日"],
-		["2023/05/05 (金)","こどもの日"],
-		["2023/07/17 (月)","海の日"],
-		["2023/08/11 (金)","山の日"],
-		["2023/09/18 (月)","敬老の日"],
-		["2023/09/23 (土)","秋分の日"],
-		["2023/10/09 (月)","スポーツの日"],
-		["2023/11/03 (金)","文化の日"],
-		["2023/11/23 (木)","勤労感謝の日"],
-		// 2024年
-		["2024/01/01 (月)", "元日"],
-		["2024/01/08 (月)", "成人の日"],
-		["2024/02/11 (日)", "建国記念の日"],
-		["2024/02/12 (月)","振替休日"],
-		["2024/02/23 (金)","天皇誕生日"],
-		["2024/03/20 (水)","春分の日"],
-		["2024/04/29 (月)","昭和の日"],
-		["2024/05/03 (金)","憲法記念日"],
-		["2024/05/04 (土)","みどりの日"],
-		["2024/05/05 (日)","こどもの日"],
-		["2024/05/06 (月)","振替休日"],
-		["2024/07/15 (月)","海の日"],
-		["2024/08/11 (日)","山の日"],
-		["2024/08/12 (月)","振替休日"],
-		["2024/09/16 (月)","敬老の日"],
-		["2024/09/22 (日)","秋分の日"],
-		["2024/09/23 (月)","振替休日"],
-		["2024/10/14 (月)","スポーツの日"],
-		["2024/11/03 (日)","文化の日"],
-		["2024/11/04 (月)","振替休日"],
-		["2024/11/23 (土)","勤労感謝の日"],
-		// 2025年
-		["2025/01/01 (水)","元日"],
-		["2025/01/13 (月)","成人の日"],
-		["2025/02/11 (火)","建国記念の日"],
-		["2025/02/23 (日)","天皇誕生日"],
-		["2025/02/24 (月)","振替休日"],
-		["2025/03/20 (木)","春分の日"],
-		["2025/04/29 (火)","昭和の日"],
-		["2025/05/03 (土)","憲法記念日"],
-		["2025/05/04 (日)","みどりの日"],
-		["2025/05/05 (月)","こどもの日"],
-		["2025/05/06 (火)","振替休日"],
-		["2025/07/21 (月)","海の日"],
-		["2025/08/11 (月)","山の日"],
-		["2025/09/15 (月)","敬老の日"],
-		["2025/09/23 (火)","秋分の日"],
-		["2025/10/13 (月)","スポーツの日"],
-		["2025/11/03 (月)","文化の日"],
-		["2025/11/23 (日)","勤労感謝の日"],
-		["2025/11/24 (月)","振替休日"], 
-		// 2026年
-		["2026/01/01 (木)","元日"],
-		["2026/01/12 (月)","成人の日"],
-		["2026/02/11 (水)","建国記念の日"],
-		["2026/02/23 (月)","天皇誕生日"],
-		["2026/03/20 (金)","春分の日"],
-		["2026/04/29 (水)","昭和の日"],
-		["2026/05/03 (日)","憲法記念日"],
-		["2026/05/04 (月)","みどりの日"],
-		["2026/05/05 (火)","こどもの日"],
-		["2026/05/06 (水)","振替休日"],
-		["2026/07/20 (月)","海の日"],
-		["2026/08/11 (火)","山の日"],
-		["2026/09/21 (月)","敬老の日"],
-		["2026/09/22 (火)","国民の休日"],
-		["2026/09/23 (水)","秋分の日"],
-		["2026/10/12 (月)","スポーツの日"],
-		["2026/11/03 (火)","文化の日"],
-		["2026/11/23 (月)","勤労感謝の日"],
-		// 2027年
-		["2027/01/01 (金)","元日"],
-		["2027/01/11 (月)","成人の日"],
-		["2027/02/11 (木)","建国記念の日"],
-		["2027/02/23 (火)","天皇誕生日"],
-		["2027/03/21 (日)","春分の日"],
-		["2027/03/22 (月)","振替休日"],
-		["2027/04/29 (木)","昭和の日"],
-		["2027/05/03 (月)","憲法記念日"],
-		["2027/05/04 (火)","みどりの日"],
-		["2027/05/05 (水)","こどもの日"],
-		["2027/07/19 (月)","海の日"],
-		["2027/08/11 (水)","山の日"],
-		["2027/09/20 (月)","敬老の日"],
-		["2027/09/23 (木)","秋分の日"],
-		["2027/10/11 (月)","スポーツの日"],
-		["2027/11/03 (水)","文化の日"],
-		["2027/11/23 (火)","勤労感謝の日"],
-		// 2028年
-		["2028/01/01 (土)","元日"],
-		["2028/01/10 (月)","成人の日"],
-		["2028/02/11 (金)","建国記念の日"],
-		["2028/02/23 (水)","天皇誕生日"],
-		["2028/03/20 (月)","春分の日"],
-		["2028/04/29 (土)","昭和の日"],
-		["2028/05/03 (水)","憲法記念日"],
-		["2028/05/04 (木)","みどりの日"],
-		["2028/05/05 (金)","こどもの日"],
-		["2028/07/17 (月)","海の日"],
-		["2028/08/11 (金)","山の日"],
-		["2028/09/18 (月)","敬老の日"],
-		["2028/09/22 (金)","秋分の日"],
-		["2028/10/09 (月)","スポーツの日"],
-		["2028/11/03 (金)","文化の日"],
-		["2028/11/23 (木)","勤労感謝の日"],
-		// 2029年
-		["2029/01/01 (月)","元日"],
-		["2029/01/08 (月)","成人の日"],
-		["2029/02/11 (日)","建国記念の日"],
-		["2029/02/12 (月)","振替休日"],
-		["2029/02/23 (金)","天皇誕生日"],
-		["2029/03/20 (火)","春分の日"],
-		["2029/04/29 (日)","昭和の日"],
-		["2029/04/30 (月)","振替休日"],
-		["2029/05/03 (木)","憲法記念日"],
-		["2029/05/04 (金)","みどりの日"],
-		["2029/05/05 (土)","こどもの日"],
-		["2029/07/16 (月)","海の日"],
-		["2029/08/11 (土)","山の日"],
-		["2029/09/17 (月)","敬老の日"],
-		["2029/09/23 (日)","秋分の日"],
-		["2029/09/24 (月)","振替休日"],
-		["2029/10/08 (月)","スポーツの日"],
-		["2029/11/03 (土)","文化の日"],
-		["2029/11/23 (金)","勤労感謝の日"],
-		// 2030年
-		["2030/01/01 (火)","元日"],
-		["2030/01/14 (月)","成人の日"],
-		["2030/02/11 (月)","建国記念の日"],
-		["2030/02/23 (土)","天皇誕生日"],
-		["2030/03/20 (水)","春分の日"],
-		["2030/04/29 (月)","昭和の日"],
-		["2030/05/03 (金)","憲法記念日"],
-		["2030/05/04 (土)","みどりの日"],
-		["2030/05/05 (日)","こどもの日"],
-		["2030/05/06 (月)","振替休日"],
-		["2030/07/15 (月)","海の日"],
-		["2030/08/11 (日)","山の日"],
-		["2030/08/12 (月)","振替休日"],
-		["2030/09/16 (月)","敬老の日"],
-		["2030/09/23 (月)","秋分の日"],
-		["2030/10/14 (月)","スポーツの日"],
-		["2030/11/03 (日)","文化の日"],
-		["2030/11/04 (月)","振替休日"],
-		["2030/11/23 (土)","勤労感謝の日"],
-		// 2031年
-		["2031/01/01 (水)","元日"],
-		["2031/01/13 (月)","成人の日"],
-		["2031/02/11 (火)","建国記念の日"],
-		["2031/02/23 (日)","天皇誕生日"],
-		["2031/02/24 (月)","振替休日"],
-		["2031/03/21 (金)","春分の日"],
-		["2031/04/29 (火)","昭和の日"],
-		["2031/05/03 (土)","憲法記念日"],
-		["2031/05/04 (日)","みどりの日"],
-		["2031/05/05 (月)","こどもの日"],
-		["2031/05/06 (火)","振替休日"],
-		["2031/07/21 (月)","海の日"],
-		["2031/08/11 (月)","山の日"],
-		["2031/09/15 (月)","敬老の日"],
-		["2031/09/23 (火)","秋分の日"],
-		["2031/10/13 (月)","スポーツの日"],
-		["2031/11/03 (月)","文化の日"],
-		["2031/11/23 (日)","勤労感謝の日"],
-		["2031/11/24 (月)","振替休日"],
-		// 2032年
-		["2032/01/01 (木)","元日"],
-		["2032/01/12 (月)","成人の日"],
-		["2032/02/11 (水)","建国記念の日"],
-		["2032/02/23 (月)","天皇誕生日"],
-		["2032/03/20 (土)","春分の日"],
-		["2032/04/29 (木)","昭和の日"],
-		["2032/05/03 (月)","憲法記念日"],
-		["2032/05/04 (火)","みどりの日"],
-		["2032/05/05 (水)","こどもの日"],
-		["2032/07/19 (月)","海の日"],
-		["2032/08/11 (水)","山の日"],
-		["2032/09/20 (月)","敬老の日"],
-		["2032/09/21 (火)","国民の休日"],
-		["2032/09/22 (水)","秋分の日"],
-		["2032/10/11 (月)","スポーツの日"],
-		["2032/11/03 (水)","文化の日"],
-		["2032/11/23 (火)","勤労感謝の日"],
-		// 2033年
-		["2033/01/01 (土)","元日"],
-		["2033/01/10 (月)","成人の日"],
-		["2033/02/11 (金)","建国記念の日"],
-		["2033/02/23 (水)","天皇誕生日"],
-		["2033/03/20 (日)","春分の日"],
-		["2033/03/21 (月)","振替休日"],
-		["2033/04/29 (金)","昭和の日"],
-		["2033/05/03 (火)","憲法記念日"],
-		["2033/05/04 (水)","みどりの日"],
-		["2033/05/05 (木)","こどもの日"],
-		["2033/07/18 (月)","海の日"],
-		["2033/08/11 (木)","山の日"],
-		["2033/09/19 (月)","敬老の日"],
-		["2033/09/23 (金)","秋分の日"],
-		["2033/10/10 (月)","スポーツの日"],
-		["2033/11/03 (木)","文化の日"],
-		["2033/11/23 (水)","勤労感謝の日"],
-		// 2034年
-		["2034/01/01 (日)","元日"],
-		["2034/01/02 (月)","振替休日"],
-		["2034/01/09 (月)","成人の日"],
-		["2034/02/11 (土)","建国記念の日"],
-		["2034/02/23 (木)","天皇誕生日"],
-		["2034/03/20 (月)","春分の日"],
-		["2034/04/29 (土)","昭和の日"],
-		["2034/05/03 (水)","憲法記念日"],
-		["2034/05/04 (木)","みどりの日"],
-		["2034/05/05 (金)","こどもの日"],
-		["2034/07/17 (月)","海の日"],
-		["2034/08/11 (金)","山の日"],
-		["2034/09/18 (月)","敬老の日"],
-		["2034/09/23 (土)","秋分の日"],
-		["2034/10/09 (月)","スポーツの日"],
-		["2034/11/03 (金)","文化の日"],
-		["2034/11/23 (木)","勤労感謝の日"],
-		// 2035年
-		["2035/01/01 (月)","元日"],
-		["2035/01/08 (月)","成人の日"],
-		["2035/02/11 (日)","建国記念の日"],
-		["2035/02/12 (月)","振替休日"],
-		["2035/02/23 (金)","天皇誕生日"],
-		["2035/03/21 (水)","春分の日"],
-		["2035/04/29 (日)","昭和の日"],
-		["2035/04/30 (月)","振替休日"],
-		["2035/05/03 (木)","憲法記念日"],
-		["2035/05/04 (金)","みどりの日"],
-		["2035/05/05 (土)","こどもの日"],
-		["2035/07/16 (月)","海の日"],
-		["2035/08/11 (土)","山の日"],
-		["2035/09/17 (月)","敬老の日"],
-		["2035/09/23 (日)","秋分の日"],
-		["2035/09/24 (月)","振替休日"],
-		["2035/10/08 (月)","スポーツの日"],
-		["2035/11/03 (土)","文化の日"],
-		["2035/11/23 (金)","勤労感謝の日"],
-		["2035/12/24 (月)","振替休日"],
-		// 2036年
-		["2036/01/01 (火)","元日"],
-		["2036/01/14 (月)","成人の日"],
-		["2036/02/11 (月)","建国記念の日"],
-		["2036/02/23 (土)","天皇誕生日"],
-		["2036/03/20 (木)","春分の日"],
-		["2036/04/29 (火)","昭和の日"],
-		["2036/05/03 (土)","憲法記念日"],
-		["2036/05/04 (日)","みどりの日"],
-		["2036/05/05 (月)","こどもの日"],
-		["2036/05/06 (火)","振替休日"],
-		["2036/07/21 (月)","海の日"],
-		["2036/08/11 (月)","山の日"],
-		["2036/09/15 (月)","敬老の日"],
-		["2036/09/22 (月)","秋分の日"],
-		["2036/10/13 (月)","スポーツの日"],
-		["2036/11/03 (月)","文化の日"],
-		["2036/11/23 (日)","勤労感謝の日"],
-		["2036/11/24 (月)","振替休日"],
-		// 2037年
-		["2037/01/01 (木)","元日"],
-		["2037/01/12 (月)","成人の日"],
-		["2037/02/11 (水)","建国記念の日"],
-		["2037/02/23 (月)","天皇誕生日"],
-		["2037/03/20 (金)","春分の日"],
-		["2037/04/29 (水)","昭和の日"],
-		["2037/05/03 (日)","憲法記念日"],
-		["2037/05/04 (月)","みどりの日"],
-		["2037/05/05 (火)","こどもの日"],
-		["2037/05/06 (水)","振替休日"],
-		["2037/07/20 (月)","海の日"],
-		["2037/08/11 (火)","山の日"],
-		["2037/09/21 (月)","敬老の日"],
-		["2037/09/22 (火)","国民の休日"],
-		["2037/09/23 (水)","秋分の日"],
-		["2037/10/12 (月)","スポーツの日"],
-		["2037/11/03 (火)","文化の日"],
-		["2037/11/23 (月)","勤労感謝の日"],
-		// 2038年
-		["2038/01/01 (金)","元日"],
-		["2038/01/11 (月)","成人の日"],
-		["2038/02/11 (木)","建国記念の日"],
-		["2038/02/23 (火)","天皇誕生日"],
-		["2038/03/20 (土)","春分の日"],
-		["2038/04/29 (木)","昭和の日"],
-		["2038/05/03 (月)","憲法記念日"],
-		["2038/05/04 (火)","みどりの日"],
-		["2038/05/05 (水)","こどもの日"],
-		["2038/07/19 (月)","海の日"],
-		["2038/08/11 (水)","山の日"],
-		["2038/09/20 (月)","敬老の日"],
-		["2038/09/23 (木)","秋分の日"],
-		["2038/10/11 (月)","スポーツの日"],
-		["2038/11/03 (水)","文化の日"],
-		["2038/11/23 (火)","勤労感謝の日"],
-		// 2039年
-		["2039/01/01 (土)","元日"],
-		["2039/01/10 (月)","成人の日"],
-		["2039/02/11 (金)","建国記念の日"],
-		["2039/02/23 (水)","天皇誕生日"],
-		["2039/03/21 (月)","春分の日"],
-		["2039/04/29 (金)","昭和の日"],
-		["2039/05/03 (火)","憲法記念日"],
-		["2039/05/04 (水)","みどりの日"],
-		["2039/05/05 (木)","こどもの日"],
-		["2039/07/18 (月)","海の日"],
-		["2039/08/11 (木)","山の日"],
-		["2039/09/19 (月)","敬老の日"],
-		["2039/09/23 (金)","秋分の日"],
-		["2039/10/10 (月)","スポーツの日"],
-		["2039/11/03 (木)","文化の日"],
-		["2039/11/23 (水)","勤労感謝の日"],
-		// 2040年
-		["2040/01/01 (日)","元日"],
-		["2040/01/02 (月)","振替休日"],
-		["2040/01/09 (月)","成人の日"],
-		["2040/02/11 (土)","建国記念の日"],
-		["2040/02/23 (木)","天皇誕生日"],
-		["2040/03/20 (火)","春分の日"],
-		["2040/04/29 (日)","昭和の日"],
-		["2040/04/30 (月)","振替休日"],
-		["2040/05/03 (木)","憲法記念日"],
-		["2040/05/04 (金)","みどりの日"],
-		["2040/05/05 (土)","こどもの日"],
-		["2040/07/16 (月)","海の日"],
-		["2040/08/11 (土)","山の日"],
-		["2040/09/17 (月)","敬老の日"],
-		["2040/09/22 (土)","秋分の日"],
-		["2040/10/08 (月)","スポーツの日"],
-		["2040/11/03 (土)","文化の日"],
-		["2040/11/23 (金)","勤労感謝の日"],
-
-		// 以下に他のデータを追加してください...
-        ];
-        
-        let currentYear = new Date().getFullYear();
-        let currentMonth = new Date().getMonth();
-        const today = new Date();
-        const todayYear = today.getFullYear();
-        const todayMonth = today.getMonth();
-        const todayDate = today.getDate();
-        const todayDateString = `${todayYear}/${String(todayMonth + 1).padStart(2, '0')}/${String(todayDate).padStart(2, '0')}`;
-        let longPressTimer;
-
-        function showTodayInfo() {
-            document.getElementById("current-date").textContent = todayDateString;
-        }
-
-        function isHoliday(year, month, day) {
-            const dateString = `${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-            return holidaysData.some(h => h[0].startsWith(dateString));
-        }
-
-        function updateCalendar() {
-            /* [維持] --March-- 等のハイフンによる位置調整をそのまま保持 */
-            const monthNames = ['--January-', '-February-', '----March--', '-----April---', '-----May----', '----June----', '-----July----', '---August--', 'September', '-October', 'November', 'December'];
-            document.getElementById("year").textContent = currentYear;
-            document.getElementById("month-name").textContent = monthNames[currentMonth];
-            document.getElementById("month-number").textContent = currentMonth + 1;
-
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            let calendarBody = document.getElementById("calendar-body");
-            calendarBody.innerHTML = "";
-            let row = document.createElement("tr");
-
-            for (let i = 0; i < firstDay; i++) {
-                row.appendChild(document.createElement("td"));
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                let cell = document.createElement("td");
-                cell.textContent = day;
-
-                const formattedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                cell.id = `day-${formattedDate}`;
-                
-                if (currentYear === todayYear && currentMonth === todayMonth && day === todayDate) {
-                    cell.classList.add("today");
-                }
-                const weekDay = (firstDay + day - 1) % 7;
-                if (isHoliday(currentYear, currentMonth, day)) {
-                    cell.classList.add("holiday");
-                } else if (weekDay === 6) { 
-                    cell.classList.add("saturday");
-                } else if (weekDay === 0) { 
-                    cell.classList.add("weekend");
-                }
-
-                cell.style.cursor = "pointer";
-                cell.addEventListener("click", function() {
-                    displayScheduleForDate(currentYear, currentMonth, day);
-                });
-
-                row.appendChild(cell);
-                if ((firstDay + day) % 7 === 0) {
-                    calendarBody.appendChild(row);
-                    row = document.createElement("tr");
-                }
-            }
-            if (row.children.length > 0) calendarBody.appendChild(row);
-            applyScheduleColorsToCalendar();
-        }
-
-        function changeMonth(delta) {
-            currentMonth += delta;
-            if (currentMonth < 0) { currentMonth = 11; currentYear--; } 
-            else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-            updateCalendar();
-        }
-
-        function changeYear(delta) { currentYear += delta; updateCalendar(); }
-        function goToCurrentMonth() { currentYear = todayYear; currentMonth = todayMonth; updateCalendar(); }
-
-        /* [重複整理] setIntervalの中身と、ここにあったupdateTimeの呼び出しを、末尾のDOMContentLoadedに集約しました */
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('ja-JP');
-            document.getElementById("current-time").textContent = timeString;
-        }
-    </script>
+    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
 
 	<div class="container">
-    <!--  <h1>予定表</h1> -->
-    
-<!-- Tokyo時刻 4/20 -->
-  <div id="clockGrid" class="grid"></div>
-  
-	<script>
-	//4/20 追加　Tokyoの時刻をクリックで遷移
-	document.getElementById("clockGrid").addEventListener("click", function() {
-	  sessionStorage.setItem('fromIndex', 'true');
-	  window.location.href = "today-card.html";
-	});
-	</script>
-	
+	    <h3>データkeyリスト</h3>
 
+	    <p>このファイルは慎重に扱ってください。</p>
+	    	
+		<button id="keyButton" onclick="displayKeys()">全keyリストを表示</button>
+		<h2>ローカルストレージのKey出力</h2>
 		
-		<div class="centered-label-button margin-tight">
-		    <h5 class="section-title">日付タップのモード切り替え</h5>
-	    </div>
-	    
-	      
-<!-- カレンダー下部または適切な位置に配置するトグルボタン -->
-<div class="centered-label-button" style="text-align: center; margin: 10px 0;">
-    <button id="calendarModeToggle" onclick="toggleCalendarMode()" style="padding: 8px 16px; font-weight: bold;">モード: 予定出力</button>
-</div>
-	    <div id="calendarHint04" style="font-size: 15px; color: #666; margin-top: 8px;margin-bottom: 0px;">
-		  日付タップの動作を<span style="color: blue;">「予定の出力」と「予定入力」</span>で切り替えます。
-		</div>		
+        <button id="closeKeysButton" style="display: none;" onclick="closeKeys()">キーリストを閉じる</button>		
+		<div id="keys"></div>
+        <button id="closeKeysButtonN" style="display: none;" onclick="closeKeys()">キーリストを閉じる</button>
+
+		<p class="key-label">Keyの詳細:</p>
+		<div class="inline-elements">
+		    <label for="keyInput">keyを入力:</label>
+		    <input type="text" id="keyInput" class="key-input">
+		<button onclick="displayText()">表示</button>
+		</div>
+
+		<div id="displayText"></div>
+		<button id="closeDetailsButton" style="display: none;" onclick="closeDetails()">詳細を閉じる</button>
+		<br>
+		<button id="deleteButton" style="display: none;" onclick="deleteKeyAndText()">Keyと本文を削除</button>
 		<br>
 		
-<!-- 日付選択（選択日付の表示部分を id="dateDisplayContainer" で囲み、初期は非表示にする） -->
-<div id="dateDisplayContainer" class="input-row date-row" style="display:none;">
-    <label>選択日付:</label>
-    <span id="displaySelectedDate" style="font-weight: bold; margin-left: 5px;">未選択</span>
-    <input type="hidden" id="scheduleDate">
-</div>
+		
+	    <button id="toggleButton">全予定リストを表示</button>
 
-<!-- 音声入力ボタン（初期は非表示） -->
-<button id="voiceInputButton" onclick="startVoiceInput()" style="display:none;">🎤 音声入力</button>
+	    <ul id="scheduleList" class="hidden"></ul>
 
-		<!-- 予定入力欄 -->
-		<div class="input-row"> 
-		    <textarea id="scheduleInput" rows="2" placeholder="例: 10:00〜13:00　〇〇店にて打合せ"></textarea>
-		</div>
-
-	    
-	    <button class="save-button" onclick="saveSchedule()">💾 保存</button>
-
-	    <button id="toggleButton" class="check-button" onclick="toggleButtonFunction('check')">予定リストの確認</button>
-
-	    <div id="listContainer">
-	        <button id="closeListButton" onclick="closeList()">予定リストを閉じる</button>
-	        <div id="output"></div>
+	    <div id="detailArea" class="hidden">
+	        <h3>詳細・修正</h3>
+	        <span id="detailDate"></span>
+	        <textarea id="detailTextarea"></textarea>
+	        <button id="saveButton">修正して保存</button>
 	    </div>
-
-    <div id="alternativesModal" style="display:none; position:fixed; z-index:10001; left:0; top:0; width:100%; height:100%; overflow:auto; background-color: rgba(0,0,0,0.4);">
-    <div class="modal-content">
-        <h3>認識候補を選択してください</h3>
-        
-        <div id="alternativeButtons">
-            </div>
-        <button id="closeModalButton">キャンセル</button>
-    </div>	
-</div>
-
-    <script>
-    // --- 予定管理スクリプト ---
-    // グローバル変数は極力減らし、ローカル変数で処理するように修正    
-    let currentEditingKey = null;
-    let limitEnabled = true;
-
-	// 予定内容の候補が選択されたときの処理 (新規
-    function selectAlternative(transcript) {
-        const scheduleInput = document.getElementById("scheduleInput");
-		// 既存の入力内容に続けて追記する        
-        scheduleInput.value += transcript;
-		// モーダルを閉じる
-        document.getElementById('alternativesModal').style.display = 'none'; 
-        scheduleInput.focus();
-    }
-    // --- 候補選択関数ここまで ---
-	
-    /* [重複整理] 別の場所にあったDOM読み込み時の処理を一つに集約 */
-    document.addEventListener("DOMContentLoaded", function () {
-        const voiceInputButton = document.getElementById("voiceInputButton");
-        const voiceInputButton2 = document.getElementById("voiceInputButton2");
-        const scheduleInput = document.getElementById("scheduleInput");
-        const scheduleDateInput = document.getElementById('scheduleDate');
-        // ★修正点: モーダルキャンセルボタンの処理を追加
-        const closeModalButton = document.getElementById('closeModalButton');
-        if (closeModalButton) {
-            closeModalButton.onclick = () => { document.getElementById('alternativesModal').style.display = 'none'; };
-        }
-
-		// 音声認識が使えるかチェック
-        if (!('webkitSpeechRecognition' in window)) {
-            if (voiceInputButton) voiceInputButton.style.display = "none";
-            if (voiceInputButton2) voiceInputButton2.style.display = "none";
-            showCustomAlert4('この端末では音声入力が使えません。');
-        }
-
-		// 日付選択ツールで日付を選択したときの処理
-        if (scheduleDateInput) {
-            scheduleDateInput.addEventListener('change', function () {
-                const selectedDate = this.value;
-                if (selectedDate) {
-                    const [year, month, day] = selectedDate.split('-');
-                    scheduleInput.value = `${month}/${day} `;
-                    scheduleInput.focus();
-                    if (voiceInputButton) {
-                        voiceInputButton.style.display = "inline-block";
-                        voiceInputButton.classList.remove("recording", "blinking");
-                    }
-                }
-            });
-        }
-        
-        /* [集約] 複数の場所にあった初期化呼び出しをここに移動 */
-        showTodayInfo(); 
-        updateCalendar(); 
-        applyScheduleColorsToCalendar();  
-        updateTime(); 
-        setInterval(updateTime, 1000); 
-        showScrollButtonsIfPageLong();
-    });
-
-
-// モード切替用の関数
-function toggleCalendarMode() {
-    calendarMode = calendarMode === 'output' ? 'input' : 'output';
-    const btn = document.getElementById('calendarModeToggle');
-    const dateContainer = document.getElementById('dateDisplayContainer');
-    const voiceBtn = document.getElementById('voiceInputButton');
-
-    if (calendarMode === 'output') {
-        btn.textContent = 'モード: 予定出力';
-        btn.style.backgroundColor = '';
-        // 出力モード時は「選択日付」と「音声ボタン」を隠す
-        if (dateContainer) dateContainer.style.display = 'none';
-        if (voiceBtn) voiceBtn.style.display = 'none';
-    } else {
-        btn.textContent = 'モード: 予定入力';
-        btn.style.backgroundColor = '#ffeb3b';
-        // 入力モード時は「選択日付」を表示する（音声ボタンは日付をタップしてから表示）
-        if (dateContainer) dateContainer.style.display = 'block';
-    }
-}
-
-
-	// 日付音声入力の処理
-    function startVoiceInput2() {
-        const voiceInputButton2 = document.getElementById("voiceInputButton2");
-        voiceInputButton2.classList.add("blinking");
-        voiceInputButton2.classList.add("recording2"); 
-
-        const recognition = new webkitSpeechRecognition();
-        recognition.lang = 'ja-JP';
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 1;
-
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            const parsedDate = parseJapaneseDate(transcript);
-            if (parsedDate) {
-                document.getElementById("scheduleDate").value = parsedDate;
-                const dateObj = new Date(parsedDate);
-                const mmdd = `${String(dateObj.getMonth() + 1).padStart(2, '0')}/${String(dateObj.getDate()).padStart(2, '0')}`;
-                document.getElementById("scheduleInput").value = mmdd + " ";
-                document.getElementById("voiceInputButton2").style.display = "none";
-                document.getElementById("voiceInputButton").style.display = "inline-block";
-                startVoiceInput(); 
-            } else { alert("日付の認識に失敗しました。"); }
-        };
-
-        recognition.onerror = (event) => {
-            showCustomAlert4('音声入力が使えません。');
-            voiceInputButton2.style.display = "none";
-        };
-        recognition.onend = () => {
-            voiceInputButton2.classList.remove("blinking");
-            voiceInputButton2.classList.remove("recording2"); 
-        };
-        recognition.start();
-    }
-
-    // 日付テキストを yyyy-mm-dd に変換する関数
-    function parseJapaneseDate(text) {
-        const currentYear = new Date().getFullYear();
-        let year = currentYear;
-        const yearMatch = text.match(/(\d{4})年/);
-        if (yearMatch) { year = parseInt(yearMatch[1], 10); }
-        const monthMatch = text.match(/(\d{1,2})月/);
-        const dayMatch = text.match(/(\d{1,2})日/);
-        if (monthMatch && dayMatch) {
-            const month = String(monthMatch[1]).padStart(2, '0');
-            const day = String(dayMatch[1]).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-        return null;
-    }
-
-	// Androidから結果を受け取るためのグローバル関数
-	// ★この関数がAndroidのKotlinコードから呼び出されます★
-    function receiveNativeAlternatives(alternatives) {
-        const voiceInputButton = document.getElementById("voiceInputButton");
-        if (voiceInputButton) {
-            voiceInputButton.classList.remove("blinking");
-            voiceInputButton.classList.remove("recording");
-        }
-        const alternativesContainer = document.getElementById('alternativeButtons');
-        alternativesContainer.innerHTML = '';
-        if (alternatives.length === 0) { showCustomAlert('音声認識ができませんでした。'); return; }
-        alternatives.forEach(transcript => {
-            const button = document.createElement('button');
-            button.textContent = transcript;
-            button.onclick = () => selectAlternative(transcript);
-            alternativesContainer.appendChild(button);
-        });
-        document.getElementById('alternativesModal').style.display = 'block';
-    }
-
-	// 音声入力開始処理 (予定内容) - ★ここを候補選択式に修正★
-    function startVoiceInput() {
-        const voiceInputButton = document.getElementById("voiceInputButton");
-        if (!voiceInputButton) return;
-        voiceInputButton.classList.add("blinking");
-        voiceInputButton.classList.add("recording");
-        
-	    // ==========================================================
-	    // ★ 修正/追加箇所: Android 環境チェック ★
-	    // =========================================================        
-        if (typeof Android !== 'undefined' && Android.startVoiceRecognition) {
-        	// Android (WebView) 環境の場合、Kotlin関数を呼び出す
-            Android.startVoiceRecognition();
-            return;
-        }
-	    // Android 以外の環境 (PC Chrome、Web版など) の処理
-        if (!('webkitSpeechRecognition' in window)) {
-            showCustomAlert4('音声入力が使えません。');
-            voiceInputButton.style.display = "none";
-            return;
-        }
-	    // ローカルで毎回 recognition を定義し直すことで、リセットを確実にする
-        const recognition = new webkitSpeechRecognition(); 
-        recognition.lang = "ja-JP";
-        recognition.interimResults = false;
-        recognition.maxAlternatives = 3; // 複数の候補を取得
-        recognition.onresult = (event) => {
-        // Web Speech API の結果をそのまま receiveNativeAlternatives に渡すのと同じ処理を実行
-            const alternatives = Array.from(event.results[0]).map(r => r.transcript);
-            receiveNativeAlternatives(alternatives);  // ★結果処理を共通化★
-            // onresult が成功した場合は onend も呼ばれるため、ここではアニメーション解除は不要
-        };
-        recognition.onerror = function (event) {
-            showCustomAlert4('音声認識エラー');
-            voiceInputButton.style.display = "none";
-        };
-        recognition.onend = () => {
-            voiceInputButton.classList.remove("blinking");
-            voiceInputButton.classList.remove("recording");
-        };
-        recognition.start();
-    }
-
-    /* 通知・音声関数 */
-    function showCustomAlert(message) {
-        const alertContainer = document.createElement('div');
-        alertContainer.className = 'custom-alert';
-        alertContainer.textContent = message;
-        document.body.appendChild(alertContainer);
-        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
-    }
-    function showCustomAlert2(message) {
-        const alertContainer = document.createElement('div');
-        alertContainer.className = 'custom-alert2';
-        alertContainer.textContent = message;
-        document.body.appendChild(alertContainer);
-        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 2000);
-    }
-    function showCustomAlert3(message) {
-        const alertContainer = document.createElement('div');
-        alertContainer.className = 'custom-alert3';
-        alertContainer.textContent = message;
-        document.body.appendChild(alertContainer);
-        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 3000);
-    }
-    function showCustomAlert4(message) {
-        const alertContainer = document.createElement('div');
-        alertContainer.className = 'custom-alert4';
-        alertContainer.textContent = message;
-        document.body.appendChild(alertContainer);
-        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 5000);
-    } 
-    function speakText(text) {
-        if ('speechSynthesis' in window) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'ja-JP';
-            window.speechSynthesis.speak(utterance);
-        } else { showCustomAlert("音声合成非対応です"); }
-    }
-    function nativeSpeak(text) {
-        if (typeof Android !== 'undefined' && Android.speak) { Android.speak(text); } else { speakText(text); }
-    }
-
-	// ==========================================================
-	// ★ 共通ユーティリティ (カスタム確認ダイアログ) 10/21
-	// ==========================================================
-    function showCustomConfirm(message) {
-        return new Promise(resolve => {
-            const confirmDiv = document.createElement('div');
-            confirmDiv.className = 'custom-confirm';
-            confirmDiv.innerHTML = `<p>${message}</p><div class="custom-confirm-buttons"><button class="btn-yes">はい</button><button class="btn-no">いいえ</button></div>`;
-            document.body.appendChild(confirmDiv);
-            confirmDiv.querySelector('.btn-yes').onclick = () => { document.body.removeChild(confirmDiv); resolve(true); };
-            confirmDiv.querySelector('.btn-no').onclick = () => { document.body.removeChild(confirmDiv); resolve(false); };
-        });
-    }
-
-    /* [集約] 別の場所にもあったsaveState, loadStateをここに一箇所にまとめました */
-    function saveState(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
-    function loadState(key) {
-        const value = localStorage.getItem(key);
-        return value ? JSON.parse(value) : null;
-    }
-
-    const storedLimitEnabled = loadState("limitEnabled");
-    if (storedLimitEnabled !== null) { limitEnabled = storedLimitEnabled; }
-
-    function toggleLimit(enable) {
-        limitEnabled = enable;
-        saveState("limitEnabled", limitEnabled);
-        showCustomAlert(enable ? "機能制限を有効にしました。" : "件数制限を解除しました。");
-    }
-
-	// スケジュール保存関数 
-// スケジュール保存関数 
-    async function saveSchedule() { 
-        const voiceInputButton = document.getElementById("voiceInputButton");
-        const voiceInputButton2 = document.getElementById("voiceInputButton2");
-        const dateInput = document.getElementById('scheduleDate');
-        const scheduleInput = document.getElementById('scheduleInput');
-
-        voiceInputButton.style.display = "none";
-        const selectedDateValue = dateInput.value;
-        const rawScheduleText = scheduleInput.value;
-        const trimmedScheduleText = rawScheduleText.trim();
-
-        const scheduleKeys = Object.keys(localStorage).filter(key => key.startsWith("ScheduledText"));
-        if (limitEnabled && scheduleKeys.length >= 10 && !currentEditingKey) {
-            showCustomAlert("予定は10件までです。");
-            nativeSpeak("入力件数は10件までです。機能充実の正規版をお勧めします。");
-            return;
-        }
-
-        if (selectedDateValue && trimmedScheduleText) {
-            const [year, month, day] = selectedDateValue.split('-');
-            const dateForlocalStorageKey = `${year}${month.padStart(2, '0')}${day.padStart(2, '0')}`;
-            let scheduleToStore = trimmedScheduleText;
-            const autoInsertedPrefix = `${month.padStart(2, '0')}/${day.padStart(2, '0')} `;
-            if (rawScheduleText.startsWith(autoInsertedPrefix) && trimmedScheduleText === autoInsertedPrefix.trim()) {
-                showCustomAlert('予定欄に予定案件を入力してください。');
-                return;
-            }
-            if (!rawScheduleText.match(/^\d{1,2}\/\d{1,2}\s/)) {
-                scheduleToStore = `${month.padStart(2, '0')}/${day.padStart(2, '0')} ${trimmedScheduleText}`;
-            } else { scheduleToStore = rawScheduleText; }
-
-            if (currentEditingKey) {
-                localStorage.setItem(currentEditingKey, scheduleToStore);
-                showCustomAlert('修正保存しました。');
-                currentEditingKey = null;
-            } else {
-                const randomSuffix = Math.floor(100 + Math.random() * 900).toString();
-                const key = `ScheduledText${dateForlocalStorageKey}_${randomSuffix}`;
-                localStorage.setItem(key, scheduleToStore);
-            }
-
-            //const continueInput = await showCustomConfirm("日付音声入力ボタンを表示しますか？"); 
-            //if (continueInput) { voiceInputButton2.style.display = "inline-block"; }
-
-			// 入力欄をクリア
-            dateInput.value = '';
-            scheduleInput.value = '';
-            if (document.getElementById('output').innerHTML !== '') { displayCheck(); }
-            applyScheduleColorsToCalendar();
-        } else {
-            showCustomAlert('日付または予定を入力してください。');
-        }
-    }
-
-    // --- 予定修正関数 ---
-    function editSchedule(key) {
-        const schedule = localStorage.getItem(key);
-        if (schedule) {
-            document.getElementById('scheduleInput').value = schedule;
-            // キーから日付を抽出し、日付入力フィールドにセッ
-            const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-            if (dateMatch) { document.getElementById('scheduleDate').value = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`; }
-            currentEditingKey = key; // 編集中のキーを設定
-            // window.scrollTo({ top: 0, behavior: 'smooth' });// ページ上部へスクロール 4/22中止
-        }
-    }
-
-	// --- リスト表示関連 --- 
-    function closeList() {
-        document.getElementById('output').innerHTML = '';
-        document.getElementById('closeListButton').style.display = 'none';
-        const tb = document.getElementById('toggleButton');
-        tb.textContent = '予定リストの確認';
-        tb.onclick = () => toggleButtonFunction('check');
-        tb.className = 'check-button';
-        currentEditingKey = null;
-        clearInputs(); // ← ここで呼び出すだけ！
-    }
-
-    function clearInputs() {
-        const si = document.getElementById('scheduleInput');
-        const di = document.getElementById('scheduleDate');
-        if (si) si.value = '';
-        if (di) di.value = '';
-    }
-
-	// 入力欄をクリアする関数は別に定義 3/4,5
-	// function clearInputs() {
-	    // const scheduleInput = document.getElementById('scheduleInput');
-	    // const scheduleDate = document.getElementById('scheduleDate');
-	    // const dateInput = document.getElementById('dateInput'); // 必要なら
-		// const dateInput = document.getElementById('scheduleDate');
-
-	    // if (scheduleInput) scheduleInput.value = '';
-	    // if (scheduleDate) scheduleDate.value = '';
-	    // if (dateInput) dateInput.value = '';
-		// if (dateInput) dateInput.value = '';
-	// }
-	
-    function toggleButtonFunction(mode) {
-        const button = document.getElementById('toggleButton');
-        if (mode === 'check') {
-            displayCheck();
-            button.textContent = '予定の音声出力';
-            button.onclick = () => toggleButtonFunction('output');
-            button.className = 'output-button';
-        } else if (mode === 'output') {
-            displaySchedules();
-            button.textContent = '予定リストの確認';
-            button.onclick = () => toggleButtonFunction('check');
-            button.className = 'check-button';
-        }
-    }
-
-	// --- 「予定の確認」表示関数  ---
-    function displayCheck() {
-        const outputElement = document.getElementById('output');
-        outputElement.innerHTML = ''; 
-        document.getElementById('closeListButton').style.display = 'block';
-        const today = new Date(); today.setHours(0,0,0,0);
-        const todayYMD = parseInt(`${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`);
-        const keys = Object.keys(localStorage).filter(k => k.startsWith('ScheduledText')).filter(k => {
-            const m = k.match(/ScheduledText(\d{8})_/);
-            return m && parseInt(m[1]) >= todayYMD;
-        }).sort();
-
-        if (keys.length === 0) { outputElement.textContent = "予定はありません。"; return; }
-
-        keys.forEach(key => {
-            const text = localStorage.getItem(key);
-            const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-            const contentMatch = text.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
-            let dDate = dateMatch ? `${dateMatch[2]}/${dateMatch[3]}` : "";
-            let dContent = contentMatch ? contentMatch[2].trim() : text.trim();
-
-            const row = document.createElement('div');
-            row.className = 'output-row';
-            const sDiv = document.createElement('div');
-            sDiv.textContent = `${dDate} ${dContent}`;
-            row.appendChild(sDiv);
-
-            const eBtn = document.createElement('button'); eBtn.textContent = '確認修正'; eBtn.onclick = () => editSchedule(key);
-            row.appendChild(eBtn);
-
-            const dBtn = document.createElement('button'); dBtn.textContent = '消去'; dBtn.onclick = () => {
-                localStorage.removeItem(key);
-                displayCheck(); applyScheduleColorsToCalendar(); alert('消去しました'); clearInputs();
-            };
-            row.appendChild(dBtn);
-            outputElement.appendChild(row);
-        });
-    }
-
-    // --- 「予定の音声出力」表示関数) ---
-    function displaySchedules() {
-        const today = new Date(); today.setHours(0,0,0,0);
-        const todayYMD = parseInt(`${today.getFullYear()}${String(today.getMonth()+1).padStart(2,'0')}${String(today.getDate()).padStart(2,'0')}`);
-        const todayKeys = Object.keys(localStorage).filter(k => k.startsWith('ScheduledText')).filter(k => {
-            const m = k.match(/ScheduledText(\d{8})_/);
-            return m && parseInt(m[1]) === todayYMD;
-        });
-        // 今日の予定がない場合
-        if (todayKeys.length === 0) {
-            const msg = `今日 ${today.getMonth()+1}月${today.getDate()}日の予定はありません。`;
-            showCustomAlert(msg); nativeSpeak(msg); return;
-        }
-        // 今日の予定がある場合
-        let fullText = `今日 ${today.getMonth()+1}月${today.getDate()}日の予定は、`;
-        todayKeys.forEach(key => {
-            const text = localStorage.getItem(key);
-            const m = text.match(/^(\d{1,2}\/\d{1,2})\s*(.*)/);
-            fullText += `${m ? m[2].trim() : text.trim()}。`;
-        });
-        showCustomAlert(fullText); nativeSpeak(fullText);
-    }
-
-	// --- 新しい関数: ローカルストレージに基づいて日付に色を適用 ---
-    function applyScheduleColorsToCalendar() {
-        document.querySelectorAll('#calendar-body td').forEach(c => c.classList.remove('has-schedule'));
-        const keys = Object.keys(localStorage).filter(k => k.startsWith('ScheduledText'));
-        const dates = new Set(); 
-        keys.forEach(k => {
-            const m = k.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-            if (m) dates.add(`${m[1]}-${m[2]}-${m[3]}`);
-        });
-        dates.forEach(d => {
-            const cell = document.getElementById(`day-${d}`);
-            if (cell) cell.classList.add('has-schedule');
-        });
-    }
-
-// displayScheduleForDate 関数を修正（モードによって処理を分岐）
-function displayScheduleForDate(year, month, day) {
-    const formattedYMD = `${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-    const mmdd = `${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
-
-    if (calendarMode === 'output') {
-        const prefix = `ScheduledText${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}_`;
-        const keys = Object.keys(localStorage).filter(k => k.startsWith(prefix));
-        const holiday = holidaysData.find(h => h[0].startsWith(`${year}/${String(month+1).padStart(2,'0')}/${String(day).padStart(2,'0')}`));
-        
-        let hasS = keys.length > 0;
-        let hasH = !!holiday;
-        let sText = ''; let aMsg = ''; let aType;
-
-        if (hasS) {
-            const ss = keys.map(k => localStorage.getItem(k).replace(/^\d{1,2}\/\d{1,2}\s*/, '').trim());
-            const t = new Date(); t.setHours(0,0,0,0);
-            const c = new Date(year, month, day); c.setHours(0,0,0,0);
-            if (c < t) { sText += `${month+1}月${day}日は${ss.join('。 ')}でした。`; aMsg += `過去：${ss.join('、 ')}`; } 
-            else { sText += `${month+1}月${day}日の予定は${ss.join('。 ')}です。`; aMsg += `予定：${ss.join('、 ')}`; }
-            aType = 'custom-alert';
-        }
-        if (hasH) {
-            if (hasS) { sText += ` なお、${holiday[1]}です。`; aMsg += `\n祝日：${holiday[1]}`; } 
-            else { sText += `${month+1}月${day}日は${holiday[1]}です。`; aMsg += `祝日：${holiday[1]}`; aType = 'custom-alert3'; }
-        }
-        if (!hasS && !hasH) { sText = `${month+1}月${day}日は何も登録されていません。`; aMsg = sText; aType = 'custom-alert2'; }
-
-        if (aType === 'custom-alert') showCustomAlert(aMsg);
-        else if (aType === 'custom-alert3') showCustomAlert3(aMsg);
-        else showCustomAlert2(aMsg);
-        nativeSpeak(sText);
-
-    } else if (calendarMode === 'input') {
-        // 1. 日付表示を更新
-        document.getElementById('displaySelectedDate').textContent = formattedYMD;
-        document.getElementById('scheduleDate').value = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        
-        // 2. 予定内容にセット
-        const scheduleInput = document.getElementById('scheduleInput');
-        scheduleInput.value = `${mmdd} `;
-        scheduleInput.focus();
-        
-        // 3. ★ここで音声入力ボタンを表示する
-        const voiceBtn = document.getElementById('voiceInputButton');
-        if (voiceBtn) {
-            voiceBtn.style.display = 'inline-block';
-        }
-        
-        showCustomAlert2(`${mmdd} をセットしました。予定を入力してください。`);
-    }
-}
-
-    </script>
-
-    <script>
-		// --- image64.pngクリック時の処理 (10/31 btnSearch8を追加) ---
-		document.addEventListener('DOMContentLoaded', () => {
-		    const logoImage = document.querySelector('.logo-title img[src="image64.png"]');
-
-		    if (!logoImage) return;
-
-		    // ダイアログ表示処理 (customDialog)
-		    const showDialog = () => {
-		        document.getElementById("customDialog").style.display = "flex";
-		    };
-
-		    // ダイアログ非表示処理 (customDialog)
-		    const hideDialog = () => {
-		        document.getElementById("customDialog").style.display = "none";
-		    };
-
-		    // KeyNダイアログ表示処理 (dialogOverlay)
-		    const showKeyNDialog = () => {
-		        document.getElementById("dialogOverlay").style.display = "flex";
-		    };
-
-		    // 各ボタンの処理設定
-		    // document.getElementById("btnSchedule").onclick = () => {
-		    //     speakTodaySchedule();
-		    //    hideDialog();
-		    // };
-
-		    // 各ボタンの処理設定 12/14 変更
-		    // 12/27書き換え
-			document.getElementById("btnSchedule").onclick = () => {
-			    sessionStorage.setItem("fromIndex", "true");
-			    window.location.href = "today-card.html";
-			};
-		    
-		    // 4/14書き替え
-// 🔥 btnSearch7 (AIに相談する) の処理を修正
-document.getElementById("btnSearch7").onclick = () => {
-    // 1. 最初のダイアログ (customDialog) を閉じる
-    hideDialog();
-    // 2. 「AIに相談する」専用のダイアログを表示する
-    openAiConsultDialog(); 
-};
-
-			document.getElementById("btnSearch").onclick = () => {
-			    window.location.href = "AdvancedSearch.html?from=index";
-			};
-
-
-		    document.getElementById("btnSearch2").onclick = () => {
-		        window.location.href = "notepad.html";
-		    };
-
-		    document.getElementById("btnSearch3").onclick = () => {
-		        window.location.href = "diary.html";
-		    };
-
-		    document.getElementById("btnSearch4").onclick = () => {
-		        window.location.href = "shopping.html";
-		    };
-
-			document.getElementById("btnSearch5").onclick = () => {
-			    openQRReader(); 
-			};
-
-			document.getElementById("btnSearch6").onclick = () => {
-			     window.location.href = "usage.html";
-			};
-
-			// 🔥 ここに処理を追加・修正します
-			document.getElementById("btnSearch8").onclick = () => {
-			    // 1. 最初のダイアログを閉じる
-			    hideDialog();
-			    // 2. データの保存と復元ツールのダイアログを表示する
-			    showKeyNDialog(); 
-			};
-								    
-		    document.getElementById("btnClose").onclick = hideDialog;
-
-		    // 画像クリック時の処理
-		    logoImage.addEventListener('click', () => {
-		        logoImage.classList.add('spin-around');
-
-		        setTimeout(() => logoImage.classList.remove('spin-around'), 800);
-		        setTimeout(showDialog, 1000);
-		    });
-		});
-		
-        // --- 予定管理のスクリプトここまで ---		
-    </script>
-
-		<div class="container2">
-<!-- AIボタン 4/10 -->		
-<div>		
-<button id="ai-button" class="blinking" onclick="announceCompass()">
-    💡 AI秘書
-</button>
-</div>		
-		
-		  <div class="link-buttons1">
-		    <button class="calendar-button" onclick="location.href='calendar.html'">カレンダー</button>
-		    <button class="clock-button" onclick="location.href='clock.html'">時計</button>
-		    <button id="note-button" class="blinking" onclick="
-		      sessionStorage.setItem('fromIndex', 'true');
-		      location.href='today-card.html';
-		    ">
-		      今日のカード
-		    </button>
-		  </div>
-		  <br>
-
-		  <button class="diary-button" onclick="location.href='shopping.html'">お買い物電卓</button>
-		  <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>
-
-		  <button id="note-button2" onclick="location.href='notepad.html'">ノート</button>
-		  <button id="note-button3" onclick="location.href='scribbling.html?from=index'">走り書き</button>
-		  <button class="diary-button" onclick="location.href='diary.html'">簡易日記</button>
-
-<!-- 
-	    <h3>検索</h3>
-	    <div class="input-row">
-		<div id="calendarHint02" style="font-size: 15px; color: #666; margin-top: 8px;">
-		  このアプリに入力された案件が対象です。
-		</div>	
-		
-	        <label for="searchKeyword">キーワード:</label>
-			<input type="text" id="searchKeyword"
-		       class="word-input2"
-		       style="width: 40%; max-width: 260px;">
-
-	        <button id="searchButton" onclick="searchWords()">表示</button>
--->
-
-	    <h3>高機能検索</h3>	        
-	    <div id="calendarHint03" style="font-size: 15px; color: #666; margin-top: 8px;margin-bottom: 0px;">
-		  このアプリに入力された案件が対象です。
-		</div>	
-		<button id="keyNButton3" onclick="location.href='AdvancedSearch.html?from=index'">高機能検索に移動</button>
-
-		<div>
-			
-		<!-- ボタン 9/29 -->
-		<button id="keyNButton">データの保存と復元ツール</button>
-		</div>
-
-<!-- 以前のAIボタン 4/04 -->
-
-<!-- Tokyo時刻 4/20 -->
-<!--   <div id="clockGrid" class="grid"></div> -->
-		
-<div>
-	<button id="toggleButton2">＋ その他機能</button>
-</div>
-
-    <div id="container3" class="container3">
-    <div style="padding: 10px;">
-
-<div style="text-align:center; margin-bottom:15px;">
-    <button onclick="openAiUnlock()" style="padding:8px 15px; border-radius:5px; border:1px solid #ccc; background:#f9f9f9; cursor:pointer;">🧭 AI秘書・羅針盤の鍵を開ける</button>
-</div>
-
-
-<div style="text-align:center; margin-bottom:15px;">
-    <button onclick="openAiConsultDialog()" style="padding:15px 25px; border-radius:12px; border:2px solid #5daab0; background:#5daab0; color:white; cursor:pointer; font-weight:bold; font-size:1.1em; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">💬 AIに相談する❗️</button>
-</div>
-
-<!-- ここに書いていた「AI秘書・羅針盤」は980行辺り　ダイアログに引っ越し4/14 -->
-
-<div id="ai-unlock-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background:white; padding:25px; border:4px solid #5daab0; z-index:1000; border-radius:20px; width:85%; max-width:350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: sans-serif;">
-    
-    <h3 style="margin-top:0; color:#5daab0; text-align:center; font-size:1.2em;">🔑 秘書・羅針盤の鍵を開ける</h3>
-    
-    <div style="background:#f0f9f9; padding:15px; border-radius:12px; margin-bottom:20px; border:1px dashed #5daab0;">
-        <p style="font-size:14px; color:#333; margin:0; line-height:1.6; text-align:center;">
-            AI機能をご利用いただくための確認です。<br>
-            下の欄に合言葉「 <strong style="color:#d9534f; font-size:1.1em;">hirao2026</strong> 」と入力して解除ボタンを押してください。
-        </p>
-    </div>
-
-    <input type="password" id="ai-pass-input" placeholder="ここに hirao2026 と入力" 
-        style="width:100%; padding:15px; border:2px solid #ccc; border-radius:10px; box-sizing:border-box; margin-bottom:20px; font-size:18px; text-align:center; outline:none;">
-    
-    <div style="display:flex; justify-content: space-between;">
-        <button onclick="closeAiUnlock()" 
-            style="width:45%; padding:10px; border-radius:8px; border:1px solid #ccc; background:#f5f5f5; color:#666; cursor:pointer; font-weight:bold;">閉じる</button>
-        <button onclick="unlockAiWithPass()" 
-            style="width:45%; padding:10px; border-radius:8px; border:none; background:#5daab0; color:white; font-weight:bold; cursor:pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2);">解除</button>
-    </div>
-    
-    <p style="font-size:11px; color:#999; margin-top:15px; text-align:center; line-height:1.4;">
-        ※一度解除すれば、次回から入力は不要です。<br>
-        (ドメイン制限により安全に保護されています)
-    </p>
-</div>
-
-
-<div id="sync-section" style="text-align:center; margin-bottom:20px; padding:10px; border:1px solid #eee; border-radius:15px; background:#fafafa;">
-    
-    <button onclick="handleSyncClick()" id="syncBtn" style="padding:15px 20px; border-radius:10px; border:2px solid #5daab0; background:#e0f2f1; color:#00796b; cursor:pointer; font-weight:bold; width:90%; max-width:320px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom:12px; display:inline-block;">
-        🔄 Web版へ送るデータ抽出
-    </button>
-    
-    <button onclick="handleImportClick()" id="importBtn" style="padding:15px 20px; border-radius:10px; border:2px solid #f44336; background:#ffebee; color:#c62828; cursor:pointer; font-weight:bold; width:90%; max-width:320px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display:inline-block;">
-        📥 Web版のデータを取り込む
-    </button>
-
-</div>
-
-		
-	    <h3>天気予報</h3>
-	    <button id="weather-button" onclick="location.href='weather.html'">現在地の天気予報</button>
 	    <br>
-		<div id="calendarHint01" style="font-size: 15px; color: #666; margin-top: 8px;">
-		  天気サイトのアドレスを入力して下さい。
-		</div>	
-		
-		<label for="weatherUrl">URL:</label>
-
-		<input type="url" id="weatherUrl"
-		       placeholder="例: https://www.weather.com"
-		       class="word-input"
-		       style="width: 60%; max-width: 260px;">
-
-		<button onclick="navigate()">移動</button>
-
-	    
-	    <button id="updateBtn" onclick="enableEditing()">入力と修正</button>
-	    <button id="saveBtn" onclick="saveNewUrl()" style="display:none;">保存</button>
-
-		<br>
-		<h3>その他の機能</h3>
-        <button onclick="location.href='calculatorapp.html'">電卓</button>
-        <button onclick="location.href='agecalculation.html'">年齢計算</button>
-        <button onclick="location.href='metrology.html'">度量衡</button>
-		<button onclick="location.href='bookmarknew.html'">ブックマーク</button> 
-		<button onclick="location.href='alcoholcheck.html'">アルコールチェック</button>
-		<br>
-		<button onclick="openQRReader()">QRリーダー & 拡大鏡</button>
-		<br>
-		<button onclick="openOCRReader()">簡易版OCR</button>
-		<br>
-		<button onclick="location.href='medication-check.html'">お薬手帳</button>
-		<br>		
-		<div id="calendarHint" style="font-size: 14px; color: #666; margin-top: 8px;margin-bottom: 6px;">
-		  🦊 カレンダーが小さく表示された場合は、二本指でふわっと広げてください♪
-		</div>		
-		<button id="keyNButton2" onclick="openTodayCalendar()">簡易版Googleカレンダー</button>
-		<br>
-        <button id="omikujiButton" style="margin-top: 0px;margin-bottom: 8px;">おみくじを引く</button>
-
-		</div>
-
-</div>
-</div>
-	
-		<script>
-
-		document.addEventListener('DOMContentLoaded', () => {
-		  const button = document.getElementById('toggleButton2');
-		  const container = document.getElementById('container3');
-
-		  button.addEventListener('click', () => {
-		    container.classList.toggle('open');
-
-		    const isOpen = container.classList.contains('open');
-
-		    button.textContent = isOpen ? '✕ 閉じる' : '＋ その他機能';
-		    button.style.backgroundColor = isOpen ? '#eee' : '#fff';
-		  });
-		});
-
-		//function toggleContainer3(show) {
-		//  const element = document.querySelector('.container3');
-		//  const button = document.getElementById('toggleButton2');
-
-		//  if (element) {
-		//    element.style.display = show ? 'block' : 'none';
-		//    button.textContent = show ? '☓ 閉じる' : 'その他機能';
-
-		    // 次回の切り替えのために、onclickを反転
-		//    button.setAttribute('onclick', `toggleContainer3(${!show})`);
-		//  }
-		//}
-
-		</script>
-		
-		<script>
-		  // ダイアログ表示（keyNButtonを押したとき）9/30
-		  document.getElementById("keyNButton").addEventListener("click", function () {
-		    document.getElementById("dialogOverlay").style.display = "flex";
-		  });
-
-		  // Android版へ移動
-		  document.getElementById("androidBtn").addEventListener("click", function () {
-		    location.href = "データの保存と復元ツール10.html";
-		  });
-
-		  // Web版へ移動
-		  document.getElementById("webBtn").addEventListener("click", function () {
-		    location.href = "データの保存と復元ツール20.html";
-		  });
-
-		  // Keyリストへ移動 9/30追加　GitHub用
-		  <!-- keyリスト（旧：keyリスト.html） -->
-		  document.getElementById("keyListBtn").addEventListener("click", function () {
-		    location.href = "keyList.html";
-		  });
-
-		  // 閉じる
-		  document.getElementById("closeBtn").addEventListener("click", function () {
-		    document.getElementById("dialogOverlay").style.display = "none";
-		  });
-		</script>
-		
-	    <script>
-	        document.getElementById('weatherUrl').value = localStorage.getItem("weatherUrl") || '';
-
-	        function enableEditing() {
-	            document.getElementById("weatherUrl").disabled = false;
-	            document.getElementById("saveBtn").style.display = "inline";
-	        }
-
-	        function saveNewUrl() {
-	            const newWeatherUrl = document.getElementById("weatherUrl").value;
-	            if (newWeatherUrl) {
-	                localStorage.setItem("weatherUrl", newWeatherUrl);
-	                alert("保存しました");
-	                document.getElementById("saveBtn").style.display = "none";
-	                document.getElementById("weatherUrl").disabled = true;
-	            } else {
-	                alert("新しいURLを入力してください。");
-	            }
-	        }
-	        
-
-        // ここに移動    
-        // ページロード時にローカルストレージからアドレスを復元
-        window.onload = function() {
-            const savedUrl = localStorage.getItem('weatherUrl');
-            if (savedUrl) {
-                document.getElementById('weatherUrl').value = savedUrl;
-            }
-        };
-
-        // 入力されたアドレスをローカルストレージに保存して移動
-		function navigate() {
-		    const url = document.getElementById('weatherUrl').value;
-		    if (url) {
-		        localStorage.setItem('weatherUrl', url); // アドレスを保存
-		        window.open(url, '_blank'); // 新しいタブで入力されたURLを開く
-		    } else {
-		        alert("アドレスを入力してください");
-		    }
-		}
-
-		function searchWords() {
-		    const keyword = document.getElementById('searchKeyword').value.trim();
-		    if (keyword.length > 0) {
-		        localStorage.setItem('searchKeyword', keyword);
-		        location.href = 'searchresults.html';
-		        document.getElementById('searchKeyword').value = ''; // テキストボックスの内容を消去
-		    }
-		}
-    
-    document.getElementById('omikujiButton').onclick = () => {
-        const res = [
-            	{
-                    text: "やったね。大吉だよ。最高だね。気を抜かないで好調をキープしよう。",
-                    s: "やったね。だいきちだよ。さいこうだね。きをぬかないでこうちょうをキープしよう。"
-                },
-                {
-                    text: "吉だよ。いいね。今の幸運をキープしよう。",
-                    s: "きちだよ。いいね。いまのこううんをキープしよう。"
-                },
-                {
-                    text: "中吉だね。吉の半分ってとこかな。心がけ次第だよ。",
-                    s: "ちゅうきちだね。きちのはんぶんってとこかな。こころがけしだいだよ。"
-                },
-                {
-                    text: "小吉だね。でも、いいんじゃなあい ? ささやかな幸せを楽しもう。",
-                    s: "しょうきちだね。でも、いいんじゃなあい ? ささやかなしあわせをたのしもう。"
-                },
-                {
-                    text: "末吉だね。今よくなくても、これから運は開けていくよ。",
-                    s: "すえきちだね。いまよくなくても、これからうんはひらけていくよ。"
-                },
-                {
-                    text: "ガーン！凶だね。でもこれから上がっていくだけだよ。何回も引くと制限かけるよ。",
-                    s: "ガーン！きょうだね。でもこれからあがっていくだけだよ。なんかいもひくとせいげんかけるよ。"
-                }
-        ];
-        const r = res[Math.floor(Math.random() * res.length)];
-        showCustomAlert(r.text); nativeSpeak(r.s);
-    };
-
-    let clickCount = 0;
-    function handleClick() {
-        clickCount++;
-        if (clickCount === 3) { clickCount = 0; window.location.href = 'index-NNN.html'; }
-    }
-    </script>
-
-</div>
-
-    <button onclick="location.href='introduction.html'">紹介ページ</button>
-    
-    <!-- 3/25差別化機能を追加 -->
-	<!-- 差別化ボタン（6つ）→ 非表示にしておく 4/19 -->
-	<!-- 差別化機能：将来の課金版を見据えて、UIや機能の切替を制御できるようにする -->
-
-	<!-- 差別化ボタン群（デバッグ・開発用） -->
-	<!-- 現時点では非表示にしておくが、切替のロジックは保持しておく -->
-	<div id="feature-buttons" style="display: none;">
-	    <!-- 予定入力の件数を制限 -->
-	    <button class="limit-button" onclick="toggleLimit(true)">機能を制限</button>
-	    <!-- 制限を解除して正規版の動作にする -->
-	    <button class="limit-button" onclick="toggleLimit(false)">機能を復元</button><br>
-
-	    <!-- 特定のUIコンテナを非表示にする -->
-	    <button class="limit-button" onclick="toggleVisibility(false)">機能を制限</button>
-	    <!-- UIコンテナを表示に戻す -->
-	    <button class="limit-button" onclick="toggleVisibility(true)">機能を復元</button><br>
-
-	    <!-- 背景色を簡易版に変更（薄緑） -->
-	    <button class="limit-button" onclick="toggleBackgroundColor(false)">簡易版</button>
-	    <!-- 背景色を正規版に変更（淡い黄色） -->
-	    <button class="limit-button" onclick="toggleBackgroundColor(true)">正規版</button><br>
+    		
+    		
+	    <button id="keyButton3" onclick="displayStorageUsage()">ローカルストレージの使用量を表示</button>
+		<br><br>
+		<button id="keyButton2">全keyを消去</button>
+				
 	</div>
-
-	<!-- 本番で使う予定の「簡易版／正規版」切替ボタン（課金対応） -->
-	<!-- 今は表示状態にしておくが、後で display: none に切り替えて連携する -->
-	<div id="version-buttons" style="display: block;">
-	    <!-- 将来の課金機能と連動する予定 -->
-	    <!-- <div id="version-buttons" style="display: none;"> -->
-	    <button onclick="applySimpleVersion()">簡易版</button>
-	    <button onclick="applyPremiumVersion()">正規版</button>
-	</div>
-	
-    <script>
-    /* [集約] 差別化機能（簡易版/正規版）のスクリプトを整理してまとめました */
-    function applySimpleVersion() { toggleLimit(true, false); toggleVisibility(false, false); toggleBackgroundColor(false, false); }
-    
-    function applyPremiumVersion() { toggleLimit(false, false); toggleVisibility(true, false); toggleBackgroundColor(true, true); }
-    
-    function toggleBackgroundColor(isP, alert = true) {
-        const c = isP ? "#ffffcc" : "#e3ffe3";
-        document.body.style.backgroundColor = c;
-        saveState("backgroundColor", c);
-        if (isP && alert) { showCustomAlert("機能制限は解除されました。"); nativeSpeak("機能制限は解除されました。"); }
-    }
-    
-    function initializeState() {
-        if (localStorage.getItem("limitEnabled") === null) saveState("limitEnabled", true);
-        if (localStorage.getItem("visibility") === null) saveState("visibility", false);
-        if (localStorage.getItem("backgroundColor") === null) saveState("backgroundColor", "#e3ffe3");
-        const v = loadState("visibility");
-        const el = document.querySelector('.container2');
-        if (el && v !== null) el.style.display = v ? 'block' : 'none';
-        const bc = loadState("backgroundColor");
-        if (bc) document.body.style.backgroundColor = bc;
-    }
-    
-    function toggleVisibility(show, alert = false) {
-        const el = document.querySelector('.container2');
-        if (el) { el.style.display = show ? 'block' : 'none'; saveState("visibility", show); }
-    }
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) initializeState(); });
-    initializeState();
-    
-    
-// --- AI機能の解錠（環境判別・自動切り替え方式：最終完全版） ---
-
-// A. 環境を判定する関数（一つのファイルでアプリかWebかを見分ける）
-function getAiEnvironment() {
-    const isAndroidApp = window.location.href.includes("android_asset") || 
-                         window.document.URL.includes("android_asset");
-
-    if (isAndroidApp) {
-        return {
-            type: "android",
-            // ★確定したWeb版のアドレスをセットしました
-            webUrl: "https://ettomio0518.github.io/my-calendar-app/index.html" 
-        };
-    } else {
-        return {
-            type: "web",
-            pass: "hirao2026", 
-            storageName: "gemini_api_key", 
-            keyPart1: "AIzaSyAgWd3pGmTi5C3", 
-            keyPart2: "oCE-g2B2w77ekrrcr4KQ"  
-        };
-    }
-}
-
-// 1. 画面を開く（アプリ版ならスマートに誘導、Web版なら合言葉入力を表示）
-function openAiUnlock() {
-    const env = getAiEnvironment();
-
-    // 【アプリ版(apk)で実行された場合】
-    if (env.type === "android") {
-        const confirmJump = confirm("AI秘書の鍵を開ける設定を行います。\n安全な設定画面（Web版）へ移動してよろしいですか？ \n※移動先の画面でもう一度「鍵を開ける」ボタンを押してください。");
-        if (confirmJump) {
-            window.location.href = env.webUrl;
-        }
-        return; 
-    }
-
-    // 【Web版(GitHub)で実行された場合】
-    const savedKey = localStorage.getItem(env.storageName);
-    if (savedKey) {
-        const res = confirm("すでに鍵は開いています。再設定しますか？");
-        if (!res) return;
-    }
-
-    const modal = document.getElementById("ai-unlock-modal");
-    const instruction = modal.querySelector("p");
-    const inputField = document.getElementById("ai-pass-input");
-
-    instruction.innerHTML = `AI機能をご利用いただくための確認です。<br>下の欄に合言葉「 <strong style="color:#d9534f; font-size:1.1em;">${env.pass}</strong> 」と入力してください。`;
-    inputField.placeholder = `ここに ${env.pass} と入力`;
-    inputField.value = ""; 
-
-    modal.style.display = "block";
-}
-
-// 2. 画面を閉じる
-function closeAiUnlock() {
-    document.getElementById("ai-unlock-modal").style.display = "none";
-}
-
-// 3. 解除ボタン
-function unlockAiWithPass() {
-    const passInput = document.getElementById("ai-pass-input").value.trim();
-    const env = getAiEnvironment();
-    
-    if (env.type === "web") {
-        if (passInput === env.pass) {
-            localStorage.setItem(env.storageName, env.keyPart1 + env.keyPart2);
-            alert("Web版のロックを解除しました。\n設定を保存しました。");
-            closeAiUnlock();
-        } else {
-            alert("合言葉が違います。");
-        }
-    }
-}
-
-     
-    </script>
 
     <button class="top-button" id="topBtn" onclick="scrollToTop()">Top</button>
-    <button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+	<button class="bottom-button" id="bottomBtn" onclick="scrollToBottom()">Bottom</button>
+    <div style="height: 30px;"></div>
+	
+    <!-- <footer>
+	© 20251020 ettomio
+	</footer>
+	<div style="height: 80px;"></div> -->
 
-  <script>
+	<script>
+	    // ==========================================================
+	    // ★ 予定リスト関連の定数・変数の定義
+	    // ==========================================================
+	    const PREFIX = 'ScheduledText'; // 予定データのキー接頭辞
+
+	    const toggleButton = document.getElementById('toggleButton');
+	    const scheduleList = document.getElementById('scheduleList');
+	    const detailArea = document.getElementById('detailArea');
+	    const detailDateSpan = document.getElementById('detailDate'); 
+	    const detailTextarea = document.getElementById('detailTextarea');
+	    const saveButton = document.getElementById('saveButton');
+	    const keyButton2 = document.getElementById('keyButton2'); // 全key消去ボタン
+
+	    let currentKey = null; // 現在修正対象のキーを保持
+
+	    // ==========================================================
+	    // ★ 共通ユーティリティ (アラート/音声/ストレージ/日付)
+	    // ==========================================================
+
+	    const customAlertContainer = document.createElement('div');
+	    customAlertContainer.className = 'custom-alert2';
+	    customAlertContainer.style.display = 'none';
+	    document.body.appendChild(customAlertContainer);
+
+	    function showCustomAlert(message) {
+	        const alertContainer = document.createElement('div');
+	        alertContainer.className = 'custom-alert';
+	        alertContainer.textContent = message;
+	        document.body.appendChild(alertContainer);
+	        setTimeout(() => { if(document.body.contains(alertContainer)) { document.body.removeChild(alertContainer); } }, 3000);
+	    }
+	    
+	    function showCustomAlert2(message) {
+	        customAlertContainer.textContent = message;
+	        customAlertContainer.style.display = 'block';
+	        setTimeout(() => { customAlertContainer.style.display = 'none'; }, 3000);
+	    }
+
+	    function speakText(text) {
+	        if ('speechSynthesis' in window) {
+	            const utterance = new SpeechSynthesisUtterance(text);
+	            utterance.lang = 'ja-JP';
+	            window.speechSynthesis.speak(utterance);
+	        } else { showCustomAlert("ご使用のブラウザは音声合成をサポートしていません。"); }
+	    }
+	    function nativeSpeak(text) {
+	        // Android環境でなければWeb標準の音声合成を使う
+	        if (typeof Android !== 'undefined' && Android.speak) { Android.speak(text); } 
+	        else { speakText(text); }
+	    }
+
+	    function getLocalStorageUsage() {
+	        let total = 0;
+	        for (let i = 0; i < localStorage.length; i++) {
+	            const key = localStorage.key(i);
+	            const value = localStorage.getItem(key);
+	            // キーと値の合計サイズ
+	            total += (key ? key.length : 0) + (value ? value.length : 0);
+	        }
+	        return total; // 使用容量（バイト数）
+	    }
+	    
+	    // YYYY/MM/DD形式で返す
+	    function getDisplayDate(key) {
+	        const datePart = key.substring(PREFIX.length, PREFIX.length + 8);
+	        const year = datePart.substring(0, 4); // 年（YYYY）を抽出
+	        const month = datePart.substring(4, 6);
+	        const day = datePart.substring(6, 8);
+	        return `${year}/${month}/${day}`; // YYYY/MM/DD 形式
+	    }
+
+	    // 今日を YYYY/MM/DD 形式の文字列で取得するヘルパー関数
+	    function getTodayDateString() {
+	        const today = new Date();
+	        const year = today.getFullYear();
+	        const month = String(today.getMonth() + 1).padStart(2, '0');
+	        const day = String(today.getDate()).padStart(2, '0');
+	        return `${year}/${month}/${day}`;
+	    }
+
+
+	    // ==========================================================
+	    // ★ キーリスト機能 (displayKeys/closeKeys/displayText/deleteKeyAndText)
+	    // ==========================================================
+	    
+	    function displayKeys() {
+	        const keys = Object.keys(localStorage).sort((a, b) => a.localeCompare(b));
+	        const keysElement = document.getElementById('keys');
+	        keysElement.innerHTML = '';
+	        keys.forEach(key => {
+	            const div = document.createElement('div');
+	            div.textContent = key;
+	            keysElement.appendChild(div);
+	        });
+	        document.getElementById('closeKeysButton').style.display = 'block';
+	        document.getElementById('closeKeysButtonN').style.display = 'block';
+
+	        const message = `ローカルストレージのキーの総数は ${keys.length} 個です。`;
+	        showCustomAlert(message);
+	        nativeSpeak(message);
+	        showScrollButtonsIfPageLong(); 
+	    }
+
+	    function closeKeys() {
+	        const keysElement = document.getElementById('keys');
+	        keysElement.innerHTML = '';
+	        document.getElementById('closeKeysButton').style.display = 'none';
+	        document.getElementById('closeKeysButtonN').style.display = 'none';
+	        showScrollButtonsIfPageLong();
+	    }
+	    
+	    function displayText() {
+	        const key = document.getElementById('keyInput').value;
+	        const val = localStorage.getItem(key);
+	        const time = localStorage.getItem(key + 'Time');
+	        const displayTextElement = document.getElementById('displayText');
+
+	        displayTextElement.style.whiteSpace = 'pre-wrap';
+
+	        if (val !== null) {
+	            const content = (val === '') ? '(空文字)' : val;
+	            displayTextElement.textContent = `内容: ${content}\n時間: ${time || '保存日時なし'}`;
+	            document.getElementById('deleteButton').style.display = 'block';
+	        } else {
+	            displayTextElement.textContent = '指定したキーは存在しません';
+	            document.getElementById('deleteButton').style.display = 'none';
+	        }
+
+	        document.getElementById('closeDetailsButton').style.display = 'block';
+	    }
+
+
+	    function closeDetails() {
+	        const displayTextElement = document.getElementById('displayText');
+	        const keyInputElement = document.getElementById('keyInput');
+
+	        displayTextElement.innerHTML = '';
+	        keyInputElement.value = '';
+	        document.getElementById('closeDetailsButton').style.display = 'none';
+	        document.getElementById('deleteButton').style.display = 'none';
+	    }
+
+	    function displayStorageUsage() {
+	        const usage = getLocalStorageUsage();
+	        const usedKB = (usage / 1024).toFixed(2);
+	        const maxStorageKB = 5120;
+	        const bytesPerSheet = 800;
+	        const usedSheets = Math.round((usage / bytesPerSheet));
+	        const remainingKB = (maxStorageKB - usedKB).toFixed(2);
+	        const remainingSheets = Math.round(((remainingKB * 1024) / bytesPerSheet));
+	        const remainingSheetsS = Math.floor(remainingSheets / 10) * 10;
+
+	        const message = (
+	            `ローカルストレージの使用量は` +
+	            `原稿用紙約　　${usedSheets} 枚分です。` +
+	            `あと、理論上は` +
+	            `${remainingSheetsS} 枚分程度の空き容量です。`
+	        );
+
+	        showCustomAlert(
+	            `ローカルストレージの使用量は　　　${usedKB} KB\n` +
+	            `原稿用紙約　　${usedSheets} 枚分です。\n` +
+	            `あと、　　　　${remainingKB} KB、　　　　${remainingSheets} 枚分程度の空き容量です。`
+	        );
+
+	        nativeSpeak(message);
+	    }
+
+	    function deleteKeyAndText() {
+	        const key = document.getElementById('keyInput').value;
+	        if (localStorage.getItem(key) === null) {
+	            showCustomAlert('指定したキーは存在しません');
+	            return;
+	        }
+
+	        localStorage.removeItem(key);
+	        localStorage.removeItem(key + 'Time');
+
+	        closeDetails();
+	        closeKeys();
+	        showCustomAlert('Keyと本文が削除されました');
+	        nativeSpeak('Keyと本文が削除されました');
+	    }
+
+	    // ==========================================================
+	    // ★ 全キー消去機能
+	    // ==========================================================
+	    keyButton2.addEventListener('click', function() {
+	        const confirmation = confirm('本当に全データを削除しますか？');
+	        if (confirmation) {
+	            localStorage.clear();
+	            showCustomAlert2('データは消去されました'); // custom-alert2を使用
+	            nativeSpeak('データは消去されました');
+	            
+	            // リストと詳細も閉じる
+	            closeKeys();
+	            hideDetailArea();
+	        }
+	    });
+
+
+	    // ==========================================================
+	    // ★ 予定リスト機能 (ScheduledText...)
+	    // ==========================================================
+
+	    function getSortedScheduleKeys() {
+	        const keys = Object.keys(localStorage).filter(key => key.startsWith(PREFIX));
+	        keys.sort();
+	        return keys;
+	    }
+
+	    function hideDetailArea() {
+	        detailArea.classList.add('hidden');
+	        detailTextarea.value = '';
+	        detailDateSpan.textContent = ''; 
+	        currentKey = null;
+	    }
+
+	    // ★修正済み: 過去は「案件」、今日以降は「予定」と表示を切り替える
+	    function showDetailArea(key, dateStr, content) {
+	        currentKey = key;
+	        detailArea.classList.remove('hidden');
+
+	        // 1. 今日（YYYY/MM/DD）を取得
+	        const todayStr = getTodayDateString();
+	        
+	        let suffixText = '';
+	        
+	        // 2. 日付を比較 (YYYY/MM/DD 形式で文字列比較が可能)
+	        if (dateStr < todayStr) {
+	            // 過去の日付の場合
+	            suffixText = 'の案件'; 
+	        } else {
+	            // 今日、または未来の日付の場合
+	            suffixText = 'の予定';
+	        }
+
+	        // 3. 表示テキストを設定
+	        detailDateSpan.textContent = `${dateStr} ${suffixText}`;
+	        
+	        detailTextarea.value = content;
+	        
+	        detailArea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+	        detailTextarea.focus();
+	    }
+
+	    function toggleList() {
+	        if (scheduleList.classList.contains('hidden')) {
+	            displayAllSchedules();
+	            scheduleList.classList.remove('hidden');
+	            toggleButton.textContent = '予定リストを閉じる';
+	            showScrollButtonsIfPageLong(); // リスト表示でボタン表示をチェック
+	        } else {
+	            scheduleList.classList.add('hidden');
+	            toggleButton.textContent = '全予定リストを表示';
+	            hideDetailArea();
+	            hideScrollButtons(); // リスト非表示でボタンを強制非表示
+	        }
+	    }
+
+	    function displayAllSchedules() {
+	        scheduleList.innerHTML = ''; 
+	        const keys = getSortedScheduleKeys();
+
+	        if (keys.length === 0) {
+	            scheduleList.innerHTML = '<li class="schedule-item">予定はありません。</li>';
+	            return;
+	        }
+
+	        keys.forEach(key => {
+	            // リスト表示用: MM/DD形式
+	            const fullDateStr = getDisplayDate(key); // YYYY/MM/DD 形式を取得
+	            const monthDayStr = fullDateStr.substring(5); // MM/DDを取得
+	            const fullContent = localStorage.getItem(key) || '内容なし';
+	            
+	            let displayContent = fullContent;
+	            
+	            // MM/DD形式を使用して内容の先頭の日付（例: "01/02" や "01/02 "）がある場合は削除
+	            const datePattern = new RegExp(`^${monthDayStr}\\s*`);
+	            if (datePattern.test(fullContent)) {
+	                displayContent = fullContent.replace(datePattern, '').trim();
+	            }
+
+	            // 表示内容: 20文字で切り詰める
+	            const truncatedContent = displayContent.length > 20
+	                ? displayContent.substring(0, 20) + '...'
+	                : displayContent;
+
+	            const listItem = document.createElement('li');
+	            listItem.className = 'schedule-item';
+	            listItem.dataset.key = key;
+
+	            listItem.innerHTML = `
+	                <div class="schedule-info">
+	                    <span class="date-display">${monthDayStr}</span>
+	                    ${truncatedContent || ' (内容なし) '} </div>
+	                <div class="schedule-actions">
+	                    <button class="detail-btn" data-key="${key}" data-content="${fullContent.replace(/"/g, '&quot;')}">詳細</button>
+	                    <button class="delete-btn" data-key="${key}">消去</button>
+	                </div>
+	            `;
+	            scheduleList.appendChild(listItem);
+	        });
+	    }
+
+	    function deleteSchedule(key) {
+	        if (confirm(`${getDisplayDate(key)}の予定を本当に消去しますか？`)) {
+	            localStorage.removeItem(key);
+	            alert('予定を消去しました。');
+	            displayAllSchedules();
+	            if (currentKey === key) {
+	                hideDetailArea();
+	            }
+	        }
+	    }
+
+	    function saveSchedule() {
+	        if (!currentKey) return;
+
+	        const contentToSave = detailTextarea.value.trim();
+
+	        if (!contentToSave) {
+	            alert('内容が空では保存できません。');
+	            return;
+	        }
+
+	        localStorage.setItem(currentKey, contentToSave);
+	        alert('修正して保存しました。');
+
+	        displayAllSchedules();
+	        hideDetailArea();
+	    }
+
+	    // --- 予定リスト イベントリスナー ---
+	    toggleButton.addEventListener('click', toggleList);
+
+	    scheduleList.addEventListener('click', (event) => {
+	        const target = event.target;
+	        const key = target.dataset.key;
+
+	        if (target.classList.contains('detail-btn')) {
+	            const fullContent = target.dataset.content;
+	            
+	            // YYYY/MM/DD形式の日付文字列を生成
+	            const fullDateStr = getDisplayDate(key); 
+	            
+	            // showDetailAreaにYYYY/MM/DD形式を渡す
+	            showDetailArea(key, fullDateStr, fullContent); 
+
+	        } else if (target.classList.contains('delete-btn')) {
+	            deleteSchedule(key);
+	        }
+	    });
+
+	    saveButton.addEventListener('click', saveSchedule);
+
+
 	    // ==========================================================
 	    // ★ スクロールボタン制御 (Top/Bottom)
 	    // ==========================================================
 
 	    function scrollToTop() {
-	      window.scrollTo({ top: 0, behavior: 'smooth' });
+	      window.scrollTo({ top: 0, behavior: 'smooth' });
 	    }
 
 	    function scrollToBottom() {
-	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+	      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 	    }
 
 	    function hideScrollButtons() {
@@ -2736,45 +656,44 @@ function unlockAiWithPass() {
 	        document.getElementById("bottomBtn").style.display = "none";
 	    }
 
-		// ==========================================================
-		// ★ スクロールボタン制御の修正版 (Top/Bottom 独立制御) 12/02
-		// ==========================================================
-		function showScrollButtonsIfPageLong() {
-		    const topBtn = document.getElementById("topBtn");
-		    const bottomBtn = document.getElementById("bottomBtn");
-		    
-		    const docHeight = document.body.scrollHeight;
-		    const viewHeight = window.innerHeight;
-		    const scrollY = window.scrollY;
-		    
-		    const scrollThreshold = 100; // ボタンが表示されるしきい値 (px)
-		    
-		    // ページがスクロール可能でなければ両方非表示
-		    if (docHeight <= viewHeight + scrollThreshold) {
-		        topBtn.style.display = "none";
-		        bottomBtn.style.display = "none";
-		        return;
-		    }
+	    function showScrollButtonsIfPageLong() {
+	        const topBtn = document.getElementById("topBtn");
+	        const bottomBtn = document.getElementById("bottomBtn");
+	        
+	        // スケジュールリストが表示されていない、かつキーリストも空の場合は強制非表示
+	        if (scheduleList.classList.contains('hidden') && document.getElementById('keys').innerHTML === '') {
+	             hideScrollButtons();
+	             return;
+	        }
+	        
+	        // ページが十分に長いかチェック (コンテンツが短い場合はボタン不要)
+	        const scrollThreshold = 300;
+	        const isScrollable = document.body.scrollHeight > window.innerHeight + scrollThreshold; 
 
-		    // --- Topボタンの表示制御 ---
-		    // 100px以上スクロールしたらTopボタンを表示
-		    if (scrollY > scrollThreshold) {
-		        topBtn.style.display = "block";
-		    } else {
-		        topBtn.style.display = "none";
-		    }
+	        if (!isScrollable) {
+	            hideScrollButtons();
+	            return;
+	        }
 
-			// --- Bottomボタンの表示制御 ---
-			// 100px以上スクロール かつ 下端まで余裕がある場合のみ表示
-			if (
-			    scrollY > scrollThreshold &&
-			    docHeight - viewHeight - scrollY > scrollThreshold
-			) {
-			    bottomBtn.style.display = "block";
-			} else {
-			    bottomBtn.style.display = "none";
-			}
-		}
+	        // ページが長い場合のスクロール位置による制御
+	        const scrollY = window.scrollY;
+	        const docHeight = document.body.scrollHeight;
+	        const viewHeight = window.innerHeight;
+	        
+	        if (scrollY > scrollThreshold) {
+	            // ある程度スクロールした -> Topボタンを表示
+	            topBtn.style.display = "block";
+	            bottomBtn.style.display = "none";
+	        } else if (scrollY < docHeight - viewHeight - scrollThreshold) {
+	            // ページ上部にいるが、底部はまだ遠い -> Bottomボタンを表示
+	            topBtn.style.display = "none";
+	            bottomBtn.style.display = "block";
+	        } else {
+	            // ページの下部近くにいる
+	            topBtn.style.display = "none";
+	            bottomBtn.style.display = "none";
+	        }
+	    }
 
 	    // スクロール時のボタン表示制御
 	    window.addEventListener("scroll", showScrollButtonsIfPageLong);
@@ -2791,522 +710,16 @@ function unlockAiWithPass() {
 	    // ==========================================================
 	    // 初期化処理はDOMContentLoadedが完了したタイミングで実行される
 	    document.addEventListener('DOMContentLoaded', () => {
+	        hideDetailArea();
 	        showScrollButtonsIfPageLong();
 	    });
-	    
-  </script>
 
-<script>
-window.addEventListener('DOMContentLoaded', function() {
-    const hostname = window.location.hostname;
-    const syncBtn = document.getElementById('syncBtn');
-    const importBtn = document.getElementById('importBtn');
-    const headerElement = document.querySelector('header');
-    const aiButton = document.getElementById('ai-button');
-
-    if (hostname === "ettomio0518.github.io") {
-        // GitHub版：ヘッダー色変更
-        if (headerElement) headerElement.style.background = "#baba74";
-
-        // GitHub版：AI秘書ボタンを表示
-        if (aiButton) aiButton.style.display = "inline-block";
-
-        // GitHub版：抽出ボタンの文字を「アプリへ戻す」に変更
-        if (syncBtn) syncBtn.innerHTML = "🔄 アプリ版へ戻すデータ抽出";
-
-        // GitHub版：取込ボタンを無効化（アプリ専用であることを明示）
-        if (importBtn) {
-            importBtn.innerHTML = "🚫 取り込み（アプリ専用）";
-            importBtn.style.opacity = "0.5";
-            importBtn.style.cursor = "not-allowed";
-            importBtn.style.background = "#eee";
-            importBtn.style.color = "#999";
-            importBtn.style.border = "2px solid #ccc";
-        }
-    }
-});
-
-
-    function handleSyncClick() {
-        if (window.location.hostname === "ettomio0518.github.io") {
-            location.href = 'reverse_sync_guide.html';
-        } else {
-            location.href = 'extraction.html';
-        }
-    }
-
-function handleImportClick() {
-        // hostname は中本さんの環境に合わせて適宜修正してください
-        if (window.location.hostname === "ettomio0518.github.io") {
-            alert("この機能はアプリ版専用です。\nスマホアプリを起動して操作してください。");
-        } else {
-            const isReady = confirm(
-                "【同期の確認】\nWeb版（GitHub）で「データの抽出」と「コピー」は完了していますか？\n\n[OK] 貼り付け画面（import.html）へ進む\n[キャンセル] Web版を開いてコピーしに行く"
-            );
-            
-            if (isReady) {
-                location.href = 'import.html';
-            } else {
-                // キャンセル：ブラウザを起動して抽出画面へ
-                location.href = 'https://ettomio0518.github.io/my-calendar-app/reverse_sync_guide.html';
-            }
-        }
-    }
-    
-</script>
-
-
-<script>
-// AI相談ダイアログを開く
-function openAiConsultDialog() {
-    document.getElementById("ai-consult-modal").style.display = "block";
-}
-
-// AI相談ダイアログを閉じる
-function closeAiConsultDialog() {
-    document.getElementById("ai-consult-modal").style.display = "none";
-}
-
-</script>
-
-
-<div id="ai-interaction-container" style="display:none;">
-    <p style="margin: 0 0 8px 0; font-weight: bold; color: #333; font-size: 0.85em;">💬 AI秘書へのメッセージ：</p>
-    <div style="display: flex; gap: 5px; align-items: center;">
-        <input type="text" id="ai-user-input" placeholder="何かお手伝いしますか？" style="border-radius: 10px; border: 1px solid #ccc;">
-        <div id="ai-button-group" style="display: flex; gap: 5px;">
-            <button onclick="startAiVoiceInput()" style="background: #f0f0f0; border: 1px solid #ccc; border-radius: 10px;">🎤</button>
-            <button onclick="handleAiChat()" style="background: #5daab0; color: white; border: none; border-radius: 10px; font-weight: bold;">送信</button>
-        </div>
-    </div>
-    <div id="ai-chat-history" style="display: none;"></div>
-</div>
-
-
-<script>
-
-// モデル名固定: gemini-3-flash-preview
-
-/**
- * 1. AI秘書（AI羅針盤）起動処理
- */
-function announceCompass() {
-    const chatContainer = document.getElementById('ai-interaction-container');
-    if (chatContainer) {
-        chatContainer.style.display = 'block';
-        chatContainer.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-
-    const msg = "何かお手伝いしましょうか？";
-    if (typeof nativeSpeak === 'function') {
-        nativeSpeak(msg);
-    } else if (typeof speakText === 'function') {
-        speakText(msg);
-    }
-
-    const inputField = document.getElementById('ai-user-input');
-    if (inputField) inputField.focus();
-}
-
-/**
- * 2. メイン応答処理
- */
-async function handleAiChat() {
-    const inputField = document.getElementById("ai-user-input");
-    const userMessage = (inputField.value || "").trim();
-    if (!userMessage) return;
-
-    const historyArea = document.getElementById('ai-chat-history');
-    if (historyArea) {
-        historyArea.style.display = 'block';
-        historyArea.innerText = "考え中です...";
-    }
-    if (typeof nativeSpeak === 'function') nativeSpeak("考え中です。");
-
-    // A. 誘導系
-    if (userMessage.match(/六曜|行事|節気|月相|今日.*(何|教え|紹介|カード)/)) {
-        finishAiResponse("それについては「今日のカード」で対応できます。画面のボタンから移動してください。");
-        inputField.value = "";
-        return;
-    }
-
-    // B. 予定入力（制限を解除し、Geminiに直接渡すよう修正）
-    // PC/スマホ共通でAIが解析を行うため、ここでの中断処理を削除
-
-    // C. 森羅万象（Gemini API 通信）
-    await runDialogueCompass(userMessage);
-    inputField.value = "";
-}
-
-/**
- * 3. Gemini API 通信（修正版：日付認識の強化）
- */
-async function runDialogueCompass(userMessage) {
-    const apiKey = localStorage.getItem("gemini_api_key"); 
-    if (!apiKey) {
-        finishAiResponse("AI秘書の鍵を開けてください。");
-        return;
-    }
-
-    // --- 1. デバイスの「今日」を取得 ---
-    const now = new Date();
-    // テスト用の固定設定（必要時のみコメントアウト解除）
-    // const now = new Date("2026-04-10T09:00:00"); 
-
-    const y_now = now.getFullYear();
-    const m_now = now.getMonth() + 1;
-    const d_now = now.getDate();
-    const dayOfWeek = ["日","月","火","水","木","金","土"][now.getDay()];
-    
-    // AIに教える「絶対的な今日」
-    const todayFullDate = `${y_now}年${m_now}月${d_now}日(${dayOfWeek})`;
-
-    // --- 2. 「明日」をJavaScript側で計算（AIへのヒント用） ---
-    const tomorrow = new Date(y_now, m_now - 1, d_now + 1);
-    const y_tomorrow = tomorrow.getFullYear();
-    const m_tomorrow = tomorrow.getMonth() + 1;
-    const d_tomorrow = tomorrow.getDate();
-
-const systemPrompt = `あなたは博識で有能な秘書です。
-現在の基準日時は ${todayFullDate} です。
-
-【役割分担の徹底】
-1. 歴史、科学、雑学などの「一般的な知識」を問われた場合は、その場ですぐに詳しく知的に回答してください。
-2. 予定の入力・保存・メモに関してはJSONで返せ。
-3. 予定の「確認（今日の予定は？等）」や「内容の問い合わせ」をされたら、
-   絶対に自分で内容を答えず、必ず以下の通りに回答してください。
-   「予定の確認は、カレンダーの日付セルをタップすることで対応できます。そちらを確認してみてください。」
-4. 「満月」「新月」「月相」「六曜」「二十四節気」「祝日」について聞かれたら、
-   絶対に自分で日付や名前を答えず、必ず以下の通りに回答してください。
-   「その情報は、『今日のカード』で対応できます。ぜひそちらを確認してみてください。」
-
-【重要】現在の基準日時は ${todayFullDate} です。
-ユーザーの問いが「予定の入力・保存・メモ」に関する内容である場合、必ず以下のJSON形式のみを返してください。
-{"type": "schedule", "year": "YYYY", "month": "MM", "day": "DD", "text": "内容"}
-
-【予定解析ルール】
-1. 「今日」は ${todayFullDate} です。
-2. 「明日」は ${y_tomorrow}年${m_tomorrow}月${d_tomorrow}日 です。
-3. ユーザーが「今日の予定」と言った場合：
-   - 「今日の予定は？（確認）」なら、セルタップを案内。
-   - 「今日の予定にテストと入れて（入力）」なら、JSONを生成。
-4. 年の指定がない日付は、原則として ${y_now}年 とせよ。
-5. JSONまたは指定の案内文を出す場合を除き、能書きや挨拶は不要。知的で簡潔な回答を徹底してください。`;
-
-
-    try {
-        const modelName = "gemini-3-flash-preview"; 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: systemPrompt + "\n問い: " + userMessage }] }] })
-        });
-
-        const data = await response.json();
-        if (data.candidates && data.candidates[0].content) {
-            let aiResponse = data.candidates[0].content.parts[0].text.trim();
-            
-            if (aiResponse.includes('"type": "schedule"')) {
-                try {
-                    const jsonStr = aiResponse.replace(/```json|```/g, "").trim();
-                    const s = JSON.parse(jsonStr);
-                    
-                    const dateInput = document.getElementById('scheduleDate');
-                    const scheduleInput = document.getElementById('scheduleInput');
-                    
-                    if (dateInput && scheduleInput) {
-                        // 日付をセット
-                        const targetDate = `${s.year}-${s.month.padStart(2,'0')}-${s.day.padStart(2,'0')}`;
-                        dateInput.value = targetDate;
-
-                        // テキストボックスに「MM/DD 内容」をセット
-                        scheduleInput.value = `${s.month.padStart(2,'0')}/${s.day.padStart(2,'0')} ${s.text}`;
-
-                        // finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押して、次の場面ではいいえ。`);
-
-                        finishAiResponse(`${s.year}年${s.month}月${s.day}日 の予定を準備しました。必ず保存ボタンを押してください。`);
-                        scheduleInput.focus();
-                    }
-                } catch (e) {
-                    finishAiResponse(aiResponse.replace(/[*#]/g, ''));
-                }
-            } else {
-                finishAiResponse(aiResponse.replace(/[*#]/g, ''));
-            }
-        }
-    } catch (error) {
-        finishAiResponse("通信に失敗しました。");
-    }
-}
-
-
-/**
- * 4. 予定解析（無効化維持）
- */
-function parseScheduleText(text) {
-    return null;
-}
-
-/**
- * 5. 応答出力
- */
-function finishAiResponse(msg) {
-    const resArea = document.getElementById('ai-chat-history');
-    if (resArea) {
-        resArea.style.display = 'block';
-        resArea.innerText = msg;
-    }
-    if (typeof nativeSpeak === 'function') nativeSpeak(msg);
-    else if (typeof speakText === 'function') speakText(msg);
-}
-
-/**
- * 6. 音声入力開始処理
- */
-function startAiVoiceInput() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        finishAiResponse("お使いのブラウザは音声入力に対応していません。");
-        return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'ja-JP';
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-        const historyArea = document.getElementById('ai-chat-history');
-        if (historyArea) {
-            historyArea.style.display = 'block';
-            historyArea.innerText = "聞き取り中...";
-        }
-    };
-
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        const inputField = document.getElementById("ai-user-input");
-        if (inputField) {
-            inputField.value = transcript;
-            handleAiChat();
-        }
-    };
-
-    recognition.onerror = () => {
-        finishAiResponse("マイクの使用が許可されていないか、エラーが発生しました。");
-    };
-
-    recognition.start();
-}
-
-/**
- * 4. 予定解析（使用しないため null を返す形に無効化）
- */
-function parseScheduleText(text) {
-    return null;
-}
-
-/**
- * 5. 応答出力
- */
-function finishAiResponse(msg) {
-    const resArea = document.getElementById('ai-chat-history');
-    if (resArea) resArea.innerText = msg;
-    if (typeof nativeSpeak === 'function') nativeSpeak(msg);
-    else if (typeof speakText === 'function') speakText(msg);
-}
-
-/**
- * 6. 音声入力開始処理
- */
-function startAiVoiceInput() {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        finishAiResponse("お使いのブラウザは音声入力に対応していません。");
-        return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'ja-JP';
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-        const historyArea = document.getElementById('ai-chat-history');
-        if (historyArea) {
-            historyArea.style.display = 'block';
-            historyArea.innerText = "聞き取り中...";
-        }
-    };
-
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        const inputField = document.getElementById("ai-user-input");
-        if (inputField) {
-            inputField.value = transcript;
-            handleAiChat();
-        }
-    };
-
-    recognition.onerror = () => {
-        finishAiResponse("マイクの使用が許可されていないか、エラーが発生しました。");
-    };
-
-    recognition.start();
-}
-
-</script>
-
-  <script>
-    const tokyo = { name: "東京", tz: "Asia/Tokyo" };
-    const cities = [tokyo];
-
-    const grid = document.getElementById("clockGrid");
-    const cards = cities.map(city => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      const info = document.createElement("div");
-      info.className = "info";
-
-      const cityEl = document.createElement("div");
-      cityEl.className = "city";
-      cityEl.textContent = city.name;
-
-      const dateEl = document.createElement("div");
-      dateEl.className = "date";
-
-      const warekiEl = document.createElement("div");
-      warekiEl.className = "wareki";
-
-      const timeEl = document.createElement("div");
-      timeEl.className = "time";
-
-      const diffEl = document.createElement("div");
-      diffEl.className = "diff";
-
-      info.append(cityEl, dateEl, warekiEl, timeEl, diffEl);
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 120;
-      canvas.height = 120;
-
-      card.append(info, canvas);
-      grid.appendChild(card);
-
-      return { city, card, dateEl, warekiEl, timeEl, diffEl, canvas };
-    });
-
-    function updateClocks() {
-      const now = new Date();
-      const tokyoDate = new Date(now.toLocaleString("en-US", { timeZone: tokyo.tz }));
-
-      cards.forEach(({ city, card, dateEl, warekiEl, timeEl, diffEl, canvas }) => {
-        const dateStr = new Intl.DateTimeFormat("ja-JP", {
-          timeZone: city.tz, year: "numeric", month: "2-digit", day: "2-digit", weekday: "short"
-        }).format(now);
-
-        const timeStr = new Intl.DateTimeFormat("ja-JP", {
-          timeZone: city.tz, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false
-        }).format(now);
-
-        const warekiStr = new Intl.DateTimeFormat("ja-JP-u-ca-japanese", {
-          timeZone: city.tz, era: "long", year: "numeric"
-        }).format(now);
-
-        dateEl.textContent = dateStr;
-        timeEl.textContent = timeStr;
-        warekiEl.textContent = warekiStr;
-
-        const cityDate = new Date(now.toLocaleString("en-US", { timeZone: city.tz }));
-        const diffHours = (cityDate - tokyoDate) / (1000 * 60 * 60);
-
-        let diffText;
-        if (city.name === "東京") {
-          diffText = "基準 (UTC+9)";
-        } else if (diffHours < 0) {
-          diffText = `東京より ${Math.abs(diffHours).toFixed(2).replace(/\.00$/, '')}時間 遅れている`;
-        } else if (diffHours > 0) {
-          diffText = `東京より ${diffHours.toFixed(2).replace(/\.00$/, '')}時間 進んでいる`;
-        } else {
-          diffText = "東京と時差なし";
-        }
-        diffEl.textContent = diffText;
-
-        const hour = cityDate.getHours();
-        const isDay = (hour >= 6 && hour < 18);
-        if (isDay) {
-          card.classList.add("day");
-          card.classList.remove("night");
-        } else {
-          card.classList.add("night");
-          card.classList.remove("day");
-        }
-
-        // アナログ時計描画
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        const radius = canvas.width / 2;
-        ctx.save();
-        ctx.translate(radius, radius);
-
-        // 枠線（常に黒）
-        ctx.beginPath();
-        ctx.arc(0, 0, radius - 2, 0, 2 * Math.PI);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "black";
-        ctx.stroke();
-
-        const hours = cityDate.getHours();
-        const minutes = cityDate.getMinutes();
-        const seconds = cityDate.getSeconds();
-
-        // 時針（常に黒）
-        ctx.save();
-        ctx.rotate((hours % 12 + minutes / 60) * 30 * Math.PI / 180);
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, -radius * 0.5);
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "black";
-        ctx.stroke();
-        ctx.restore();
-
-        // 分針（常に黒）
-        ctx.save();
-        ctx.rotate((minutes + seconds / 60) * 6 * Math.PI / 180);
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, -radius * 0.7);
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = "black";
-        ctx.stroke();
-        ctx.restore();
-
-        // 秒針（常に赤）
-        ctx.save();
-        ctx.rotate(seconds * 6 * Math.PI / 180);
-        ctx.strokeStyle = "red";
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, -radius * 0.8);
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.restore();
-
-        ctx.restore();
-
-      });
-    }
-
-    updateClocks();
-    setInterval(updateClocks, 1000);
-  </script>
-  
-    <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 26.9 / Updated: 2026-09-03
-    </p>
-    <div style="height: 50px;"></div>
-
+	</script>
+	
+    <footer>
+	© 20251021 ettomio
+	</footer>
+	<div style="height: 80px;"></div>
+	
 </body>
 </html>
