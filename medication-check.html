@@ -257,6 +257,14 @@ function speakText(text) {
     }
 }
 
+function nativeSpeak(text) {
+   if (typeof Android !== 'undefined' && Android.speak) {
+       Android.speak(text);
+   } else {
+       speakText(text);
+   }
+}
+
 function changeMonth(direction) {
     viewingMonth += direction;
     if (viewingMonth > 11) {
