@@ -249,20 +249,14 @@ function init() {
     checkTodayMedicationStatus();
 }
 
-function speakText(text) {
-    if ('speechSynthesis' in window) {
+function nativeSpeak(text) {
+    if (typeof Android !== 'undefined' && Android.speak) {
+        Android.speak(text);
+    } else if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'ja-JP';
         window.speechSynthesis.speak(utterance);
     }
-}
-
-function nativeSpeak(text) {
-   if (typeof Android !== 'undefined' && Android.speak) {
-       Android.speak(text);
-   } else {
-       speakText(text);
-   }
 }
 
 function changeMonth(direction) {
@@ -366,16 +360,16 @@ function checkTodayMedicationStatus() {
         if (currentMode === 1) {
             if (status === true || status.single) {
                 const msg = "今日はお薬は飲んでおられます。";
-                speakText(msg); // ★同時発話
+                nativeSpeak(msg);
                 alert(msg);
             } else {
                 const msg = "今日はお薬はまだ飲んでおられません。今から飲まれますか？";
-                speakText(msg); // ★同時発話
+                nativeSpeak(msg);
                 if (confirm(msg)) {
                     savedStatus[todayStr] = { single: true };
                     localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
                     renderCalendar();
-                    speakText("お薬手帳の記録を更新しました。");
+                    nativeSpeak("お薬手帳の記録を更新しました。");
                 }
             }
         } else if (currentMode === 2) {
@@ -384,17 +378,17 @@ function checkTodayMedicationStatus() {
 
             if (!status[targetKey]) {
                 const msg = `本日の${targetName}のお薬はまだ飲んでおられません。今から飲まれますか？`;
-                speakText(msg); // ★同時発話
+                nativeSpeak(msg);
                 if (confirm(msg)) {
                     if (typeof status !== 'object') savedStatus[todayStr] = {};
                     savedStatus[todayStr][targetKey] = true;
                     localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
                     renderCalendar();
-                    speakText(`${targetName}のお薬を記録しました。`);
+                    nativeSpeak(`${targetName}のお薬を記録しました。`);
                 }
             } else {
                 const msg = `本日の${targetName}のお薬はすでに飲んでおられます。`;
-                speakText(msg); // ★同時発話
+                nativeSpeak(msg);
                 alert(msg);
             }
         } else if (currentMode === 3) {
@@ -410,17 +404,17 @@ function checkTodayMedicationStatus() {
 
             if (!status[targetKey]) {
                 const msg = `本日の${targetName}お薬はまだ飲んでおられません。今から飲まれますか？`;
-                speakText(msg); // ★同時発話
+                nativeSpeak(msg);
                 if (confirm(msg)) {
                     if (typeof status !== 'object') savedStatus[todayStr] = {};
                     savedStatus[todayStr][targetKey] = true;
                     localStorage.setItem(STORAGE_KEY_STATUS, JSON.stringify(savedStatus));
                     renderCalendar();
-                    speakText(`${targetName}お薬を記録しました。`);
+                    nativeSpeak(`${targetName}お薬を記録しました。`);
                 }
             } else {
                 const msg = `本日の${targetName}お薬はすでに飲んでおられます。`;
-                speakText(msg); // ★同時発話
+                nativeSpeak(msg);
                 alert(msg);
             }
         }
