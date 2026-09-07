@@ -121,7 +121,8 @@
         
 	    /* 戻るボタン（右上）を統一デザインに変更 5/5 */
 	    .top-right-button {
-	      position: absolute;
+  		  /* position: static;   /* ← absolute をやめる */
+  		  position: fixed;
 	      top: 8px;
 	      right: 10px;
 	      background-color: #ccffff;
@@ -788,7 +789,7 @@
   </script>
       
   <footer>
-    © 20260108 ettomio
+    © 20260908 ettomio
   </footer>
         
 	  <!-- HTML末尾にこれを追加 5/5 -->
