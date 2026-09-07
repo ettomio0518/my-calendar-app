@@ -14,6 +14,58 @@
 		    background-color: #ffffc4;
 		}
 
+		.app {
+		  width: 100%;
+		  max-width: 500px;
+		  margin: 0 auto;          /* ← ここで中央寄せ */
+		  padding: 16px;
+		  box-sizing: border-box;
+		}
+		
+/* ===============================
+   ヘッダー
+   =============================== */
+.wf-header {
+    background: #8080ff;
+    padding: 15px 20px;
+    position: relative;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.wf-title {
+    margin: 0;
+    padding-left: 10px; /* ← 和風の余白 */
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: 2px;
+}
+
+.wf-back-button {
+    /*position: absolute; */
+    position: fixed;
+    right: 15px;
+    top: 12px;
+    padding: 4px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 20px;
+    background-color: #ccffff;
+    color: black;
+	border: 1px solid black; /* 枠線を表示 */	          
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.wf-back-button:hover {
+    background: #fff;
+}
+
+
+	  #lockMark {
+	    font-size: 16px;
+	  }
+	
+		
 		.container {
 		    display: flex;
 		    flex-direction: column;
@@ -30,13 +82,7 @@
             margin: 7px;
             background-color: #ffffc4;
         }
-		header {
-		  background: #55aaaa;
-		  color: white;
-		  padding: 1em 0; /* 上下の余白をもう少しだけ調整 */
-		  text-align: center;
-		  position: relative;
-		}
+
 		h1 {
 		  font-size: 20px;
 		  margin: 0;
@@ -132,25 +178,23 @@
 		    margin-top: 20px;
 		}
 
-	    /* Topボタン：最初は非表示にしておき、スクロールで表示 5/5 */
-	    .top-button {
-	      position: fixed;
-	      bottom: 20px;
-	      left: 50%;
-	      transform: translateX(-50%);
-	      background: #007bff;
-	      color: white;
-	      border: none;
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+  		  /* position: static;   /* ← absolute をやめる */
+  		  position: fixed;
+	      top: 10px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
 	      border-radius: 20px;
-	      padding: 10px 20px;
-	      font-size: 16px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
 	      cursor: pointer;
-	      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-	      z-index: 9999;
-	      display: none; /* 最初は非表示 */
 	    }
-	    .top-button:hover {
-	      background: #0056b3;
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
 	    }
 
 		/* 11/4 Top/Bottomボタン */
@@ -175,9 +219,9 @@
 		}    
 
 	    /* 戻るボタン 5/6 */
-	    .top-right-button {
+	    /* .top-right-button {
           width: auto; /* ボタンの幅を自動調整 */
-	      position: absolute;
+	     /*  position: absolute;
 	      top: 3px;
 	      right: 10px;
 	      background-color: #ccffff;
@@ -186,11 +230,11 @@
 	      padding: 6px 12px;
 	      font-size: 14px;
     	  border: 1px solid black; /* 枠線を表示 */	      
-	      cursor: pointer;
+	       /*cursor: pointer;
 	    }
 	    .top-right-button:hover {
 	      background-color: #f4f4f4;
-	    }
+	    } */
 	    
 		/* 以降1/14追加 */
 		.category-with-image {
@@ -227,12 +271,12 @@
 </head>
 
 <body>
+  <div class="app">
+<header class="wf-header">
+    <h1 class="wf-title">⭐  ブックマーク</h1>
+    <button class="wf-back-button" onclick="location.href='index.html'">戻る</button>
+</header>
 
-  	<header>
-    <!-- Homeに戻るボタン 5/6 -->
-	    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
-	    <h1>⭐  ブックマーク</h1>
-  	</header>
 
     <div class="container">
         <p>サイト名とアドレスを入力してください。</p>
@@ -475,11 +519,12 @@ function displayBookmarkList() {
   </script>
 
   <footer>
-    © 20260114 ettomio
+    © 20260908 ettomio
   </footer>
 
 	<!-- HTML末尾にこれを追加 5/5 -->
 	<div style="height: 50px;"></div>
+	</div>
 	
 </body>
 </html>
