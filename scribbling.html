@@ -174,25 +174,24 @@
 	      color: #b87272;                
 	    }	
 	    
-    /* 戻るボタン 5/6 */
-    .top-right-button {
-	  position: static;   /* ← flex に任せる */   
-	  /*position: fixed;   */   
-      width: auto; /* ボタンの幅を自動調整 */
-	  position: static;           /* ← absolute をやめる */
-      top: 15px;
-      right: 10px;
-      background-color: #e1ffff;
-      color: #400040;
-	  border: 1px solid #ff8000; /* 枠線を表示 */		      
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .top-right-button:hover {
-      background-color: #e3e3f0;
-    }
+	    /* 戻るボタン 5/6 */
+	    .top-right-button {
+          width: auto; /* ボタンの幅を自動調整 */
+  		  /* position: static;   /* ← absolute をやめる */
+  		  position: fixed;
+	      top: 10px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
 
 	.calc-btn-wrapper {
 	  text-align: right;
@@ -921,7 +920,7 @@
   </script>
   
   <footer>
-  © 20260904 ettomio - 舞いカレンダー
+  © 20260908 ettomio - 舞いカレンダー
   </footer>
   <div style="height: 50px;"></div>
   
