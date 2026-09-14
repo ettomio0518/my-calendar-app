@@ -30,7 +30,7 @@
             font-family: Arial, sans-serif; /* フォント設定 */
             text-align: center; /* テキスト中央揃え */
             position: relative; /* 位置を相対的に設定 */
-            background-color: #e0e0ef;  /* 背景色 */
+            background-color: #f3f3e7;  /* 背景色 */
         }
 
 		.container {
@@ -2553,7 +2553,7 @@ document.getElementById("btnSearch7").onclick = () => {
     function applyPremiumVersion() { toggleLimit(false, false); toggleVisibility(true, false); toggleBackgroundColor(true, true); }
     
     function toggleBackgroundColor(isP, alert = true) {
-        const c = isP ? "#e0e0ef" : "#e3ffe3";
+        const c = isP ? "#f3f3e7" : "#e3ffe3";
         document.body.style.backgroundColor = c;
         saveState("backgroundColor", c);
         if (isP && alert) { showCustomAlert("機能制限は解除されました。"); nativeSpeak("機能制限は解除されました。"); }
