@@ -40,7 +40,7 @@
 		  border: 1px solid #ccc;
 		  border-radius: 10px;
 		  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-		  background-color: #e7e7e7; /* 背景色 */
+		  background-color: #cae4ff; /* 背景色 */
 		  box-sizing: border-box;
 		}
 
@@ -78,7 +78,7 @@
 		    text-align: center;
 		} */
 
-        h1 { font-size: 19px; color: #595959; }
+        h1 { font-size: 19px; color: #800040; }
         h2 { font-size: 16px; }
         h3 { 
         	font-size: 17px; 
@@ -380,10 +380,8 @@
 		    align-items: center;
 		    justify-content: center;
 		    gap: 10px;
-		}
-		.logo-title img {
-		    height: 64px;
-		    width: auto;
+		    background-color: #8080c0; 
+		    color: white;  		    
 		}
 
 		/* 1秒ごとに点滅する現在時刻
@@ -816,7 +814,7 @@
 		/* 全部のリンクに効かせるのではなく、特定のクラスだけ 12/4 */
 		.header-link {
 		  text-decoration: none;
-		  color: inherit;
+		  color: #ffffff;
 		}
 
 		.current-date {
@@ -993,9 +991,14 @@ let calendarMode = 'output'; // 'output' または 'input'
 </head>	
 		
 <body>
+	<button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+	<header>
+	  <div class="logo-title">
+	    <img src="image64.png" alt="サンプル画像">
+	    <h4><a href="weather.html" class="header-link">stealth index</a></h4>
+	  </div>
+	</header>
 
-	<img src="image64.png" alt="サンプル画像">
-    <button class="top-right-button" onclick="location.href='index.html'">戻る</button>
 
     <div class="calendar-header">
         <button onclick="changeMonth(-1)">◁</button>
