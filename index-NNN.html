@@ -2363,9 +2363,47 @@ document.getElementById("btnSearch7").onclick = () => {
 
 		</div>
 
+    <!-- 簡易版グーグルカレンダーを開くボタンの下などに配置するボタン -->
+    <div>
+        <button id="syncDriveBtn" style="margin: 10px 0; padding: 10px 16px; font-size: 16px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Googleドライブから同期</button>
+    </div>
+
+
 </div>
 </div>
-	
+
+    <script>
+    document.getElementById('syncDriveBtn').addEventListener('click', async () => {
+        // Googleドライブのダウンロード用URL
+	const jsonUrl = 'https://script.google.com/macros/s/AKfycbzphaulkfvre0Xanhe5Q24MCCvFK8e8tdMYuEtgFEOus0sN8kKzf_YdhPogW8cJ3OLA/exec';
+
+        if (!jsonUrl) {
+            alert('URLが設定されていません。');
+            return;
+        }
+
+        try {
+            console.log('データを取得中...');
+            const response = await fetch(jsonUrl);
+            if (!response.ok) throw new Error('データの取得に失敗しました');
+            
+            const data = await response.json();
+            console.log('取得したデータ:', data);
+
+            // 取得したJSONデータをブラウザの localStorage に書き込み
+            for (const [key, value] of Object.entries(data)) {
+                localStorage.setItem(key, value);
+            }
+
+            alert('Googleドライブからデータを正常に取り込みました！\nF12キーの「Application」タブ（ローカルストレージ）でデータが入ったか確認できます。');
+            
+        } catch (error) {
+            console.error(error);
+            alert('同期エラー: ' + error.message);
+        }
+    });
+    </script>
+    	
 		<script>
 
 		document.addEventListener('DOMContentLoaded', () => {
@@ -3249,9 +3287,10 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 27.3 / Updated: 2026-09-14
+        © 2025 ettomio. All rights reserved. Version 27.4 / Updated: 2026-09-14
     </p>
     <div style="height: 50px;"></div>
 
 </body>
 </html>
+
