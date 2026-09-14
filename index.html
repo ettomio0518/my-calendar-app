@@ -30,7 +30,7 @@
             font-family: Arial, sans-serif; /* フォント設定 */
             text-align: center; /* テキスト中央揃え */
             position: relative; /* 位置を相対的に設定 */
-            background-color: #ffffcc; /* 背景色 */
+            background-color: #f3f3e7; /* 背景色 */
         }
 		/* 星屑ノイズ（控えめ・高貴寄り）12/23 */
 		body::after {
@@ -94,7 +94,7 @@
 		}
 
 		header {
-		    background: #ffdcb9;
+		    background: #ffdfbf;
 		    color: #595959;
 		    padding: 0.1em;
 		    text-align: center;
@@ -279,6 +279,14 @@
 		    border-radius: 5px;		    	    
 		}
 		
+		#shopping-button {
+		    font-size: 16px; /* フォントサイズを大きく */
+		    padding: 3px 10px; /* ボタン全体の大きさを調整 */
+		    color: blue;
+		    background-color:  #efefe0; /* 背景色も変更可能 */
+		    border-radius: 5px;		    	    
+		}
+				
 		/* 「現在地の天気予報」ボタンだけスタイルを変更 12/22 */
 		#weather-button {
 		    font-size: 16px; /* フォントサイズを大きく */
@@ -341,8 +349,8 @@
             font-size: 18px;
         }
         th {
-            background-color: #f4f4f4;
-		    color: #595959;             
+            background-color: #a7a7a7;
+		    color: #ffffff;             
         }
         .today {
             font-weight: bold;
@@ -2277,7 +2285,7 @@ document.getElementById("btnSearch7").onclick = () => {
 		  </div>
 		  <br>
 
-		  <button class="diary-button" onclick="location.href='shopping.html'">お買い物電卓</button>
+		  <button id="shopping-button"  onclick="location.href='shopping.html'">お買い物電卓</button>
 		  <button class="clock-button" onclick="location.href='newworldtime.html'">世界の時刻</button>
 
 		  <button id="note-button2" onclick="location.href='notepad.html'">ノート</button>
@@ -2612,7 +2620,7 @@ document.getElementById("btnSearch7").onclick = () => {
     function applyPremiumVersion() { toggleLimit(false, false); toggleVisibility(true, false); toggleBackgroundColor(true, true); }
     
     function toggleBackgroundColor(isP, alert = true) {
-        const c = isP ? "#ffffcc" : "#e3ffe3";
+        const c = isP ? "#f3f3e7" : "#e3ffe3";
         document.body.style.backgroundColor = c;
         saveState("backgroundColor", c);
         if (isP && alert) { showCustomAlert("機能制限は解除されました。"); nativeSpeak("機能制限は解除されました。"); }
@@ -3305,7 +3313,7 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 27.2 / Updated: 2026-09-08
+        © 2025 ettomio. All rights reserved. Version 27.3 / Updated: 2026-09-14
     </p>
     <div style="height: 50px;"></div>
 
