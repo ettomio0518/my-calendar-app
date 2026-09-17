@@ -85,22 +85,23 @@
       color: #666;
     }
 
-    /* 戻るボタン（右上）を統一デザインに変更 */
-    .top-right-button {
-      position: absolute;
-      top: 2px;
-      right: 10px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .top-right-button:hover {
-      background-color: #0056b3;
-    }
+	    /* 戻るボタン（右上）を統一デザインに変更 5/5 */
+	    .top-right-button {
+  		  /* position: static;   /* ← absolute をやめる */
+  		  position: fixed;
+	      top: 8px;
+	      right: 10px;
+	      background-color: #ccffff;
+	      color: black;
+	      border-radius: 20px;
+	      padding: 6px 12px;
+	      font-size: 14px;
+    	  border: 1px solid black; /* 枠線を表示 */	      
+	      cursor: pointer;
+	    }
+	    .top-right-button:hover {
+	      background-color: #f4f4f4;
+	    }
 
 	/* 11/4 Top/Bottomボタン */
 	.bottom-button, .top-button {
@@ -487,4 +488,3 @@ Topページでは、AIの協力で予定入力も可能。Topページをはじ
 
 </body>
 </html>
-
