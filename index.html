@@ -2161,25 +2161,36 @@ function toggleCalendarMode() {
     }
 
 
-	// --- ローカルストレージに基づいて日付に色を適用（シフト判定および「重要」の分割表示対応） --- 2026/9/17
+    // --- ローカルストレージに基づいて日付に色を適用
+    // （シフト判定および「重要」の分割表示対応） --- 2026/9/17
     function applyScheduleColorsToCalendar() {
-        // カレンダーの全セルを初期状態（クラスと背景色をリセットし、日付の数字のみに戻す）に初期化
+        // カレンダーの全セルを初期状態
+        // （クラスと背景色をリセットし、日付の数字のみに戻す）
         document.querySelectorAll('#calendar-body td').forEach(c => {
-            c.classList.remove('has-schedule', 'has-schedule-hayade', 'has-schedule-holiday');
+            c.classList.remove(
+                'has-schedule',
+                'has-schedule-hayade',
+                'has-schedule-holiday'
+            );
             c.style.backgroundColor = '';
             c.innerHTML = c.getAttribute('data-day-number') || c.innerText;
         });
-        
+
         // localStorageから 'ScheduledText' で始まるキーをすべて抽出
-        const keys = Object.keys(localStorage).filter(k => k.startsWith('ScheduledText'));
+        const keys = Object.keys(localStorage).filter(k =>
+            k.startsWith('ScheduledText')
+        );
+
         const dateMap = new Map();
 
-        // 抽出したキーを解析し、日付ごとのスケジュール種別と「重要」の有無を判定
+        // 抽出したキーを解析し、
+        // 日付ごとのスケジュール種別と「重要」の有無を判定
         keys.forEach(k => {
             const m = k.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
+
             if (m) {
                 const year = parseInt(m[1], 10);
-                const month = parseInt(m[2], 10) - 1; // 月は0始まり（0=1月）
+                const month = parseInt(m[2], 10) - 1; // 月は0始まり
                 const day = parseInt(m[3], 10);
 
                 // 現在表示中の年月に一致するデータのみを対象とする
@@ -2187,13 +2198,21 @@ function toggleCalendarMode() {
                     const dateStr = `${m[1]}-${m[2]}-${m[3]}`;
                     const text = localStorage.getItem(k) || "";
 
-                    let info = dateMap.get(dateStr) || { type: 'normal', hasImportant: false };
-                    
+                    let info = dateMap.get(dateStr) || {
+                        type: 'normal',
+                        hasImportant: false
+                    };
+
                     // シフトや休日の判定ロジック
                     if (text.includes('休日') || text.includes('有給')) {
                         info.type = 'holiday';
-                    } else if (text.includes('早出') && info.type !== 'holiday') {
+
+                    } else if (
+                        text.includes('早出') &&
+                        info.type !== 'holiday'
+                    ) {
                         info.type = 'hayade';
+
                     } else if (!dateMap.has(dateStr)) {
                         info.type = 'normal';
                     }
@@ -2208,39 +2227,62 @@ function toggleCalendarMode() {
             }
         });
 
-        // 判定結果をもとに、該当する日付のセルにクラスとHTML構造を適用
+        // 判定結果をもとに、
+        // 該当する日付のセルにクラスとHTML構造を適用
         dateMap.forEach((info, d) => {
             const cell = document.getElementById(`day-${d}`);
+
             if (cell) {
-                const dayNum = cell.getAttribute('data-day-number') || cell.innerText.trim();
+                const dayNum =
+                    cell.getAttribute('data-day-number') ||
+                    cell.innerText.trim();
+
                 if (!cell.getAttribute('data-day-number')) {
                     cell.setAttribute('data-day-number', dayNum);
                 }
 
                 let baseClass = '';
+
                 if (info.type === 'holiday') {
                     baseClass = 'has-schedule-holiday';
+
                 } else if (info.type === 'hayade') {
                     baseClass = 'has-schedule-hayade';
+
                 } else {
                     baseClass = 'has-schedule';
                 }
 
-                // 「重要」が含まれる場合は上下分割コンテナを生成し、下半分にピンク色を適用
+                // 「重要」が含まれる場合は上下分割コンテナを生成し、
+                // 下半分にピンク色を適用
                 if (info.hasImportant) {
-                    cell.className = baseClass;
+
+                    // ★ 修正：todayクラスを消さないようにclassNameではなくclassList.addを使用
+                    cell.classList.add(baseClass);
+
                     cell.innerHTML = `
                         <div class="cell-container">
                             <div class="cell-upper">${dayNum}</div>
-                            <div class="cell-lower has-important-lower" style="background-color: #ffc0cb !important;"></div>
+                            <div class="cell-lower has-important-lower"
+                                 style="background-color: #ffc0cb !important;">
+                            </div>
                         </div>
                     `;
+
                 } else {
+
                     // 通常時は日付をセル全体に中央配置
-                    cell.className = baseClass;
+                    // ★ 修正：todayクラスを消さないようにclassNameではなくclassList.addを使用
+                    cell.classList.add(baseClass);
+
                     cell.innerHTML = `
                         <div class="cell-container">
-                            <div class="cell-upper" style="flex: 2; height: 100%; display: flex; align-items: center; justify-content: center;">${dayNum}</div>
+                            <div class="cell-upper"
+                                 style="flex: 2; height: 100%; display: flex;
+                                        align-items: center;
+                                        justify-content: center;">
+                                ${dayNum}
+                            </div>
                         </div>
                     `;
                 }
@@ -3443,10 +3485,9 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 27.6 / Updated: 2026-09-17
+        © 2025 ettomio. All rights reserved. Version 27.7 / Updated: 2026-09-18
     </p>
     <div style="height: 50px;"></div>
 
 </body>
 </html>
-
