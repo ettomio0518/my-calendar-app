@@ -340,18 +340,67 @@
             border-collapse: collapse;
             margin-top: 10px;
         }
+        
+        
+		/* 
+         * カレンダーのセル（td）およびヘッダー（th）の基本設定
+         * width: 14% で1週間（7日分）の幅を均等割りにしています
+         * padding: 0 !important と position: relative により、内部の上下分割コンテナ（cell-container）の基準位置を作ります
+         */
         th, td {
             width: 14%;
-            /* 縦方向の圧縮を反映 */
-            padding: 6px 0;
+            padding: 0 !important;
             border: 1px solid #ddd;
             text-align: center;
             font-size: 18px;
+            position: relative;
+            vertical-align: middle;
+            height: 48px;
         }
+
+        /* 曜日ヘッダーの背景色と高さの設定 */
         th {
             background-color: #e2e2c2;
-		    color: #797979;             
+            color: #797979;
+            height: 35px;
         }
+
+        /* 
+         * セル全体を上下に分割するためのコンテナ
+         * セル内いっぱいに広げ、Flexboxを使って縦方向（column）に並べます
+         */
+        .cell-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        /* 上半分：日付の数字を配置するエリア */
+        .cell-upper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 下半分：通常時の空エリア（または将来の拡張用） */
+        .cell-lower {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 「重要」スケジュールがある際、下半分に適用するピンク色のアクセント */
+        .has-important-lower {
+            background-color: #ffc0cb !important;
+        }
+        
+        
         .today {
             font-weight: bold;
             animation: blink 1s step-start 0s infinite;
@@ -1935,7 +1984,6 @@ function toggleCalendarMode() {
     }
 
 	// スケジュール保存関数 
-// スケジュール保存関数 
     async function saveSchedule() { 
         const voiceInputButton = document.getElementById("voiceInputButton");
         const voiceInputButton2 = document.getElementById("voiceInputButton2");
@@ -2112,49 +2160,94 @@ function toggleCalendarMode() {
         showCustomAlert(fullText); nativeSpeak(fullText);
     }
 
-	// --- 既存コードを置換: ローカルストレージに基づいて日付に色を適用（シフト判定付き） ---
+
+	// --- ローカルストレージに基づいて日付に色を適用（シフト判定および「重要」の分割表示対応） ---
     function applyScheduleColorsToCalendar() {
+        // カレンダーの全セルを初期状態（クラスと背景色をリセットし、日付の数字のみに戻す）に初期化
         document.querySelectorAll('#calendar-body td').forEach(c => {
             c.classList.remove('has-schedule', 'has-schedule-hayade', 'has-schedule-holiday');
+            c.style.backgroundColor = '';
+            c.innerHTML = c.getAttribute('data-day-number') || c.innerText;
         });
         
+        // localStorageから 'ScheduledText' で始まるキーをすべて抽出
         const keys = Object.keys(localStorage).filter(k => k.startsWith('ScheduledText'));
-        
-        // 日付ごとの判定用マップ（例: '2026-09-21': 'hayade' 等）
-        const dateTypeMap = new Map();
+        const dateMap = new Map();
 
+        // 抽出したキーを解析し、日付ごとのスケジュール種別と「重要」の有無を判定
         keys.forEach(k => {
             const m = k.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
             if (m) {
-                const dateStr = `${m[1]}-${m[2]}-${m[3]}`;
-                const text = localStorage.getItem(k) || "";
+                const year = parseInt(m[1], 10);
+                const month = parseInt(m[2], 10) - 1; // 月は0始まり（0=1月）
+                const day = parseInt(m[3], 10);
 
-                // 優先順位の判定（既に休日や早出が入っている場合は上書きしないなどの調整が可能ですが、ここではキーワードが含まれるかで判定）
-                let currentType = dateTypeMap.get(dateStr) || 'normal';
-                
-                if (text.includes('休日') || text.includes('有給')) {
-                    dateTypeMap.set(dateStr, 'holiday');
-                } else if (text.includes('早出') && currentType !== 'holiday') {
-                    dateTypeMap.set(dateStr, 'hayade');
-                } else if (!dateTypeMap.has(dateStr)) {
-                    dateTypeMap.set(dateStr, 'normal');
+                // 現在表示中の年月に一致するデータのみを対象とする
+                if (year === currentYear && month === currentMonth) {
+                    const dateStr = `${m[1]}-${m[2]}-${m[3]}`;
+                    const text = localStorage.getItem(k) || "";
+
+                    let info = dateMap.get(dateStr) || { type: 'normal', hasImportant: false };
+                    
+                    // シフトや休日の判定ロジック
+                    if (text.includes('休日') || text.includes('有給')) {
+                        info.type = 'holiday';
+                    } else if (text.includes('早出') && info.type !== 'holiday') {
+                        info.type = 'hayade';
+                    } else if (!dateMap.has(dateStr)) {
+                        info.type = 'normal';
+                    }
+
+                    // 「重要」キーワードが含まれているか判定
+                    if (text.includes('重要')) {
+                        info.hasImportant = true;
+                    }
+
+                    dateMap.set(dateStr, info);
                 }
             }
         });
 
-        dateTypeMap.forEach((type, d) => {
+        // 判定結果をもとに、該当する日付のセルにクラスとHTML構造を適用
+        dateMap.forEach((info, d) => {
             const cell = document.getElementById(`day-${d}`);
             if (cell) {
-                if (type === 'holiday') {
-                    cell.classList.add('has-schedule-holiday');
-                } else if (type === 'hayade') {
-                    cell.classList.add('has-schedule-hayade');
+                const dayNum = cell.getAttribute('data-day-number') || cell.innerText.trim();
+                if (!cell.getAttribute('data-day-number')) {
+                    cell.setAttribute('data-day-number', dayNum);
+                }
+
+                let baseClass = '';
+                if (info.type === 'holiday') {
+                    baseClass = 'has-schedule-holiday';
+                } else if (info.type === 'hayade') {
+                    baseClass = 'has-schedule-hayade';
                 } else {
-                    cell.classList.add('has-schedule');
+                    baseClass = 'has-schedule';
+                }
+
+                // 「重要」が含まれる場合は上下分割コンテナを生成し、下半分にピンク色を適用
+                if (info.hasImportant) {
+                    cell.className = baseClass;
+                    cell.innerHTML = `
+                        <div class="cell-container">
+                            <div class="cell-upper">${dayNum}</div>
+                            <div class="cell-lower has-important-lower" style="background-color: #ffc0cb !important;"></div>
+                        </div>
+                    `;
+                } else {
+                    // 通常時は日付をセル全体に中央配置
+                    cell.className = baseClass;
+                    cell.innerHTML = `
+                        <div class="cell-container">
+                            <div class="cell-upper" style="flex: 2; height: 100%; display: flex; align-items: center; justify-content: center;">${dayNum}</div>
+                        </div>
+                    `;
                 }
             }
         });
     }
+    
     
 // displayScheduleForDate 関数を修正（モードによって処理を分岐）
 function displayScheduleForDate(year, month, day) {
@@ -3350,10 +3443,9 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 27.5 / Updated: 2026-09-17
+        © 2025 ettomio. All rights reserved. Version 27.6 / Updated: 2026-09-17
     </p>
     <div style="height: 50px;"></div>
 
 </body>
 </html>
-
