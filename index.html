@@ -453,9 +453,17 @@
 		    background: #0056b3;
 		}    
 		
-        /* 予定がある日の背景色 6/4 */
+        /* 予定がある日の背景色（デフォルト・通常勤務など） */
         .has-schedule {
-            background-color: #fff59b !important; /* 予定がある日 */
+            background-color: #fff59b !important;
+        }
+        /* 早出勤務の日の背景色（薄い茶色） */
+        .has-schedule-hayade {
+            background-color: #ffe6cc !important;
+        }
+        /* 休日・有給休日の日の背景色（薄い緑色） */
+        .has-schedule-holiday {
+            background-color: #d0ffe8 !important;
         }
 
 		/* 4. 下に来る「日付選択」行の上の余白を消す 12/23 */
@@ -2104,21 +2112,50 @@ function toggleCalendarMode() {
         showCustomAlert(fullText); nativeSpeak(fullText);
     }
 
-	// --- 新しい関数: ローカルストレージに基づいて日付に色を適用 ---
+	// --- 既存コードを置換: ローカルストレージに基づいて日付に色を適用（シフト判定付き） ---
     function applyScheduleColorsToCalendar() {
-        document.querySelectorAll('#calendar-body td').forEach(c => c.classList.remove('has-schedule'));
+        document.querySelectorAll('#calendar-body td').forEach(c => {
+            c.classList.remove('has-schedule', 'has-schedule-hayade', 'has-schedule-holiday');
+        });
+        
         const keys = Object.keys(localStorage).filter(k => k.startsWith('ScheduledText'));
-        const dates = new Set(); 
+        
+        // 日付ごとの判定用マップ（例: '2026-09-21': 'hayade' 等）
+        const dateTypeMap = new Map();
+
         keys.forEach(k => {
             const m = k.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-            if (m) dates.add(`${m[1]}-${m[2]}-${m[3]}`);
+            if (m) {
+                const dateStr = `${m[1]}-${m[2]}-${m[3]}`;
+                const text = localStorage.getItem(k) || "";
+
+                // 優先順位の判定（既に休日や早出が入っている場合は上書きしないなどの調整が可能ですが、ここではキーワードが含まれるかで判定）
+                let currentType = dateTypeMap.get(dateStr) || 'normal';
+                
+                if (text.includes('休日') || text.includes('有給')) {
+                    dateTypeMap.set(dateStr, 'holiday');
+                } else if (text.includes('早出') && currentType !== 'holiday') {
+                    dateTypeMap.set(dateStr, 'hayade');
+                } else if (!dateTypeMap.has(dateStr)) {
+                    dateTypeMap.set(dateStr, 'normal');
+                }
+            }
         });
-        dates.forEach(d => {
+
+        dateTypeMap.forEach((type, d) => {
             const cell = document.getElementById(`day-${d}`);
-            if (cell) cell.classList.add('has-schedule');
+            if (cell) {
+                if (type === 'holiday') {
+                    cell.classList.add('has-schedule-holiday');
+                } else if (type === 'hayade') {
+                    cell.classList.add('has-schedule-hayade');
+                } else {
+                    cell.classList.add('has-schedule');
+                }
+            }
         });
     }
-
+    
 // displayScheduleForDate 関数を修正（モードによって処理を分岐）
 function displayScheduleForDate(year, month, day) {
     const formattedYMD = `${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
@@ -3313,9 +3350,10 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 27.4 / Updated: 2026-09-14
+        © 2025 ettomio. All rights reserved. Version 27.5 / Updated: 2026-09-17
     </p>
     <div style="height: 50px;"></div>
 
 </body>
 </html>
+
