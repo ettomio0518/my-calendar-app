@@ -342,7 +342,7 @@
         }
         
         
-		/* 
+		/* 2026/9/17
          * カレンダーのセル（td）およびヘッダー（th）の基本設定
          * width: 14% で1週間（7日分）の幅を均等割りにしています
          * padding: 0 !important と position: relative により、内部の上下分割コンテナ（cell-container）の基準位置を作ります
@@ -2161,7 +2161,7 @@ function toggleCalendarMode() {
     }
 
 
-	// --- ローカルストレージに基づいて日付に色を適用（シフト判定および「重要」の分割表示対応） ---
+	// --- ローカルストレージに基づいて日付に色を適用（シフト判定および「重要」の分割表示対応） --- 2026/9/17
     function applyScheduleColorsToCalendar() {
         // カレンダーの全セルを初期状態（クラスと背景色をリセットし、日付の数字のみに戻す）に初期化
         document.querySelectorAll('#calendar-body td').forEach(c => {
@@ -3449,3 +3449,4 @@ function startAiVoiceInput() {
 
 </body>
 </html>
+
