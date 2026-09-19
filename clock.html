@@ -50,8 +50,8 @@
 	    */
 	     
         .date {
-            color: #8affff; /* 空色 */        
-            font-size: 1.8em;
+            color: #c0c083;       
+            font-size: 2.8em;
             margin-bottom: 0.1em;
         }
         .weekday {
@@ -67,29 +67,22 @@
 		    padding-bottom: 20px;		    
 		}
         
-		/* 共通ボタンスタイル */
-		button {
-		    font-size: 16px;
-		    padding-top: 3px;	
-		    padding-bottom: 3px;            
-		    margin: 10px 5px;
-		    border-radius: 8px;
-		    border-color: #ffccff;            
-		    background-color: #bfffff;
-		    line-height: 1.2;
-		    width: 100px; /* 少しコンパクトに */
-		    white-space: nowrap; /* 改行させない */
-		    min-width: 100px; /* これ以下にはならない */
-		}
+    button {
+      font-size: 14.5px;
+      margin: 3px;
+      background-color: white;
+      border: 1px solid #444;   /* ← 太さを明示 */
+      border-radius: 5px;
+    }
 		    
 
 		/* 「世界の時刻」ボタン */
 		.worldtime-button {
 		    font-size: 16px;
-		    padding-top: 2px;	
-		    padding-bottom: 2px;	
+		    padding-top: 8px;	
+		    padding-bottom: 8px;	
 		    width: 160px; /* 少し広めに */
-		    background-color: #ffffe1;
+		    background-color: #bbbb7b;
 		    margin-top: 30px;
 		    margin-bottom: 0px;
 		    line-height: 1.2;
@@ -129,9 +122,46 @@
 		    height: 35px;            /* ボタンの高さを指定 */
 		    cursor: pointer;        /* ボタンにカーソルを合わせたときに手のひらアイコン */
     		margin-left: 20px;
-		    background-color: #bfffff;    		
+		    background-color: #c1c1c1;    		
 		}
 
+		.logo-title {
+		    display: flex;
+		    flex-direction: row;
+		    align-items: center;
+		    justify-content: center;
+		    gap: 10px;
+		}
+		.logo-title img {
+		    height: 50px;
+		    width: auto;
+		}
+
+	footer {
+	  text-align: center;
+	  font-size: 15px;
+	  padding: 12px;
+	  color: #dfdfdf; 
+	}
+
+    /* 戻るボタン（右上） */
+    .top-right-button {
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 5px 25px;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 5px 5px;
+    }
+    .top-right-button:hover {
+        background-color: #0056b3;
+    }
+	    			
 	</style>
 
         		      
@@ -148,7 +178,13 @@
     	</style>
         
 		<body>
-		<div class="date" id="current-date"></div>
+    	<button class="top-right-button" onclick="location.href='index.html'">戻る</button>
+
+		
+	    <div class="logo-title">
+	        <img src="image64.png" alt="サンプル画像">
+			<Div class="date" id="current-date"></div>
+	    </div>
 		
 	    <div class="inline-elements">
 	        <div class="weekday" id="current-weekday"></div>
@@ -449,6 +485,7 @@
 		  font-weight: bold;
 		  color: #c0c0c0;
 		}
+		
 		</style>
 
 
@@ -669,9 +706,12 @@
 		<button class="worldtime-button" onclick="location.href='worldtime.html'">🌍&nbsp;世界の時刻</button>
 
 		<br>
-	    <button class="bottom-home-button" onclick="location.href='index.html'">🏠&nbsp;Homeに戻る</button>	    
-    
 
+    
+  <footer>
+    © 20260919 ettomio - 舞いカレンダー
+  </footer>
+  
 </body>
 	
 </html>
