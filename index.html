@@ -95,7 +95,7 @@
 
 		header {
 		    background: #c9c98f;
-		    color: #623131;
+		    color: #6f0000;
 		    padding: 0.1em;
 		    text-align: center;
 		}
@@ -1070,7 +1070,7 @@ let calendarMode = 'output'; // 'output' または 'input'
 	    <h4><a href="clock.html" class="header-link">舞い ♪ カレンダー</a></h4>
 	  </div>
 	</header>
-	
+
 <div id="customDialog" style="display:none;" class="dialog-overlay">
   <div class="dialog-box">
     <h3>どちらに進みますか？</h3>
@@ -1562,32 +1562,26 @@ let calendarMode = 'output'; // 'output' または 'input'
 		// 以下に他のデータを追加してください...
         ];
         
-		let currentYear = new Date().getFullYear();
+        let currentYear = new Date().getFullYear();
         let currentMonth = new Date().getMonth();
+        const today = new Date();
+        const todayYear = today.getFullYear();
+        const todayMonth = today.getMonth();
+        const todayDate = today.getDate();
+        const todayDateString = `${todayYear}/${String(todayMonth + 1).padStart(2, '0')}/${String(todayDate).padStart(2, '0')}`;
         let longPressTimer;
 
-        function getToday() {
-            const today = new Date();
-            return {
-                year: today.getFullYear(),
-                month: today.getMonth(),
-                date: today.getDate()
-            };
-        }
-
         function showTodayInfo() {
-            const t = getToday();
-            const todayDateString = `${t.year}/${String(t.month + 1).padStart(2, '0')}/${String(t.date).padStart(2, '0')}`;
             document.getElementById("current-date").textContent = todayDateString;
         }
-        
+
         function isHoliday(year, month, day) {
             const dateString = `${year}/${String(month + 1).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
             return holidaysData.some(h => h[0].startsWith(dateString));
         }
 
-function updateCalendar() {
-            const t = getToday();
+        function updateCalendar() {
+            /* [維持] --March-- 等のハイフンによる位置調整をそのまま保持 */
             const monthNames = ['--January-', '-February-', '----March--', '-----April---', '-----May----', '----June----', '-----July----', '---August--', 'September', '-October', 'November', 'December'];
             document.getElementById("year").textContent = currentYear;
             document.getElementById("month-name").textContent = monthNames[currentMonth];
@@ -1610,7 +1604,7 @@ function updateCalendar() {
                 const formattedDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 cell.id = `day-${formattedDate}`;
                 
-                if (currentYear === t.year && currentMonth === t.month && day === t.date) {
+                if (currentYear === todayYear && currentMonth === todayMonth && day === todayDate) {
                     cell.classList.add("today");
                 }
                 const weekDay = (firstDay + day - 1) % 7;
@@ -1637,13 +1631,12 @@ function updateCalendar() {
             applyScheduleColorsToCalendar();
         }
 
-        function goToCurrentMonth() { 
-            const t = getToday();
-            currentYear = t.year; 
-            currentMonth = t.month; 
-            updateCalendar(); 
+        function changeMonth(delta) {
+            currentMonth += delta;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; } 
+            else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            updateCalendar();
         }
-        
 
         function changeYear(delta) { currentYear += delta; updateCalendar(); }
         function goToCurrentMonth() { currentYear = todayYear; currentMonth = todayMonth; updateCalendar(); }
@@ -2805,20 +2798,17 @@ document.getElementById("btnSearch7").onclick = () => {
         if (isP && alert) { showCustomAlert("機能制限は解除されました。"); nativeSpeak("機能制限は解除されました。"); }
     }
     
-	function initializeState() {
-	        if (localStorage.getItem("limitEnabled") === null) saveState("limitEnabled", true);
-	        if (localStorage.getItem("visibility") === null) saveState("visibility", false);
-	        if (localStorage.getItem("backgroundColor") === null) saveState("backgroundColor", "#e3ffe3");
-	        const v = loadState("visibility");
-	        const el = document.querySelector('.container2');
-	        if (el && v !== null) el.style.display = v ? 'block' : 'none';
-	        const bc = loadState("backgroundColor");
-	        if (bc) document.body.style.backgroundColor = bc;
-	        
-	        updateCalendar();
-	        showTodayInfo();
-	    }
-        
+    function initializeState() {
+        if (localStorage.getItem("limitEnabled") === null) saveState("limitEnabled", true);
+        if (localStorage.getItem("visibility") === null) saveState("visibility", false);
+        if (localStorage.getItem("backgroundColor") === null) saveState("backgroundColor", "#e3ffe3");
+        const v = loadState("visibility");
+        const el = document.querySelector('.container2');
+        if (el && v !== null) el.style.display = v ? 'block' : 'none';
+        const bc = loadState("backgroundColor");
+        if (bc) document.body.style.backgroundColor = bc;
+    }
+    
     function toggleVisibility(show, alert = false) {
         const el = document.querySelector('.container2');
         if (el) { el.style.display = show ? 'block' : 'none'; saveState("visibility", show); }
@@ -3495,10 +3485,9 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 27.9 / Updated: 2026-09-20
+        © 2025 ettomio. All rights reserved. Version 27.8 / Updated: 2026-09-19
     </p>
     <div style="height: 50px;"></div>
 
 </body>
 </html>
-
