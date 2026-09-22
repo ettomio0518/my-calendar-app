@@ -54,6 +54,11 @@
             font-size: 2.8em;
             margin-bottom: 0.1em;
         }
+.date-highlight {
+    color: #8affff; /* 空色 */
+    font-weight: bold;
+}
+        
         .weekday {
             color: #8affff; /* 空色 */         
             font-size: 1.5em;
@@ -195,53 +200,60 @@
 		<div class="time" id="current-time"></div>
 
 		<script>
-	    function updateClock() {
-	        const now = new Date();
+		function updateClock() {
+		    const now = new Date();
 
-	        // yyyy/mm/dd形式の西暦日付
-	        const year = now.getFullYear();
-	        const month = String(now.getMonth() + 1).padStart(2, '0');
-	        const date = String(now.getDate()).padStart(2, '0');
-	        const westernDate = `${year}/${month}/${date}`;
+		    // yyyy/mm/dd形式の西暦日付
+		    const year = now.getFullYear();
+		    const month = String(now.getMonth() + 1).padStart(2, '0');
+		    const date = String(now.getDate()).padStart(2, '0');
 
-	        // 和暦の計算
-	        const eraData = [
-	            { name: '令和', start: new Date(2019, 4, 1) },
-	            { name: '平成', start: new Date(1989, 0, 8) },
-	            { name: '昭和', start: new Date(1926, 11, 25) },
-	            { name: '大正', start: new Date(1912, 6, 30) },
-	            { name: '明治', start: new Date(1868, 0, 25) }
-	        ];
-	        let era, eraYear;
-	        for (let i = 0; i < eraData.length; i++) {
-	            if (now >= eraData[i].start) {
-	                era = eraData[i].name;
-	                eraYear = now.getFullYear() - eraData[i].start.getFullYear() + 1;
-	                break;
-	            }
-	        }
-	        const japaneseDate = `${era}${eraYear}年`;
+		    // 月日だけを空色＋太字にする
+		    const mmdd = `${month}/${date}`;
+		    const westernDate = `${year}/<span class="date-highlight">${mmdd}</span>`;
 
-	        // 曜日を取得
-	        const weekdays = ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'];
-	        const weekday = weekdays[now.getDay()];
+		    // 和暦の計算
+		    const eraData = [
+		        { name: '令和', start: new Date(2019, 4, 1) },
+		        { name: '平成', start: new Date(1989, 0, 8) },
+		        { name: '昭和', start: new Date(1926, 11, 25) },
+		        { name: '大正', start: new Date(1912, 6, 30) },
+		        { name: '明治', start: new Date(1868, 0, 25) }
+		    ];
+		    let era, eraYear;
+		    for (let i = 0; i < eraData.length; i++) {
+		        if (now >= eraData[i].start) {
+		            era = eraData[i].name;
+		            eraYear = now.getFullYear() - eraData[i].start.getFullYear() + 1;
+		            break;
+		        }
+		    }
+		    const japaneseDate = `${era}${eraYear}年`;
 
-	        // リアルタイムの時刻
-	        const hours = String(now.getHours()).padStart(2, '0');
-	        const minutes = String(now.getMinutes()).padStart(2, '0');
-	        const seconds = String(now.getSeconds()).padStart(2, '0');
-	        const time = `${hours}:${minutes}:${seconds}`;
+		    // 曜日
+		    const weekdays = ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'];
+		    const weekday = weekdays[now.getDay()];
 
-	        // 要素に値を設定
-	        document.getElementById('current-date').textContent = `${westernDate} (${japaneseDate})`;
-	        document.getElementById('current-weekday').textContent = weekday;
-	        document.getElementById('current-time').textContent = time;
-	    }
+		    // 時刻
+		    const hours = String(now.getHours()).padStart(2, '0');
+		    const minutes = String(now.getMinutes()).padStart(2, '0');
+		    const seconds = String(now.getSeconds()).padStart(2, '0');
+		    const time = `${hours}:${minutes}:${seconds}`;
 
-	    // 初回更新
-	    updateClock();
-	    // 1秒ごとに時計を更新
-	    setInterval(updateClock, 1000);
+		    // ★ 表示（09/22 を空色＋太字）
+		    document.getElementById('current-date').innerHTML =
+		        `${westernDate} (${japaneseDate})`;
+
+		    document.getElementById('current-weekday').textContent = weekday;
+		    document.getElementById('current-time').textContent = time;
+		}
+
+		// ★ 初回実行
+		updateClock();
+
+		// ★ 1秒ごとに更新
+		setInterval(updateClock, 1000);
+
 		</script>
 		        
 		<style>
@@ -709,7 +721,7 @@
 
     
   <footer>
-    © 20260919 ettomio - 舞いカレンダー
+    © 20260922 ettomio - 舞いカレンダー
   </footer>
   
 </body>
