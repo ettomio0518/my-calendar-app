@@ -393,6 +393,62 @@
     <script>
         let itemIndex = 0;
 
+		// ==========================================
+		// 税率期間判定
+		// ==========================================
+		 
+		function getCurrentTaxMode() {
+		 
+			const today = new Date();
+		 
+			const start = new Date('2027-04-01');
+			const end = new Date('2029-03-31');
+		 
+			if (today >= start && today <= end) {
+			return "SPECIAL";
+			}
+		 
+		return "NORMAL";
+		}
+		 
+		function getDefaultTaxRate() {
+		 
+			if (getCurrentTaxMode() === "SPECIAL") {
+			return 1;
+			}
+		 
+			return 8;
+		}
+		 
+		function updateTaxButtons(index) {
+		 
+			const buttons = document.querySelectorAll(
+				`#itemTable tr:nth-child(${index + 2}) .tax-button`
+			);
+		 
+			if (buttons.length < 3) return;
+		 
+			const btn1 = buttons[0];
+			const btn8 = buttons[1];
+			const btn10 = buttons[2];
+		 
+			if (getCurrentTaxMode() === "SPECIAL") {
+		 
+				// 2027/4/1～2029/3/31
+				btn1.style.display = "";
+				btn8.style.display = "none";
+				btn10.style.display = "";
+		 
+			} else {
+		 
+				// ～2027/3/31 と 2029/4/1～
+				btn1.style.display = "none";
+				btn8.style.display = "";
+				btn10.style.display = "";
+		 
+			}
+		}
+
         function addItemRow() {
             if (itemIndex >= 20) {
             showCustomAlert("申し訳ございません。計算はここまでです。");
@@ -413,8 +469,9 @@
                 <td><button onclick="clearRow(${itemIndex})">消去</button></td>
                 <td><input type="text" id="subtotal${itemIndex}" readonly></td>
             `;
-            setTaxRate(itemIndex, 8);
-            itemIndex++;
+            setTaxRate(itemIndex, getDefaultTaxRate());
+			updateTaxButtons(itemIndex);
+			itemIndex++;
         }
 
         function checkAndAddRow(index) {
@@ -447,7 +504,7 @@
             document.getElementById(`price${index}`).value = '';
             document.getElementById(`quantity${index}`).value = '1';
             document.getElementById(`subtotal${index}`).value = '';
-            setTaxRate(index, 8);
+            setTaxRate(index, getDefaultTaxRate());
         }
 
         function increaseQuantity(index) {
@@ -758,7 +815,7 @@ function startAiVoiceInput() {
 </script>
 
     <footer>
-    © 20260922 ettomio - 舞いカレンダー
+    © 20260924 ettomio - 舞いカレンダー
     </footer>
 
     <div style="height: 50px;"></div>
