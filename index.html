@@ -2051,18 +2051,30 @@ function toggleCalendarMode() {
         }
     }
 
-    // --- 予定修正関数 ---
-    function editSchedule(key) {
-        const schedule = localStorage.getItem(key);
-        if (schedule) {
-            document.getElementById('scheduleInput').value = schedule;
-            // キーから日付を抽出し、日付入力フィールドにセッ
-            const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
-            if (dateMatch) { document.getElementById('scheduleDate').value = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`; }
-            currentEditingKey = key; // 編集中のキーを設定
-            // window.scrollTo({ top: 0, behavior: 'smooth' });// ページ上部へスクロール 4/22中止
-        }
-    }
+    // --- 予定修正関数 2026/10/17修正---
+	function editSchedule(key) {
+	    const schedule = localStorage.getItem(key);
+	    if (schedule) {
+	        const input = document.getElementById('scheduleInput');
+
+	        input.value = schedule;
+
+	        // キーから日付を抽出
+	        const dateMatch = key.match(/ScheduledText(\d{4})(\d{2})(\d{2})_/);
+	        if (dateMatch) {
+	            document.getElementById('scheduleDate').value =
+	                `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+	        }
+
+	        currentEditingKey = key;
+
+			input.scrollIntoView({
+			    behavior: 'smooth',
+			    block: 'center'
+			});
+			input.focus();
+			    }
+			}
 
 	// --- リスト表示関連 --- 
     function closeList() {
@@ -3501,7 +3513,7 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 28.2 / Updated: 2026-09-28
+        © 2025 ettomio. All rights reserved. Version 28.3 / Updated: 2026-10-17
     </p>
     <div style="height: 50px;"></div>
 
