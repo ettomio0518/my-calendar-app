@@ -297,6 +297,53 @@
     .top-right-button:hover {
       background: #e2e2e2;
     }
+    
+
+#shoppingMemo {
+    margin-bottom: 25px;
+}
+
+.memo-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 5px 0;
+}
+
+.memo-name {
+    flex: 1;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 7px 9px;
+    font-size: 1em;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: #fff;
+    color: #222;
+}
+
+.memo-save,
+.memo-delete {
+    flex-shrink: 0;
+    padding: 3px 9px;
+    font-size: 0.9em;
+    line-height: 1.3;
+    border: 1px solid #555;
+    border-radius: 7px;
+    white-space: nowrap;
+}
+
+.memo-save {
+    background: #c8f7dc;
+    color: #222;
+}
+
+.memo-delete {
+    background: #eee;
+    color: #222;
+}
+    
     </style>
 </head>
 
@@ -311,6 +358,13 @@
 <button id="ai-button" class="blinking" onclick="announceCompass()">
     🧭 AI羅針盤
 </button>
+
+
+<section>
+    <h2>🛒 お買い物メモ</h2>
+    <p>品名を入力したら「保存」ボタンを押してください。</p>
+    <div id="shoppingMemo"></div>
+</section>
 
 <section>
 <h2>🏷 割引計算</h2>    
@@ -593,6 +647,163 @@
             }
         }
 
+
+// 2026/10/20追加
+
+const SHOPPING_MEMO_KEY = "shoppingMemoItems";
+
+// 保存データを読み込んで表示
+function loadShoppingMemo() {
+    const container = document.getElementById("shoppingMemo");
+    if (!container) return;
+
+    let items = [];
+
+    try {
+        const saved = localStorage.getItem(SHOPPING_MEMO_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed)) {
+                items = parsed.filter(
+                    item => typeof item === "string" && item.trim() !== ""
+                );
+            }
+        }
+    } catch (error) {
+        console.error("買い物メモの読み込みに失敗しました", error);
+    }
+
+    container.replaceChildren();
+
+    items.forEach(item => {
+        createShoppingMemoRow(item);
+    });
+
+    // 最後に空欄を1行用意
+    createShoppingMemoRow("");
+}
+
+// 入力行を作成
+function createShoppingMemoRow(value = "") {
+    const container = document.getElementById("shoppingMemo");
+
+    const row = document.createElement("div");
+    row.className = "memo-row";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className = "memo-name";
+    input.placeholder = "品名を入力";
+    input.value = value;
+
+    // Enterキーで保存して次の行へ
+    input.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            saveShoppingMemoRow(input);
+        }
+    });
+
+    const saveButton = document.createElement("button");
+    saveButton.type = "button";
+    saveButton.className = "memo-save";
+    saveButton.textContent = "保存";
+    saveButton.addEventListener("click", function () {
+        saveShoppingMemoRow(input);
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "memo-delete";
+    deleteButton.textContent = "消去";
+    deleteButton.addEventListener("click", function () {
+        deleteShoppingMemoRow(row);
+    });
+
+    row.append(input, saveButton, deleteButton);
+    container.appendChild(row);
+
+    return input;
+}
+
+// 保存して次の入力欄へフォーカス
+function saveShoppingMemoRow(input) {
+    const container = document.getElementById("shoppingMemo");
+    const rows = Array.from(container.querySelectorAll(".memo-row"));
+    const currentRow = input.closest(".memo-row");
+
+    if (!input.value.trim()) {
+        input.focus();
+        return;
+    }
+
+    // 入力中の全品目を保存
+    saveShoppingMemoItems();
+
+    // 次の行がなければ追加
+    let nextRow = currentRow.nextElementSibling;
+
+    if (!nextRow) {
+        createShoppingMemoRow("");
+        nextRow = currentRow.nextElementSibling;
+    }
+
+    // 次の入力欄へ移動
+    const nextInput = nextRow.querySelector(".memo-name");
+    if (nextInput) {
+        nextInput.focus();
+    }
+}
+
+// 現在の品目をローカルストレージに保存
+function saveShoppingMemoItems() {
+    const container = document.getElementById("shoppingMemo");
+
+    const items = Array.from(
+        container.querySelectorAll(".memo-name")
+    )
+        .map(input => input.value.trim())
+        .filter(value => value !== "");
+
+    try {
+        localStorage.setItem(
+            SHOPPING_MEMO_KEY,
+            JSON.stringify(items)
+        );
+    } catch (error) {
+        console.error("買い物メモの保存に失敗しました", error);
+        alert("買い物メモを保存できませんでした。");
+    }
+}
+
+// 行を画面から削除し、保存データも更新
+function deleteShoppingMemoRow(row) {
+    const container = document.getElementById("shoppingMemo");
+    const input = row.querySelector(".memo-name");
+
+    row.remove();
+
+    // 最後の1行は必ず残す
+    if (container.querySelectorAll(".memo-row").length === 0) {
+        createShoppingMemoRow("");
+    }
+
+    // 削除した品目を保存データからも除外
+    saveShoppingMemoItems();
+
+    // 削除後、入力欄にフォーカス
+    const inputs = container.querySelectorAll(".memo-name");
+    inputs[inputs.length - 1].focus();
+}
+
+// ページの読み込み時に復元
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadShoppingMemo);
+} else {
+    loadShoppingMemo();
+}
+
+
 // ==========================================
 // 🧭 AI羅針盤：お買い物・完全起動版
 // ==========================================
@@ -816,7 +1027,7 @@ function startAiVoiceInput() {
 </script>
 
     <footer>
-    © 20260928 ettomio - 舞いカレンダー
+    © 20261020 ettomio - 舞いカレンダー
     </footer>
 
     <div style="height: 50px;"></div>
