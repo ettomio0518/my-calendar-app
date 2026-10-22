@@ -1785,6 +1785,18 @@ function goToCurrentMonth() {
         applyScheduleColorsToCalendar();  
         updateTime(); 
         setInterval(updateTime, 1000); 
+        // 日付が変わったらカレンダーを更新
+		let lastDate = new Date().toDateString();
+
+		setInterval(() => {
+		    const currentDate = new Date().toDateString();
+
+		    if (currentDate !== lastDate) {
+		        lastDate = currentDate;
+		        showTodayInfo();
+		        updateCalendar();
+		    }
+		}, 1000);
         showScrollButtonsIfPageLong();
     });
 
@@ -3513,7 +3525,7 @@ function startAiVoiceInput() {
   </script>
   
     <p id="version-number" onclick="handleClick();" style="color: #b66b6b; font-size: 15px;">
-        © 2025 ettomio. All rights reserved. Version 28.4 / Updated: 2026-10-20
+        © 2025 ettomio. All rights reserved. Version 28.5 / Updated: 2026-10-23
     </p>
     <div style="height: 50px;"></div>
 
